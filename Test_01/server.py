@@ -741,8 +741,8 @@ def fetch_kita_trade_news(max_count=10):
 @app.route('/api/market-issues', methods=['GET'])
 def get_market_issues():
     """시장 핵심 이슈 API - KITA 무역뉴스 포함"""
-    # KITA 무역뉴스 (메인)
-    kita_news = fetch_kita_trade_news(max_count=8)
+    # KITA 무역뉴스 (메인) - 최근 1일치 모두 포함 위해 30개 조회
+    kita_news = fetch_kita_trade_news(max_count=30)
     
     # Google News에서 증시 이슈 (보조)
     stock_issues = fetch_google_news_rss("코스피 증시", max_count=4, max_days=3)

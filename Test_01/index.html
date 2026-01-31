@@ -333,9 +333,25 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 300px;
+            max-height: 450px;
             overflow-y: auto;
+            padding-right: 8px;
+            /* For scrollbar spacing */
         }
+
+        .news-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .news-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .news-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
 
         .news-item {
             background: rgba(255, 255, 255, 0.03);
@@ -593,7 +609,7 @@
                 <!-- Right: Market Issues -->
                 <div class="info-panel">
                     <h3>🔥 KITA 무역뉴스 & 증시 리스크</h3>
-                    <div id="issuesList">
+                    <div id="issuesList" class="news-list">
                         <div class="loading-inline">이슈를 불러오는 중...</div>
                     </div>
                 </div>
