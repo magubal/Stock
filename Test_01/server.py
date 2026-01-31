@@ -681,19 +681,76 @@ def get_stock_news(symbol):
     })
 
 
+def fetch_kita_trade_news(max_count=10):
+    """KITA 무역뉴스 스크래핑 - 원문 링크 포함"""
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    
+    try:
+        list_url = 'https://www.kita.net/board/totalTradeNews/totalTradeNewsList.do'
+        response = requests.get(list_url, headers=headers, timeout=15)
+        response.encoding = 'utf-8'
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        news_items = []
+        
+        # goDetailPage 패턴이 있는 링크 찾기
+        links = soup.find_all('a', onclick=re.compile(r'goDetailPage'))
+        
+        for link in links[:max_count]:
+            try:
+                onclick = link.get('onclick', '')
+                title = link.get_text(strip=True)
+                
+                # goDetailPage('98789', '2') 패턴에서 번호 추출
+                match = re.search(r"goDetailPage\('(\d+)',\s*'(\d+)'\)", onclick)
+                if match:
+                    no = match.group(1)
+                    site_id = match.group(2)
+                    
+                    # KITA 상세 페이지 URL
+                    detail_url = f'https://www.kita.net/board/totalTradeNews/totalTradeNewsDetail.do?no={no}&siteId={site_id}'
+                    
+                    # 날짜 찾기
+                    parent = link.find_parent('li')
+                    date = ''
+                    if parent:
+                        text = parent.get_text()
+                        date_match = re.search(r'(\d{4}\.\d{2}\.\d{2})', text)
+                        if date_match:
+                            date = date_match.group(1)
+                    
+                    news_items.append({
+                        'title': title,
+                        'description': title,
+                        'link': detail_url,
+                        'source': 'KITA 무역뉴스',
+                        'time': date or '최근'
+                    })
+            except Exception as e:
+                print(f"[KITA] Error parsing item: {e}")
+                continue
+        
+        print(f"[KITA] Fetched {len(news_items)} trade news")
+        return news_items
+        
+    except Exception as e:
+        print(f"[KITA] Error fetching news: {e}")
+        return []
+
+
 @app.route('/api/market-issues', methods=['GET'])
 def get_market_issues():
-    """시장 핵심 이슈 API - 3일 이내만"""
-    # Google News RSS에서 시장 이슈 가져오기 (3일 이내)
-    issues = fetch_google_news_rss("코스피 증시", max_count=5, max_days=3)
+    """시장 핵심 이슈 API - KITA 무역뉴스 포함"""
+    # KITA 무역뉴스 (메인)
+    kita_news = fetch_kita_trade_news(max_count=8)
     
-    # 리스크 키워드 뉴스 (3일 이내)
-    risks = fetch_google_news_rss("증시 리스크 하락", max_count=3, max_days=3)
+    # Google News에서 증시 이슈 (보조)
+    stock_issues = fetch_google_news_rss("코스피 증시", max_count=4, max_days=3)
     
     return jsonify({
         'success': True,
-        'issues': issues,
-        'risks': risks,
+        'issues': kita_news,  # KITA 무역뉴스를 메인으로
+        'risks': stock_issues,  # 증시 뉴스를 보조로
         'timestamp': datetime.now().isoformat()
     })
 
@@ -710,6 +767,21 @@ def list_stocks():
     stocks = [{'symbol': r[0], 'name': r[1], 'currency': r[2], 'market': r[3], 'lastUpdated': r[4]} for r in rows]
     
     return jsonify({'success': True, 'stocks': stocks, 'count': len(stocks)})
+
+
+@app.route('/api/kita-news', methods=['GET'])
+def get_kita_news():
+    """KITA 무역뉴스 전용 API"""
+    count = request.args.get('count', 10, type=int)
+    news = fetch_kita_trade_news(max_count=min(count, 20))
+    
+    return jsonify({
+        'success': True,
+        'news': news,
+        'count': len(news),
+        'source': 'KITA 한국무역협회',
+        'timestamp': datetime.now().isoformat()
+    })
 
 
 @app.route('/api/health', methods=['GET'])
@@ -734,7 +806,8 @@ if __name__ == '__main__':
     print("\n[API] Endpoints:")
     print("   GET /api/stock/<symbol>  - Stock data")
     print("   GET /api/news/<symbol>   - Stock news")
-    print("   GET /api/market-issues   - Market issues")
+    print("   GET /api/market-issues   - Market issues (KITA)")
+    print("   GET /api/kita-news       - KITA Trade News")
     print("   GET /api/stocks          - Saved stocks list")
     print("   GET /api/health          - Health check")
     print("\n[SERVER] Running at: http://localhost:5000")
