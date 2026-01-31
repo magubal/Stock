@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Dashboard - Premium</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent-up: #34d399;
+            --accent-down: #f87171;
+            --accent-blue: #38bdf8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .stock-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Server Status */
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-sub);
+        }
+
+        .status-dot.online {
+            background: var(--accent-up);
+            box-shadow: 0 0 8px var(--accent-up);
+        }
+
+        .status-dot.offline {
+            background: var(--accent-down);
+        }
+
+        .data-source {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        /* Search Section */
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-blue);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-sub);
+        }
+
+        button.search-btn {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            padding: 0 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        button.search-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        button.search-btn:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+
+        .stock-hint {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 24px;
+        }
+
+        /* Chart Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .toggle-group {
+            display: flex;
+            background: var(--input-bg);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* Header Info */
+        .header-info {
+            margin-bottom: 20px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .price-info {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .change {
+            font-size: 16px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        .up {
+            color: var(--accent-up);
+        }
+
+        .down {
+            color: var(--accent-down);
+        }
+
+        /* Chart Area */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Loading & Error */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-sub);
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--glass-border);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-msg {
+            display: none;
+            text-align: center;
+            padding: 16px;
+            color: var(--accent-down);
+            background: rgba(248, 113, 113, 0.1);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* Saved Stocks List */
+        .saved-stocks {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .saved-stocks h3 {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .stock-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stock-tag {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stock-tag:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .stock-tag .name {
+            color: var(--text-main);
+        }
+
+        .stock-tag .symbol {
+            color: var(--text-sub);
+            margin-left: 4px;
+        }
+
+        /* News & Issues Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-panel {
+            background: var(--input-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .info-panel h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .news-item:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .news-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-meta {
+            font-size: 12px;
+            color: var(--text-sub);
+            display: flex;
+            gap: 8px;
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-item:last-child {
+            border-bottom: none;
+        }
+
+        .issue-item:hover {
+            color: var(--accent-blue);
+        }
+
+        .issue-number {
+            background: var(--accent-blue);
+            color: #0f172a;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .issue-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .risk-tag {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--accent-down);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 16px;
+        }
+
+        .modal-close:hover {
+            color: var(--text-main);
+        }
+
+        .modal-body {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-sub);
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.primary {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+        }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: var(--text-sub);
+            border: 1px solid var(--glass-border);
+        }
+
+        .loading-inline {
+            color: var(--text-sub);
+            font-size: 13px;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="stock-card">
+
+            <!-- Server Status -->
+            <div class="server-status">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">서버 연결 확인 중...</span>
+                <span class="data-source" id="dataSource"></span>
+            </div>
+
+            <!-- Search -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="종목명 또는 코드 (예: 삼성전자, 005930, AAPL)" value="삼성전자">
+                <button class="search-btn" id="searchBtn" onclick="fetchStockData()">검색</button>
+            </div>
+            <div class="stock-hint">
+                💡 종목명(삼성전자, SK하이닉스) 또는 코드(005930) 또는 미국 티커(AAPL, TSLA) 입력
+            </div>
+
+            <div class="error-msg" id="errorMsg"></div>
+
+            <!-- Stock Info -->
+            <div class="header-info">
+                <div class="company-name" id="displaySymbol">-</div>
+                <div class="price-info">
+                    <span id="displayPrice">-</span>
+                    <span class="change" id="displayChange"></span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="toggle-group" id="intervalGroup">
+                    <button class="toggle-btn active" onclick="setMode('interval', '1d', this)">일봉</button>
+                    <button class="toggle-btn" onclick="setMode('interval', '1wk', this)">주봉</button>
+                </div>
+                <div class="toggle-group" id="rangeGroup">
+                    <button class="toggle-btn active" onclick="setMode('range', '3mo', this)">3개월</button>
+                    <button class="toggle-btn" onclick="setMode('range', '6mo', this)">6개월</button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>데이터를 불러오는 중...</div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container">
+                <canvas id="stockChart"></canvas>
+            </div>
+
+            <!-- Saved Stocks -->
+            <div class="saved-stocks">
+                <h3>📂 저장된 종목</h3>
+                <div class="stock-tags" id="stockTags">
+                    <span style="color: var(--text-sub); font-size: 13px;">로딩 중...</span>
+                </div>
+            </div>
+
+            <!-- News & Issues Grid -->
+            <div class="info-grid">
+                <!-- Left: Stock News -->
+                <div class="info-panel">
+                    <h3>📰 <span id="newsStockName">종목</span> 관련 뉴스</h3>
+                    <div class="news-list" id="newsList">
+                        <div class="loading-inline">뉴스를 불러오는 중...</div>
+                    </div>
+                </div>
+
+                <!-- Right: Market Issues -->
+                <div class="info-panel">
+                    <h3>🔥 시장 핵심 이슈 & 리스크</h3>
+                    <div id="issuesList">
+                        <div class="loading-inline">이슈를 불러오는 중...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="newsModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">뉴스 제목</div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                뉴스 내용이 여기에 표시됩니다.
+            </div>
+            <div class="modal-footer">
+                <a id="modalLink" href="#" target="_blank">
+                    <button class="modal-btn primary">원문 보기 →</button>
+                </a>
+                <button class="modal-btn secondary" onclick="closeModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== Configuration ====================
+        const API_BASE = 'http://localhost:5000/api';
+        const YAHOO_PROXY = 'https://api.allorigins.win/raw?url=';
+
+        let myChart = null;
+        let currentInterval = '1d';
+        let currentRange = '3mo';
+        let serverOnline = false;
+
+        // ==================== Stock Name to Code Mapping ====================
+        const STOCK_NAME_MAP = {
+            // 대형주
+            '삼성전자': '005930', '삼성': '005930',
+            'SK하이닉스': '000660', '하이닉스': '000660',
+            'LG에너지솔루션': '373220', 'LG에너지': '373220',
+            '삼성바이오로직스': '207940', '삼성바이오': '207940',
+            '현대차': '005380', '현대자동차': '005380',
+            '기아': '000270', '기아차': '000270',
+            '셀트리온': '068270',
+            '삼성SDI': '006400',
+            'KB금융': '105560',
+            '신한지주': '055550',
+            'NAVER': '035420', '네이버': '035420',
+            '카카오': '035720',
+            '포스코홀딩스': '005490', '포스코': '005490',
+            '현대모비스': '012330',
+            'LG화학': '051910',
+            '삼성물산': '028260',
+            '삼성생명': '032830',
+            'SK이노베이션': '096770',
+            'SK텔레콤': '017670', 'SKT': '017670',
+            'KT': '030200',
+            'LG전자': '066570',
+            '한국전력': '015760', '한전': '015760',
+            '두산에너빌리티': '034020',
+            '크래프톤': '259960',
+            '엔씨소프트': '036570', 'NC소프트': '036570',
+            '넷마블': '251270',
+            '카카오게임즈': '293490',
+            '에코프로비엠': '247540', '에코프로': '086520',
+            '포스코퓨처엠': '003670',
+            '한미반도체': '042700',
+            '리노공업': '058470',
+            'HLB': '028300',
+            '알테오젠': '196170',
+            '한화에어로스페이스': '012450', '한화에어로': '012450',
+        };
+
+        function resolveSymbol(input) {
+            const trimmed = input.trim();
+            // 종목명 매핑에 있으면 코드로 변환
+            if (STOCK_NAME_MAP[trimmed]) {
+                return STOCK_NAME_MAP[trimmed];
+            }
+            // 6자리 숫자면 그대로 반환
+            if (/^\d{6}$/.test(trimmed)) {
+                return trimmed;
+            }
+            // 영문이면 그대로 반환 (미국 주식)
+            return trimmed.toUpperCase();
+        }
+
+        // ==================== Initialization ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkServerStatus();
+            loadSavedStocks();
+            fetchStockData();
+
+            // 엔터 키로 검색
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    fetchStockData();
+                }
+            });
+        });
+
+        // ==================== Server Status ====================
+        async function checkServerStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            try {
+                const response = await fetch(`${API_BASE}/health`, { timeout: 3000 });
+                if (response.ok) {
+                    serverOnline = true;
+                    statusDot.className = 'status-dot online';
+                    statusText.textContent = '🟢 로컬 서버 연결됨 (SQLite 저장 활성화)';
+                }
+            } catch (e) {
+                serverOnline = false;
+                statusDot.className = 'status-dot offline';
+                statusText.textContent = '🔴 로컬 서버 꺼짐 (Yahoo에서 직접 로드)';
+            }
+        }
+
+        // ==================== Mode Toggle ====================
+        function setMode(type, value, element) {
+            if (type === 'interval') currentInterval = value;
+            if (type === 'range') currentRange = value;
+
+            const group = element.parentElement;
+            group.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            fetchStockData();
+        }
+
+        // ==================== UI Helpers ====================
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('show', show);
+            document.getElementById('searchBtn').disabled = show;
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            if (message) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            } else {
+                errorEl.classList.remove('show');
+            }
+        }
+
+        function updateDataSource(source) {
+            document.getElementById('dataSource').textContent = `데이터: ${source}`;
+        }
+
+        // ==================== Main Data Fetch ====================
+        async function fetchStockData() {
+            const rawInput = document.getElementById('searchInput').value.trim();
+            if (!rawInput) {
+                showError('종목명 또는 코드를 입력해주세요.');
+                return;
+            }
+
+            // 종목명을 코드로 변환
+            const symbol = resolveSymbol(rawInput);
+
+            showLoading(true);
+            showError(null);
+
+            if (serverOnline) {
+                await fetchFromLocalServer(symbol);
+            } else {
+                await fetchFromYahoo(symbol);
+            }
+
+            showLoading(false);
+        }
+
+        // ==================== Local Server API ====================
+        async function fetchFromLocalServer(symbol) {
+            try {
+                const url = `${API_BASE}/stock/${symbol}?interval=${currentInterval}&range=${currentRange}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || '데이터를 가져올 수 없습니다.');
+                }
+
+                updateDisplay(data.name, symbol, data.currentPrice, data.priceChange, data.percentChange, data.currency);
+                drawChart(data.labels, data.prices, data.currency);
+                updateDataSource(`SQLite (${data.recordCount}건)`);
+                loadSavedStocks(); // Refresh saved list
+
+                // 뉴스 및 시장 이슈 로드
+                loadStockNews(symbol, data.name);
+                loadMarketIssues();
+
+            } catch (error) {
+                console.error('Local server error:', error);
+                showError(`⚠️ ${error.message}`);
+            }
+        }
+
+        // ==================== Yahoo Finance Direct ====================
+        async function fetchFromYahoo(symbol) {
+            let yahooSymbol = symbol;
+            if (/^\d{6}$/.test(symbol)) {
+                yahooSymbol = symbol + '.KS';
+            }
+
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=${currentInterval}&range=${currentRange}`;
+            const proxyUrl = `${YAHOO_PROXY}${encodeURIComponent(yahooUrl)}`;
+
+            try {
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+
+                if (data.chart.error) {
+                    // Try KOSDAQ
+                    if (yahooSymbol.endsWith('.KS')) {
+                        yahooSymbol = symbol + '.KQ';
+                        const retryUrl = `${YAHOO_PROXY}${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=${currentInterval}&range=${currentRange}`)}`;
+                        const retryResponse = await fetch(retryUrl);
+                        const retryData = await retryResponse.json();
+
+                        if (retryData.chart.error) {
+                            throw new Error('종목을 찾을 수 없습니다.');
+                        }
+
+                        processYahooData(retryData.chart.result[0], symbol);
+                        return;
+                    }
+                    throw new Error(data.chart.error.description);
+                }
+
+                processYahooData(data.chart.result[0], symbol);
+
+            } catch (error) {
+                console.error('Yahoo fetch error:', error);
+                showError(`⚠️ ${error.message}`);
+            }
+        }
+
+        function processYahooData(result, symbol) {
+            const meta = result.meta;
+            const timestamps = result.timestamp || [];
+            const quotes = result.indicators.quote[0];
+
+            const labels = timestamps.map(ts => new Date(ts * 1000).toISOString().slice(0, 10));
+            const prices = quotes.close.map(p => p !== null ? Math.round(p) : null);
+
+            const currentPrice = meta.regularMarketPrice;
+            const previousClose = meta.chartPreviousClose || meta.previousClose || currentPrice;
+            const priceChange = currentPrice - previousClose;
+            const percentChange = ((priceChange / previousClose) * 100).toFixed(2);
+
+            updateDisplay(meta.shortName || meta.symbol, symbol, currentPrice, priceChange, percentChange, meta.currency);
+            drawChart(labels, prices, meta.currency);
+            updateDataSource('Yahoo Finance (실시간)');
+        }
+
+        // ==================== Display Update ====================
+        function updateDisplay(name, symbol, price, change, percent, currency) {
+            document.getElementById('displaySymbol').textContent = `${name} (${symbol})`;
+            document.getElementById('displayPrice').textContent = price.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' ' + (currency || '');
+
+            const changeEl = document.getElementById('displayChange');
+            const isUp = change >= 0;
+            changeEl.textContent = `${isUp ? '+' : ''}${change.toLocaleString(undefined, { maximumFractionDigits: 0 })} (${isUp ? '+' : ''}${percent}%)`;
+            changeEl.className = `change ${isUp ? 'up' : 'down'}`;
+        }
+
+        // ==================== Chart Drawing ====================
+        function drawChart(labels, prices, currency) {
+            const ctx = document.getElementById('stockChart').getContext('2d');
+
+            if (myChart) myChart.destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+            gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '주가',
+                        data: prices,
+                        borderColor: '#38bdf8',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: true,
+                        tension: 0.1,
+                        spanGaps: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                label: ctx => (ctx.parsed.y || 0).toLocaleString() + ' ' + (currency || 'KRW')
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', maxTicksLimit: 6, maxRotation: 0 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#64748b',
+                                callback: v => v.toLocaleString()
+                            }
+                        }
+                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                }
+            });
+        }
+
+        // ==================== Saved Stocks List ====================
+        async function loadSavedStocks() {
+            const container = document.getElementById('stockTags');
+
+            if (!serverOnline) {
+                container.innerHTML = '<span style="color: var(--text-sub); font-size: 13px;">서버가 꺼져 있어 저장된 종목을 볼 수 없습니다.</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/stocks`);
+                const data = await response.json();
+
+                if (data.stocks && data.stocks.length > 0) {
+                    container.innerHTML = data.stocks.map(s => `
+                        <div class="stock-tag" onclick="selectStock('${s.symbol}')">
+                            <span class="name">${s.name}</span>
+                            <span class="symbol">(${s.symbol})</span>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<span style="color: var(--text-sub); font-size: 13px;">아직 저장된 종목이 없습니다.</span>';
+                }
+            } catch (e) {
+                container.innerHTML = '<span style="color: var(--text-sub); font-size: 13px;">목록을 불러올 수 없습니다.</span>';
+            }
+        }
+
+        function selectStock(symbol) {
+            document.getElementById('searchInput').value = symbol;
+            fetchStockData();
+        }
+
+        // ==================== News Loading ====================
+        let currentSymbol = '';
+
+        async function loadStockNews(symbol, stockName) {
+            currentSymbol = symbol;
+            const container = document.getElementById('newsList');
+            const nameSpan = document.getElementById('newsStockName');
+
+            nameSpan.textContent = stockName || symbol;
+            container.innerHTML = '<div class="loading-inline">뉴스를 불러오는 중...</div>';
+
+            if (!serverOnline) {
+                container.innerHTML = '<div class="loading-inline">서버 연결 필요</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/news/${symbol}`);
+                const data = await response.json();
+
+                if (data.success && data.news && data.news.length > 0) {
+                    container.innerHTML = data.news.map(item => `
+                        <div class="news-item" onclick="window.open('${item.link}', '_blank')">
+                            <div class="news-title">${item.title}</div>
+                            <div class="news-meta">
+                                <span>${item.source}</span>
+                                <span>•</span>
+                                <span>${item.time}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="loading-inline">관련 뉴스가 없습니다.</div>';
+                }
+            } catch (e) {
+                console.error('News fetch error:', e);
+                container.innerHTML = '<div class="loading-inline">뉴스를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        async function loadMarketIssues() {
+            const container = document.getElementById('issuesList');
+            container.innerHTML = '<div class="loading-inline">이슈를 불러오는 중...</div>';
+
+            if (!serverOnline) {
+                container.innerHTML = '<div class="loading-inline">서버 연결 필요</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/market-issues`);
+                const data = await response.json();
+
+                let html = '';
+
+                // 핵심 이슈
+                if (data.issues && data.issues.length > 0) {
+                    data.issues.forEach((item, index) => {
+                        html += `
+                            <div class="issue-item" onclick="window.open('${item.link}', '_blank')">
+                                <span class="issue-number">${index + 1}</span>
+                                <span class="issue-text">${item.title}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                // 리스크
+                if (data.risks && data.risks.length > 0) {
+                    html += '<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--glass-border);"><small style="color: var(--accent-down);">⚠️ 리스크 요인</small></div>';
+                    data.risks.forEach(item => {
+                        html += `
+                            <div class="issue-item" onclick="window.open('${item.link}', '_blank')" style="color: var(--accent-down);">
+                                <span class="issue-text">${item.title}<span class="risk-tag">리스크</span></span>
+                            </div>
+                        `;
+                    });
+                }
+
+                container.innerHTML = html || '<div class="loading-inline">이슈가 없습니다.</div>';
+            } catch (e) {
+                console.error('Issues fetch error:', e);
+                container.innerHTML = '<div class="loading-inline">이슈를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // ==================== Modal ====================
+        function openModal(title, description, link) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').textContent = description || '상세 내용은 원문에서 확인하세요.';
+            document.getElementById('modalLink').href = link || '#';
+            document.getElementById('newsModal').classList.add('show');
+        }
+
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('newsModal')) {
+                document.getElementById('newsModal').classList.remove('show');
+            }
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // HTML 이스케이프 함수
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+        }
+
+    </script>
+</body>
+
+</html>
