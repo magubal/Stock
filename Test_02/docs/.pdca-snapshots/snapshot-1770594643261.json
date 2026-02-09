@@ -1,0 +1,251 @@
+{
+  "timestamp": "2026-02-08T23:50:43.258Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-02-08T23:48:28.169Z",
+    "activeFeatures": [
+      "stock-moat",
+      "stock_moat"
+    ],
+    "primaryFeature": "stock-moat",
+    "features": {
+      "stock-moat": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-08T22:20:36.665Z",
+          "lastUpdated": "2026-02-08T23:22:28.085Z"
+        },
+        "lastFile": "F:/PSJ/AntigravityWorkPlace/Stock/Test_02/.agent/skills/stock-moat/utils/industry_mapper.py"
+      },
+      "stock_moat": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-08T22:23:26.345Z",
+          "lastUpdated": "2026-02-08T23:48:28.169Z"
+        },
+        "lastFile": "F:/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/stock_moat/generate_review_report.py"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-02-08T21:03:39.636Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-02-08T23:48:28.169Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-02-08T22:20:36.665Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:21:06.905Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:22:01.463Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:22:37.641Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:23:26.345Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:23:46.419Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:36:39.566Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:37:42.122Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:41:41.758Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:41:56.020Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:42:19.797Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:42:46.617Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:54:26.767Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:54:37.908Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:54:56.823Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:57:58.049Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T22:58:29.249Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:04:41.482Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:06:36.715Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:08:58.742Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:18:00.295Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:18:36.145Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:19:09.291Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:19:29.262Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:19:40.955Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:20:37.969Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:21:41.119Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:22:28.085Z",
+        "feature": "stock-moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:23:45.852Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:23:56.485Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:30:37.752Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:46:40.098Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-08T23:48:28.169Z",
+        "feature": "stock_moat",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

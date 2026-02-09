@@ -1,0 +1,32 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-02-09T22:00:00.000Z",
+  "activeFeatures": ["stock-research-dashboard"],
+  "primaryFeature": "stock-research-dashboard",
+  "features": {
+    "stock-research-dashboard": {
+      "phase": "do",
+      "startedAt": "2026-02-09T00:00:00Z",
+      "planPath": "docs/01-plan/features/stock-research-dashboard.plan.md",
+      "designPath": "docs/02-design/features/stock-research-dashboard.design.md"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-02-09T22:00:00.000Z",
+    "onboardingCompleted": true,
+    "lastActivity": "2026-02-09T22:00:00.000Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-02-09T22:00:00.000Z",
+      "feature": "stock-research-dashboard",
+      "phase": "do",
+      "action": "started"
+    }
+  ]
+}

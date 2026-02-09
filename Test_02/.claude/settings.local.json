@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Skill(pdca)",
+      "Bash(npm install:*)",
+      "Bash(python:*)",
+      "Skill(bkit:pdca)",
+      "WebFetch(domain:finance.naver.com)",
+      "WebSearch",
+      "Bash(powershell -Command:*)",
+      "WebFetch(domain:www.morningstar.com)",
+      "WebFetch(domain:opendart.fss.or.kr)",
+      "WebFetch(domain:dart-fss.readthedocs.io)"
+    ]
+  }
+}

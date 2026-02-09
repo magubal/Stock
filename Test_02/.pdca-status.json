@@ -1,0 +1,24 @@
+{
+  "features": {
+    "stock-research-dashboard": {
+      "phase": "design",
+      "startedAt": "2026-02-09T00:00:00Z",
+      "updatedAt": "2026-02-09T10:00:00Z",
+      "planPath": "docs/01-plan/features/stock-research-dashboard.plan.md",
+      "designPath": "docs/02-design/features/stock-research-dashboard.design.md",
+      "matchRate": null,
+      "iterationCount": 0
+    },
+    "stock-moat-estimator": {
+      "phase": "design",
+      "startedAt": "2026-02-09T10:30:00Z",
+      "updatedAt": "2026-02-09T11:00:00Z",
+      "planPath": "docs/01-plan/features/stock-moat-estimator.plan.md",
+      "designPath": "docs/02-design/features/stock-moat-estimator.design.md",
+      "matchRate": null,
+      "iterationCount": 0
+    }
+  },
+  "version": "1.5.2",
+  "lastUpdated": "2026-02-09T10:30:00Z"
+}

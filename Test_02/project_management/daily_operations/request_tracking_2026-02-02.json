@@ -1,0 +1,27 @@
+{
+  "date": "2026-02-02",
+  "validation_requests": [
+    {
+      "item": "일자별 폴더 구조",
+      "validated": true,
+      "details": "daybyday_001.jpg 확인 완료"
+    },
+    {
+      "item": "본문 완전성",
+      "validated": true,
+      "details": "22:15 → 2/5일 데이터 연속성 보장"
+    },
+    {
+      "item": "불필요 요소 제거",
+      "validated": true,
+      "details": "하트/댓글/관련링크 제거 완료"
+    },
+    {
+      "item": "파일 크기",
+      "validated": false,
+      "details": "현재 5.2MB → 조정 필요?"
+    }
+  ],
+  "status": "검증 대기 중",
+  "timestamp": "2026-02-02T00:19:51.955105"
+}

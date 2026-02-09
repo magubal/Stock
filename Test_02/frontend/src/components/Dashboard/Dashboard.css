@@ -646,6 +646,7 @@
   justify-content: center;
   align-items: center;
   height: 200px;
+  min-height: 200px;
 }
 
 .spinner {
@@ -655,4 +656,39 @@
   border-top: 3px solid #22c55e;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+.spinner-icon {
+  color: #22c55e;
+  animation: spin 1s linear infinite;
+}
+
+/* Error Fallback */
+.error-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  min-height: 200px;
+  text-align: center;
+}
+
+.error-icon {
+  color: #f59e0b;
+}
+
+.error-message {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.error-detail {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 300px;
 }

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stock Research ONE - AI 기반 주식 리서치 자동화 솔루션. 7단계 플라이휠 시스템으로 체계적인 투자 의사결정을 지원합니다.">
+    <title>Stock Research ONE | AI 주식 리서치 솔루션</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">
+                    <i data-lucide="trending-up"></i>
+                </span>
+                <span class="logo-text">Stock Research <span class="highlight">ONE</span></span>
+            </a>
+            <div class="nav-links" id="navLinks">
+                <a href="#features" class="nav-link">기능</a>
+                <a href="#dashboard" class="nav-link">대시보드</a>
+                <a href="#flywheel" class="nav-link">플라이휠</a>
+                <a href="#philosophy" class="nav-link">투자철학</a>
+                <a href="#pricing" class="nav-link">요금</a>
+            </div>
+            <div class="nav-actions">
+                <a href="#demo" class="btn btn-secondary">데모 보기</a>
+                <a href="#start" class="btn btn-primary">무료 체험</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="메뉴 열기">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="hero-gradient"></div>
+            <div class="hero-grid"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i data-lucide="sparkles"></i>
+                    <span>AI 기반 투자 리서치</span>
+                </div>
+                <h1 class="hero-title">
+                    체계적인 투자 의사결정을<br>
+                    <span class="gradient-text">Stock Research ONE</span>으로
+                </h1>
+                <p class="hero-description">
+                    7단계 플라이휠 시스템으로 데이터 수집부터 복기까지<br>
+                    투자의 전 과정을 자동화하고 최적화합니다.
+                </p>
+                <div class="hero-cta">
+                    <a href="#start" class="btn btn-primary btn-lg">
+                        <i data-lucide="rocket"></i>
+                        무료로 시작하기
+                    </a>
+                    <a href="#demo" class="btn btn-ghost btn-lg">
+                        <i data-lucide="play-circle"></i>
+                        데모 영상 보기
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-value">7</span>
+                        <span class="stat-label">플라이휠 단계</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-value">24/7</span>
+                        <span class="stat-label">실시간 모니터링</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-value">AI</span>
+                        <span class="stat-label">맥락 분석</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="dashboard-preview">
+                    <div class="dashboard-header">
+                        <div class="dashboard-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="dashboard-title">Stock Research ONE</span>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-sidebar">
+                            <div class="sidebar-item active">
+                                <i data-lucide="database"></i>
+                            </div>
+                            <div class="sidebar-item">
+                                <i data-lucide="brain"></i>
+                            </div>
+                            <div class="sidebar-item">
+                                <i data-lucide="target"></i>
+                            </div>
+                            <div class="sidebar-item">
+                                <i data-lucide="git-branch"></i>
+                            </div>
+                        </div>
+                        <div class="dashboard-main">
+                            <div class="dashboard-card">
+                                <div class="card-header">시장 심리 지표</div>
+                                <div class="mini-chart positive">
+                                    <div class="chart-line"></div>
+                                </div>
+                                <div class="card-value positive">+12.5%</div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="card-header">투자 신호</div>
+                                <div class="signal-dots">
+                                    <span class="dot green"></span>
+                                    <span class="dot green"></span>
+                                    <span class="dot yellow"></span>
+                                </div>
+                                <div class="card-value">매수 우위</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i data-lucide="chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">핵심 기능</span>
+                <h2 class="section-title">투자 리서치의 모든 것을<br>하나로</h2>
+                <p class="section-description">
+                    분산된 정보를 통합하고, AI가 맥락을 분석하여<br>
+                    실행 가능한 인사이트를 제공합니다.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card featured">
+                    <div class="feature-icon">
+                        <i data-lucide="database"></i>
+                    </div>
+                    <h3 class="feature-title">자동 데이터 수집</h3>
+                    <p class="feature-description">
+                        뉴스, 보고서, 텔레그램, 블로그 등 다양한 소스에서 
+                        실시간으로 정보를 수집합니다.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i data-lucide="check"></i> 실시간 뉴스 수집</li>
+                        <li><i data-lucide="check"></i> 증권사 리포트 파싱</li>
+                        <li><i data-lucide="check"></i> 텔레그램 채널 연동</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="brain"></i>
+                    </div>
+                    <h3 class="feature-title">AI 맥락 분석</h3>
+                    <p class="feature-description">
+                        수집된 데이터를 투자 심리와 연결하여 
+                        의미있는 인사이트를 도출합니다.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="target"></i>
+                    </div>
+                    <h3 class="feature-title">중요도 평가</h3>
+                    <p class="feature-description">
+                        시장, 섹터, 종목별 영향을 분석하고 
+                        대응 우선순위를 자동으로 결정합니다.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="git-branch"></i>
+                    </div>
+                    <h3 class="feature-title">시나리오 플래닝</h3>
+                    <p class="feature-description">
+                        다양한 시나리오별 행동 계획을 수립하고 
+                        리스크를 관리합니다.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="activity"></i>
+                    </div>
+                    <h3 class="feature-title">실시간 모니터링</h3>
+                    <p class="feature-description">
+                        시세 변동과 시장 상황을 실시간으로 추적하고 
+                        알림을 제공합니다.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i data-lucide="refresh-cw"></i>
+                    </div>
+                    <h3 class="feature-title">자동 복기 시스템</h3>
+                    <p class="feature-description">
+                        투자 결과를 분석하고 개선점을 도출하여 
+                        다음 사이클에 적용합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard" id="dashboard">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">고급 분석</span>
+                <h2 class="section-title">투자자 심리 분석 대시보드</h2>
+                <p class="section-description">
+                    다양한 관점에서 시장을 분석하고<br>
+                    체계적인 의사결정을 지원합니다.
+                </p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <!-- 심리 분석 섹션 -->
+                <div class="dashboard-card featured">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="brain"></i>
+                        </div>
+                        <h3>투자자 심리 지표</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="psychology-metrics">
+                            <div class="metric-item">
+                                <span class="metric-label">시장 과열도</span>
+                                <div class="metric-progress">
+                                    <div class="progress-bar" style="--progress: 35%"></div>
+                                    <span class="metric-value">35%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">투자자 공감도</span>
+                                <div class="metric-progress">
+                                    <div class="progress-bar positive" style="--progress: 72%"></div>
+                                    <span class="metric-value">72%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">기대감 레벨</span>
+                                <div class="metric-progress">
+                                    <div class="progress-bar" style="--progress: 58%"></div>
+                                    <span class="metric-value">58%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="investor-types">
+                            <h4>투자자 유형별 심리</h4>
+                            <div class="investor-type">
+                                <span class="type-label">단기 투자자</span>
+                                <span class="type-indicator cautious">보수적</span>
+                            </div>
+                            <div class="investor-type">
+                                <span class="type-label">중장기 투자자</span>
+                                <span class="type-indicator optimistic">긍정적</span>
+                            </div>
+                            <div class="investor-type">
+                                <span class="type-label">보유자</span>
+                                <span class="type-indicator neutral">중립적</span>
+                            </div>
+                            <div class="investor-type">
+                                <span class="type-label">잠재 투자자</span>
+                                <span class="type-indicator interested">관심 높음</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 시간 관점 분석 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <h3>투자 타이밍 분석</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="timeline-analysis">
+                            <div class="timeline-item">
+                                <div class="timeline-period">3개월</div>
+                                <div class="timeline-signal good">
+                                    <i data-lucide="trending-up"></i>
+                                    <span>투자 적합</span>
+                                </div>
+                                <div class="timeline-reason">기대요소 > 우려요소</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-period">6개월</div>
+                                <div class="timeline-signal good">
+                                    <i data-lucide="trending-up"></i>
+                                    <span>투자 적합</span>
+                                </div>
+                                <div class="timeline-reason">구조적 성장 기대</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-period">1년</div>
+                                <div class="timeline-signal caution">
+                                    <i data-lucide="alert-circle"></i>
+                                    <span>주의 필요</span>
+                                </div>
+                                <div class="timeline-reason">변동성 증가 예상</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 기업 평가 워크스페이스 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="building"></i>
+                        </div>
+                        <h3>기업 평가 워크스페이스</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="evaluation-workspace">
+                            <div class="eval-section">
+                                <h4>고객가치제안 평가</h4>
+                                <div class="checklist">
+                                    <div class="checklist-item checked">
+                                        <i data-lucide="check-circle"></i>
+                                        <span>차별적 혜택 철학 보유</span>
+                                    </div>
+                                    <div class="checklist-item checked">
+                                        <i data-lucide="check-circle"></i>
+                                        <span>실질적 실행 증거 확인</span>
+                                    </div>
+                                    <div class="checklist-item pending">
+                                        <i data-lucide="circle"></i>
+                                        <span>경쟁력 상승 지속성</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="eval-section">
+                                <h4>산업 평가</h4>
+                                <div class="industry-score">
+                                    <div class="score-item">
+                                        <span>빅트렌드 부합도</span>
+                                        <span class="score high">85%</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <span>해자 요인</span>
+                                        <span class="score medium">70%</span>
+                                    </div>
+                                    <div class="score-item">
+                                        <span>성장 변수</span>
+                                        <span class="score medium">60%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 포트폴리오 관리 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="briefcase"></i>
+                        </div>
+                        <h3>중장기 포트폴리오</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="portfolio-overview">
+                            <div class="portfolio-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">보유 종목</span>
+                                    <span class="stat-value">12</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">평균 수익률</span>
+                                    <span class="stat-value positive">+24.8%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">매도 신호</span>
+                                    <span class="stat-value warning">3</span>
+                                </div>
+                            </div>
+                            <div class="portfolio-alerts">
+                                <div class="alert-item price-burden">
+                                    <i data-lucide="alert-triangle"></i>
+                                    <div>
+                                        <strong>가격부담 신호</strong>
+                                        <span>2개 종목에서 감지됨</span>
+                                    </div>
+                                </div>
+                                <div class="alert-item volatility">
+                                    <i data-lucide="activity"></i>
+                                    <div>
+                                        <strong>변동성 증가</strong>
+                                        <span>시장 전반적 영향</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 맥락 연결 분석기 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="git-branch"></i>
+                        </div>
+                        <h3>맥락 연결 분석기</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="context-analyzer">
+                            <div class="context-flow">
+                                <div class="flow-node news">
+                                    <i data-lucide="newspaper"></i>
+                                    <span>뉴스/이슈</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-node psychology">
+                                    <i data-lucide="brain"></i>
+                                    <span>투자심리</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-node behavior">
+                                    <i data-lucide="users"></i>
+                                    <span>행동 예측</span>
+                                </div>
+                            </div>
+                            <div class="context-insights">
+                                <div class="insight-item">
+                                    <span class="insight-label">최신 이슈</span>
+                                    <span class="insight-value">Fed 금리 동결</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-label">심리 영향</span>
+                                    <span class="insight-value">긍정적 (+68%)</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-label">행동 가능성</span>
+                                    <span class="insight-value">매수 유도 (확률 72%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 플라이휘 실행 현황 -->
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div class="dashboard-icon">
+                            <i data-lucide="refresh-cw"></i>
+                        </div>
+                        <h3>플라이휘 실행 현황</h3>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="flywheel-status">
+                            <div class="cycle-progress">
+                                <div class="progress-circle">
+                                    <span class="progress-text">4/7</span>
+                                </div>
+                                <span class="progress-label">시나리오 작성 단계</span>
+                            </div>
+                            <div class="cycle-results">
+                                <div class="result-item completed">
+                                    <i data-lucide="check"></i>
+                                    <span>데이터 수집 완료</span>
+                                </div>
+                                <div class="result-item completed">
+                                    <i data-lucide="check"></i>
+                                    <span>맥락 분석 완료</span>
+                                </div>
+                                <div class="result-item completed">
+                                    <i data-lucide="check"></i>
+                                    <span>중요도 평가 완료</span>
+                                </div>
+                                <div class="result-item current">
+                                    <i data-lucide="loader"></i>
+                                    <span>시나리오 작성 중...</span>
+                                </div>
+                                <div class="result-item pending">
+                                    <i data-lucide="circle"></i>
+                                    <span>실질 확인 대기</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flywheel Section -->
+    <section class="flywheel" id="flywheel">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">7단계 시스템</span>
+                <h2 class="section-title">마구티어 플라이휠</h2>
+                <p class="section-description">
+                    지속적으로 개선되는 투자 사이클로<br>
+                    체계적인 의사결정을 실현합니다.
+                </p>
+            </div>
+            
+            <div class="flywheel-container">
+                <div class="flywheel-circle">
+                    <div class="flywheel-center">
+                        <i data-lucide="infinity"></i>
+                        <span>무한 반복</span>
+                    </div>
+                    <div class="flywheel-step" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>데이터 수집</h4>
+                            <p>뉴스, 보고서 자동 수집</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>맥락 분석</h4>
+                            <p>투자심리 연결</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>중요도 평가</h4>
+                            <p>우선순위 결정</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>시나리오 작성</h4>
+                            <p>행동 계획 수립</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>실질 확인</h4>
+                            <p>시세 및 행동 확인</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="6">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h4>결과 복기</h4>
+                            <p>개선점 도출</p>
+                        </div>
+                    </div>
+                    <div class="flywheel-step" data-step="7">
+                        <div class="step-number">7</div>
+                        <div class="step-content">
+                            <h4>트렌드 정리</h4>
+                            <p>인사이트 축적</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="philosophy" id="philosophy">
+        <div class="container">
+            <div class="philosophy-content">
+                <div class="philosophy-text">
+                    <span class="section-badge">투자 철학</span>
+                    <h2 class="section-title">위대한 기업을<br>발굴하고 검증합니다</h2>
+                    <blockquote class="philosophy-quote">
+                        "시대의 방향을 체감하고, 관련된 기업들을 탐색하고,<br>
+                        준비된 자들 중 최고의 가능성을 지닌 자를<br>
+                        발굴하면서 검증해나가는 과정"
+                    </blockquote>
+                    
+                    <div class="philosophy-points">
+                        <div class="philosophy-point">
+                            <div class="point-icon">
+                                <i data-lucide="eye"></i>
+                            </div>
+                            <div class="point-content">
+                                <h4>고객가치제안 이해</h4>
+                                <p>핵심 고객에게 차별적 혜택을 주는 기업</p>
+                            </div>
+                        </div>
+                        <div class="philosophy-point">
+                            <div class="point-icon">
+                                <i data-lucide="zap"></i>
+                            </div>
+                            <div class="point-content">
+                                <h4>변화에 민감한 대응</h4>
+                                <p>환경을 지배하거나 바꾸는 기업</p>
+                            </div>
+                        </div>
+                        <div class="philosophy-point">
+                            <div class="point-icon">
+                                <i data-lucide="shield"></i>
+                            </div>
+                            <div class="point-content">
+                                <h4>중장기 투자 지향</h4>
+                                <p>선호되는 좋은 종목의 체계적 축적</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="philosophy-visual">
+                    <div class="evaluation-card">
+                        <h4>기업 평가 프레임워크</h4>
+                        <div class="eval-section">
+                            <div class="eval-header">
+                                <span>산업 평가</span>
+                                <span class="eval-badge">빅트렌드 부합</span>
+                            </div>
+                            <div class="eval-items">
+                                <div class="eval-item">
+                                    <span>빅트렌드 부합</span>
+                                    <div class="eval-bar" style="--width: 85%"></div>
+                                </div>
+                                <div class="eval-item">
+                                    <span>해자 요인</span>
+                                    <div class="eval-bar" style="--width: 70%"></div>
+                                </div>
+                                <div class="eval-item">
+                                    <span>성장 변수</span>
+                                    <div class="eval-bar" style="--width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eval-section">
+                            <div class="eval-header">
+                                <span>경쟁력 평가</span>
+                                <span class="eval-badge">동일 산업 내</span>
+                            </div>
+                            <div class="eval-items">
+                                <div class="eval-item">
+                                    <span>차별적 혜택</span>
+                                    <div class="eval-bar" style="--width: 90%"></div>
+                                </div>
+                                <div class="eval-item">
+                                    <span>실행력</span>
+                                    <div class="eval-bar" style="--width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">자주 묻는 질문</span>
+                <h2 class="section-title">궁금한 점이 있으신가요?</h2>
+                <p class="section-description">
+                    Stock Research ONE에 대한 자주 묻는 질문들을<br>
+                    모아 담았습니다.
+                </p>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Stock Research ONE은 어떤 서비스인가요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>AI 기반 주식 리서치 자동화 솔루션으로, 7단계 플라이휠 시스템을 통해 뉴스 수집부터 투자 복기까지 전 과정을 자동화합니다. 투자자 심리 분석과 맥락 연결을 통해 체계적인 의사결정을 지원합니다.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>초보자도 사용하기 쉬운가요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 그렇습니다. 직관적인 대시보드와 자동 분석 기능으로 투자 초보자도 쉽게 활용할 수 있습니다. Starter 플랜에서 시작하여 점진적으로 전문 기능을 활용할 수 있으며, 상세한 가이드와 튜토리얼을 제공합니다.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>어떤 데이터 소스를 활용하나요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>실시간 뉴스, 증권사 리포트, 텔레그램 채널, 블로그 등 다양한 소스에서 데이터를 수집합니다. AI가 이를 자동으로 분석하여 투자 심리와 시장 영향을 연결하고 실행 가능한 인사이트를 제공합니다.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>7단계 플라이휠 시스템이란 무엇인가요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>데이터 수집 → 맥락 분석 → 중요도 평가 → 시나리오 작성 → 실질 확인 → 결과 복기 → 트렌드 정리의 7단계 순환 시스템입니다. 이를 통해 투자 결정이 계속해서 개선되고 체계적으로 관리됩니다.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>언제든지 해지할 수 있나요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 언제든지 부담 없이 해지할 수 있습니다. 14일 무료 체험 후에도 구속 없이 이용할 수 있으며, 데이터 역시 언제든지 내보낼 수 있어 안심하고 사용하실 수 있습니다.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>고객 지원은 어떻게 되나요?</h3>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>실시간 채팅 상담과 이메일 지원을 제공합니다. Pro 플랜 이상 사용자에게는 전담 매니저를 배정하여 맞춤형 지원을 제공하며, 상세한 사용 가이드와 비디오 튜토리얼도 제공됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">요금제</span>
+                <h2 class="section-title">투자 스타일에 맞는<br>플랜을 선택하세요</h2>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Starter</h3>
+                        <div class="pricing-price">
+                            <span class="currency">₩</span>
+                            <span class="amount">0</span>
+                            <span class="period">/월</span>
+                        </div>
+                        <p class="pricing-description">개인 투자자를 위한 기본 플랜</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 기본 뉴스 수집</li>
+                        <li><i data-lucide="check"></i> 일일 시장 요약</li>
+                        <li><i data-lucide="check"></i> 5개 관심종목</li>
+                        <li><i data-lucide="x"></i> AI 맥락 분석</li>
+                        <li><i data-lucide="x"></i> 시나리오 플래닝</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">시작하기</a>
+                </div>
+                
+                <div class="pricing-card popular">
+                    <div class="popular-badge">인기</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Pro</h3>
+                        <div class="pricing-price">
+                            <span class="currency">₩</span>
+                            <span class="amount">49,000</span>
+                            <span class="period">/월</span>
+                        </div>
+                        <p class="pricing-description">진지한 투자자를 위한 전문 플랜</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> 모든 데이터 소스 수집</li>
+                        <li><i data-lucide="check"></i> AI 맥락 분석</li>
+                        <li><i data-lucide="check"></i> 무제한 관심종목</li>
+                        <li><i data-lucide="check"></i> 시나리오 플래닝</li>
+                        <li><i data-lucide="check"></i> 실시간 알림</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full">Pro 시작하기</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Enterprise</h3>
+                        <div class="pricing-price">
+                            <span class="amount">문의</span>
+                        </div>
+                        <p class="pricing-description">기관 투자자를 위한 맞춤 플랜</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i data-lucide="check"></i> Pro 모든 기능</li>
+                        <li><i data-lucide="check"></i> 전용 데이터 파이프라인</li>
+                        <li><i data-lucide="check"></i> API 액세스</li>
+                        <li><i data-lucide="check"></i> 맞춤 대시보드</li>
+                        <li><i data-lucide="check"></i> 전담 지원</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary btn-full">문의하기</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="start">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">지금 바로 시작하세요</h2>
+                <p class="cta-description">
+                    14일 무료 체험으로 Stock Research ONE의<br>
+                    모든 기능을 경험해보세요.
+                </p>
+                <div class="cta-actions">
+                    <a href="#" class="btn btn-primary btn-lg">
+                        <i data-lucide="rocket"></i>
+                        무료 체험 시작
+                    </a>
+                </div>
+                <p class="cta-note">신용카드 없이 시작 가능</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-icon">
+                            <i data-lucide="trending-up"></i>
+                        </span>
+                        <span class="logo-text">Stock Research <span class="highlight">ONE</span></span>
+                    </a>
+                    <p class="footer-description">
+                        AI 기반 주식 리서치 자동화 솔루션.<br>
+                        체계적인 투자 의사결정을 지원합니다.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>제품</h4>
+                    <ul>
+                        <li><a href="#features">기능</a></li>
+                        <li><a href="#pricing">요금</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>리소스</h4>
+                    <ul>
+                        <li><a href="#">문서</a></li>
+                        <li><a href="#">블로그</a></li>
+                        <li><a href="#">가이드</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>회사</h4>
+                    <ul>
+                        <li><a href="#">소개</a></li>
+                        <li><a href="#">연락처</a></li>
+                        <li><a href="#">채용</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Stock Research ONE. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="#">개인정보처리방침</a>
+                    <a href="#">이용약관</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+
+        // Flywheel animation
+        const flywheelSteps = document.querySelectorAll('.flywheel-step');
+        let currentStep = 0;
+
+        function animateFlywheel() {
+            flywheelSteps.forEach((step, index) => {
+                step.classList.remove('active');
+                if (index === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            currentStep = (currentStep + 1) % flywheelSteps.length;
+        }
+
+        setInterval(animateFlywheel, 2000);
+        animateFlywheel();
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .pricing-card, .philosophy-point, .dashboard-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Dashboard interactive features
+        function initDashboardInteractions() {
+            // Psychology metrics animation
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const progress = bar.style.getPropertyValue('--progress');
+                bar.style.width = '0%';
+                
+                setTimeout(() => {
+                    bar.style.width = progress;
+                    bar.style.transition = 'width 1.5s ease-out';
+                }, 500);
+            });
+
+            // Timeline item hover effects
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+
+            // Evaluation checklist interactions
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            checklistItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const icon = this.querySelector('svg');
+                    if (icon.getAttribute('data-lucide') === 'circle') {
+                        icon.setAttribute('data-lucide', 'check-circle');
+                        this.classList.remove('pending');
+                        this.classList.add('checked');
+                    } else if (icon.getAttribute('data-lucide') === 'check-circle') {
+                        icon.setAttribute('data-lucide', 'circle');
+                        this.classList.remove('checked');
+                        this.classList.add('pending');
+                    }
+                    lucide.createIcons();
+                });
+            });
+
+            // Portfolio alerts interaction
+            const alertItems = document.querySelectorAll('.alert-item');
+            alertItems.forEach(alert => {
+                alert.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            // Context analyzer animation
+            const contextFlow = document.querySelector('.context-flow');
+            if (contextFlow) {
+                const nodes = contextFlow.querySelectorAll('.flow-node');
+                nodes.forEach((node, index) => {
+                    node.style.opacity = '0';
+                    node.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        node.style.transition = 'all 0.5s ease';
+                        node.style.opacity = '1';
+                        node.style.transform = 'translateY(0)';
+                    }, 200 * index);
+                });
+            }
+
+            // Flywheel status progress animation
+            const cycleProgress = document.querySelector('.progress-circle');
+            if (cycleProgress) {
+                let currentStep = parseInt(cycleProgress.textContent);
+                animateFlywheelProgress(currentStep);
+            }
+        }
+
+        function animateFlywheelProgress(currentStep) {
+            const progressCircle = document.querySelector('.progress-circle');
+            const totalSteps = 7;
+            const percentage = (currentStep / totalSteps) * 100;
+            
+            // Create circular progress indicator
+            const style = document.createElement('style');
+            style.textContent = `
+                .progress-circle {
+                    background: conic-gradient(var(--color-cta) ${percentage * 3.6}deg, rgba(34, 197, 94, 0.1) ${percentage * 3.6}deg);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Dashboard card hover effects
+        const dashboardCards = document.querySelectorAll('.dashboard-card');
+        dashboardCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // FAQ Accordion
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            question.addEventListener('click', () => {
+                // Close other items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current item
+                item.classList.toggle('active');
+            });
+        });
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initDashboardInteractions, 1000);
+        });
+    </script>
+</body>
+</html>

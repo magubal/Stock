@@ -1,0 +1,44 @@
+ 
+================================================== 
+[Start] 2026-02-02 09:00:06 
+================================================== 
+ 
+================================================== 
+[Start] 2026-02-03 09:00:04 
+================================================== 
+^C 
+================================================== 
+[Start] 2026-02-04 09:00:02 
+================================================== 
+^C 
+================================================== 
+[Start] 2026-02-05 09:00:02 
+================================================== 
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (100941120 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+Maximum supported image dimension is 65500 pixels
+^C 
+================================================== 
+[Start] 2026-02-06 09:01:13 
+================================================== 
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (92424960 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (106394400 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+Maximum supported image dimension is 65500 pixels
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (100526400 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+Maximum supported image dimension is 65500 pixels
+^C 
+================================================== 
+[Start] 2026-02-09 09:00:02 
+================================================== 
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (99230400 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+Maximum supported image dimension is 65500 pixels
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (90558720 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+C:\dev\Python\Python311\Lib\site-packages\PIL\Image.py:3451: DecompressionBombWarning: Image size (105357600 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+Maximum supported image dimension is 65500 pixels
+^C

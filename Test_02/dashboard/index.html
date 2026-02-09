@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Research ONE - Dashboard</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .dashboard-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+        
+        .dashboard-header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #22c55e;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #16a34a;
+        }
+        
+        .btn-secondary {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #334155;
+            color: #f8fafc;
+        }
+        
+        .dashboard-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .dashboard-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            border-color: #22c55e;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #22c55e;
+        }
+        
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+        
+        .card-content {
+            min-height: 200px;
+        }
+        
+        /* Psychology Metrics */
+        .psychology-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .metric-label {
+            width: 100px;
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+        
+        .metric-progress {
+            flex: 1;
+            height: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #10b981);
+            border-radius: 4px;
+            transition: width 1.5s ease;
+        }
+        
+        .metric-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #22c55e;
+            min-width: 40px;
+            text-align: right;
+        }
+        
+        .investor-types {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .investor-types h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f8fafc;
+        }
+        
+        .investor-type {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .investor-type:last-child {
+            border-bottom: none;
+        }
+        
+        .type-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+        
+        .type-indicator {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .indicator-cautious {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .indicator-optimistic {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+        
+        .indicator-neutral {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+        }
+        
+        .indicator-interested {
+            background: rgba(34, 197, 94, 0.2);
+            color: #10b981;
+        }
+        
+        /* Timeline */
+        .timeline-analysis {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .timeline-item {
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        .timeline-period {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-signal {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .signal-good {
+            color: #22c55e;
+        }
+        
+        .signal-caution {
+            color: #f59e0b;
+        }
+        
+        .timeline-reason {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        /* Portfolio Overview */
+        .portfolio-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .stat-positive {
+            color: #22c55e;
+        }
+        
+        .stat-warning {
+            color: #f59e0b;
+        }
+        
+        .portfolio-alerts {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid;
+        }
+        
+        .alert-price-burden {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+        }
+        
+        .alert-volatility {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        
+        .alert-icon {
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert-description {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #334155;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-main {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .portfolio-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // API 서비스
+        const apiService = {
+            async fetchDashboardData() {
+                try {
+                    const [newsData, reportsData] = await Promise.all([
+                        fetch('http://localhost:8000/api/v1/news/dashboard/summary?hours=24'),
+                        fetch('http://localhost:8000/api/v1/reports/dashboard/summary')
+                    ]);
+                    
+                    return {
+                        news: await newsData.json(),
+                        reports: await reportsData.json()
+                    };
+                } catch (error) {
+                    console.error('API Error:', error);
+                    return { news: {}, reports: {} };
+                }
+            }
+        };
+
+        // 투자자 심리 분석 컴포넌트
+        const PsychologyMetrics = ({ data }) => {
+            return (
+                <div className="psychology-metrics">
+                    <div className="metric-item">
+                        <span className="metric-label">시장 과열도</span>
+                        <div className="metric-progress">
+                            <div className="progress-bar" style={{width: '35%'}}></div>
+                        </div>
+                        <span className="metric-value">35%</span>
+                    </div>
+                    <div className="metric-item">
+                        <span className="metric-label">투자자 공감도</span>
+                        <div className="metric-progress">
+                            <div className="progress-bar" style={{width: '72%'}}></div>
+                        </div>
+                        <span className="metric-value">72%</span>
+                    </div>
+                    <div className="metric-item">
+                        <span className="metric-label">기대감 레벨</span>
+                        <div className="metric-progress">
+                            <div className="progress-bar" style={{width: '58%'}}></div>
+                        </div>
+                        <span className="metric-value">58%</span>
+                    </div>
+                    
+                    <div className="investor-types">
+                        <h4>투자자 유형별 심리</h4>
+                        <div className="investor-type">
+                            <span className="type-label">단기 투자자</span>
+                            <span className="type-indicator indicator-cautious">보수적</span>
+                        </div>
+                        <div className="investor-type">
+                            <span className="type-label">중장기 투자자</span>
+                            <span className="type-indicator indicator-optimistic">긍정적</span>
+                        </div>
+                        <div className="investor-type">
+                            <span className="type-label">보유자</span>
+                            <span className="type-indicator indicator-neutral">중립적</span>
+                        </div>
+                        <div className="investor-type">
+                            <span className="type-label">잠재 투자자</span>
+                            <span className="type-indicator indicator-interested">관심 높음</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 투자 타이밍 분석 컴포넌트
+        const TimingAnalysis = ({ data }) => {
+            return (
+                <div className="timeline-analysis">
+                    <div className="timeline-item">
+                        <div className="timeline-period">3개월</div>
+                        <div className="timeline-signal signal-good">
+                            <i data-lucide="trending-up"></i>
+                            <span>투자 적합</span>
+                        </div>
+                        <div className="timeline-reason">기대요소 > 우려요소</div>
+                    </div>
+                    <div className="timeline-item">
+                        <div className="timeline-period">6개월</div>
+                        <div className="timeline-signal signal-good">
+                            <i data-lucide="trending-up"></i>
+                            <span>투자 적합</span>
+                        </div>
+                        <div className="timeline-reason">구조적 성장 기대</div>
+                    </div>
+                    <div className="timeline-item">
+                        <div className="timeline-period">1년</div>
+                        <div className="timeline-signal signal-caution">
+                            <i data-lucide="alert-circle"></i>
+                            <span>주의 필요</span>
+                        </div>
+                        <div className="timeline-reason">변동성 증가 예상</div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 포트폴리오 관리 컴포넌트
+        const PortfolioOverview = ({ data }) => {
+            return (
+                <div>
+                    <div className="portfolio-stats">
+                        <div className="stat-item">
+                            <span className="stat-label">보유 종목</span>
+                            <span className="stat-value">12</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-label">평균 수익률</span>
+                            <span className="stat-value stat-positive">+24.8%</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-label">매도 신호</span>
+                            <span className="stat-value stat-warning">3</span>
+                        </div>
+                    </div>
+                    
+                    <div className="portfolio-alerts">
+                        <div className="alert-item alert-price-burden">
+                            <i data-lucide="alert-triangle" className="alert-icon"></i>
+                            <div className="alert-content">
+                                <div className="alert-title">가격부담 신호</div>
+                                <div className="alert-description">2개 종목에서 감지됨</div>
+                            </div>
+                        </div>
+                        <div className="alert-item alert-volatility">
+                            <i data-lucide="activity" className="alert-icon"></i>
+                            <div className="alert-content">
+                                <div className="alert-title">변동성 증가</div>
+                                <div className="alert-description">시장 전반적 영향</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 기업 평가 컴포넌트
+        const CompanyEvaluation = ({ data }) => {
+            return (
+                <div>
+                    <h4 style={{marginBottom: '1rem', fontSize: '1rem', fontWeight: '600'}}>
+                        고객가치제안 평가
+                    </h4>
+                    <div style={{marginBottom: '1.5rem'}}>
+                        <div style={{padding: '0.5rem 0', borderBottom: '1px solid #1e293b'}}>
+                            <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <input type="checkbox" defaultChecked readOnly style={{width: '16px', height: '16px'}} />
+                                <span style={{fontSize: '0.875rem', color: '#22c55e'}}>차별적 혜택 철학 보유</span>
+                            </label>
+                        </div>
+                        <div style={{padding: '0.5rem 0', borderBottom: '1px solid #1e293b'}}>
+                            <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <input type="checkbox" defaultChecked readOnly style={{width: '16px', height: '16px'}} />
+                                <span style={{fontSize: '0.875rem', color: '#22c55e'}}>실질적 실행 증거 확인</span>
+                            </label>
+                        </div>
+                        <div style={{padding: '0.5rem 0'}}>
+                            <label style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                <input type="checkbox" readOnly style={{width: '16px', height: '16px'}} />
+                                <span style={{fontSize: '0.875rem', color: '#64748b'}}>경쟁력 상승 지속성</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <h4 style={{marginBottom: '1rem', fontSize: '1rem', fontWeight: '600'}}>
+                        산업 평가
+                    </h4>
+                    <div>
+                        <div style={{padding: '0.5rem 0', display: 'flex', justifyContent: 'space-between'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>빅트렌드 부합도</span>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e', fontWeight: '600'}}>85%</span>
+                        </div>
+                        <div style={{padding: '0.5rem 0', display: 'flex', justifyContent: 'space-between'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>해자 요인</span>
+                            <span style={{fontSize: '0.875rem', color: '#f59e0b', fontWeight: '600'}}>70%</span>
+                        </div>
+                        <div style={{padding: '0.5rem 0', display: 'flex', justifyContent: 'space-between'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>성장 변수</span>
+                            <span style={{fontSize: '0.875rem', color: '#f59e0b', fontWeight: '600'}}>60%</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 맥락 연결 분석기 컴포넌트
+        const ContextAnalyzer = ({ data }) => {
+            return (
+                <div>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(30, 41, 59, 0.5)', borderRadius: '8px', border: '1px solid #334155'}}>
+                        <div style={{textAlign: 'center'}}>
+                            <div style={{fontSize: '0.75rem', color: '#22c55e', marginBottom: '0.5rem'}}>
+                                <i data-lucide="newspaper"></i>
+                            </div>
+                            <span style={{fontSize: '0.75rem', color: '#94a3b8'}}>뉴스/이슈</span>
+                        </div>
+                        <span style={{fontSize: '1.25rem', color: '#334155'}}>→</span>
+                        <div style={{textAlign: 'center'}}>
+                            <div style={{fontSize: '0.75rem', color: '#22c55e', marginBottom: '0.5rem'}}>
+                                <i data-lucide="brain"></i>
+                            </div>
+                            <span style={{fontSize: '0.75rem', color: '#94a3b8'}}>투자심리</span>
+                        </div>
+                        <span style={{fontSize: '1.25rem', color: '#334155'}}>→</span>
+                        <div style={{textAlign: 'center'}}>
+                            <div style={{fontSize: '0.75rem', color: '#22c55e', marginBottom: '0.5rem'}}>
+                                <i data-lucide="users"></i>
+                            </div>
+                            <span style={{fontSize: '0.75rem', color: '#94a3b8'}}>행동 예측</span>
+                        </div>
+                    </div>
+                    
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+                        <div style={{display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid #1e293b'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>최신 이슈</span>
+                            <span style={{fontSize: '0.875rem', color: '#f8fafc'}}>Fed 금리 동결</span>
+                        </div>
+                        <div style={{display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid #1e293b'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>심리 영향</span>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>긍정적 (+68%)</span>
+                        </div>
+                        <div style={{display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0'}}>
+                            <span style={{fontSize: '0.875rem', color: '#94a3b8'}}>행동 가능성</span>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>매수 유도 (확률 72%)</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 플라이휘 실행 현황 컴포넌트
+        const FlywheelStatus = ({ data }) => {
+            return (
+                <div>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', background: 'rgba(30, 41, 59, 0.5)', borderRadius: '8px', border: '1px solid #334155'}}>
+                        <div style={{width: '60px', height: '60px', borderRadius: '50%', border: '3px solid #22c55e', background: 'rgba(34, 197, 94, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#22c55e', fontWeight: '600', fontSize: '1.125rem'}}>
+                            4/7
+                        </div>
+                        <span style={{fontSize: '0.875rem', color: '#f8fafc'}}>시나리오 작성 단계</span>
+                    </div>
+                    
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '4px'}}>
+                            <i data-lucide="check" style={{width: '16px', height: '16px', color: '#22c55e'}}></i>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>데이터 수집 완료</span>
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '4px'}}>
+                            <i data-lucide="check" style={{width: '16px', height: '16px', color: '#22c55e'}}></i>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>맥락 분석 완료</span>
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '4px'}}>
+                            <i data-lucide="check" style={{width: '16px', height: '16px', color: '#22c55e'}}></i>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>중요도 평가 완료</span>
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(34, 197, 94, 0.2)', borderRadius: '4px'}}>
+                            <i data-lucide="loader" style={{width: '16px', height: '16px', color: '#22c55e', animation: 'spin 1s linear infinite'}}></i>
+                            <span style={{fontSize: '0.875rem', color: '#22c55e'}}>시나리오 작성 중...</span>
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(148, 163, 184, 0.1)', borderRadius: '4px'}}>
+                            <i data-lucide="circle" style={{width: '16px', height: '16px', color: '#64748b'}}></i>
+                            <span style={{fontSize: '0.875rem', color: '#64748b'}}>실질 확인 대기</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 메인 대시보드 컴포넌트
+        const Dashboard = () => {
+            const [loading, setLoading] = useState(true);
+            const [dashboardData, setDashboardData] = useState({ news: {}, reports: {} });
+
+            useEffect(() => {
+                const loadData = async () => {
+                    setLoading(true);
+                    const data = await apiService.fetchDashboardData();
+                    setDashboardData(data);
+                    setLoading(false);
+                };
+
+                loadData();
+                
+                // Lucide 아이콘 초기화
+                setTimeout(() => {
+                    lucide.createIcons();
+                }, 100);
+            }, []);
+
+            if (loading) {
+                return (
+                    <div className="dashboard-container">
+                        <div className="dashboard-header">
+                            <div className="header-content">
+                                <div className="logo">
+                                    <div className="logo-icon">
+                                        <i data-lucide="trending-up"></i>
+                                    </div>
+                                    <span>Stock Research <span style={{color: '#22c55e'}}>ONE</span></span>
+                                </div>
+                                <div className="header-actions">
+                                    <button className="btn btn-secondary">새로고침</button>
+                                    <button className="btn btn-primary">데이터 수집</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="dashboard-main">
+                            <div className="loading-spinner">
+                                <div className="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="dashboard-container">
+                    <div className="dashboard-header">
+                        <div className="header-content">
+                            <div className="logo">
+                                <div className="logo-icon">
+                                    <i data-lucide="trending-up"></i>
+                                </div>
+                                <span>Stock Research <span style={{color: '#22c55e'}}>ONE</span></span>
+                            </div>
+                            <div className="header-actions">
+                                <button className="btn btn-secondary">새로고침</button>
+                                <button className="btn btn-primary">데이터 수집</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="dashboard-main">
+                        <div className="dashboard-grid">
+                            {/* 투자자 심리 분석 */}
+                            <div className="dashboard-card" style={{gridColumn: 'span 2'}}>
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="brain"></i>
+                                    </div>
+                                    <h3 className="card-title">투자자 심리 분석</h3>
+                                </div>
+                                <div className="card-content">
+                                    <PsychologyMetrics data={dashboardData.news} />
+                                </div>
+                            </div>
+                            
+                            {/* 투자 타이밍 분석 */}
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="clock"></i>
+                                    </div>
+                                    <h3 className="card-title">투자 타이밍 분석</h3>
+                                </div>
+                                <div className="card-content">
+                                    <TimingAnalysis data={dashboardData.news} />
+                                </div>
+                            </div>
+                            
+                            {/* 포트폴리오 관리 */}
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="briefcase"></i>
+                                    </div>
+                                    <h3 className="card-title">중장기 포트폴리오</h3>
+                                </div>
+                                <div className="card-content">
+                                    <PortfolioOverview data={dashboardData.reports} />
+                                </div>
+                            </div>
+                            
+                            {/* 기업 평가 워크스페이스 */}
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="building"></i>
+                                    </div>
+                                    <h3 className="card-title">기업 평가 워크스페이스</h3>
+                                </div>
+                                <div className="card-content">
+                                    <CompanyEvaluation data={dashboardData.reports} />
+                                </div>
+                            </div>
+                            
+                            {/* 맥락 연결 분석기 */}
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="git-branch"></i>
+                                    </div>
+                                    <h3 className="card-title">맥락 연결 분석기</h3>
+                                </div>
+                                <div className="card-content">
+                                    <ContextAnalyzer data={dashboardData.news} />
+                                </div>
+                            </div>
+                            
+                            {/* 플라이휘 실행 현황 */}
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="refresh-cw"></i>
+                                    </div>
+                                    <h3 className="card-title">플라이휘 실행 현황</h3>
+                                </div>
+                                <div className="card-content">
+                                    <FlywheelStatus data={{}} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 렌더링
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>

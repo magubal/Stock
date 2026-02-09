@@ -1,6 +1,13 @@
 import React from 'react';
 import { Brain, Clock, Briefcase, Building, GitBranch, RefreshCw, TrendingUp, Check, Circle, Loader, AlertTriangle, Activity, Users, Newspaper, ArrowRight } from 'lucide-react';
 import './Dashboard.css';
+import { usePsychology } from '../../hooks/usePsychology';
+import { useTiming } from '../../hooks/useTiming';
+import { usePortfolio } from '../../hooks/usePortfolio';
+import { useEvaluation } from '../../hooks/useEvaluation';
+import { useContextAnalysis } from '../../hooks/useContextAnalysis';
+import { useFlywheel } from '../../hooks/useFlywheel';
+import DashboardCard from '../shared/DashboardCard';
 
 // 투자자 심리 분석 컴포넌트
 const PsychologyMetrics = React.memo(({ data }) => {
@@ -188,69 +195,22 @@ const FlywheelStatus = React.memo(({ data }) => {
 });
 
 const Dashboard = () => {
-  // Mock data - 실제로는 API에서 가져옴
-  const dashboardData = {
-    psychology: {
-      marketHeat: 35,
-      empathy: 72,
-      expectation: 58,
-      investorTypes: [
-        { type: '단기 투자자', sentiment: 'cautious', label: '보수적' },
-        { type: '중장기 투자자', sentiment: 'optimistic', label: '긍정적' },
-        { type: '보유자', sentiment: 'neutral', label: '중립적' },
-        { type: '잠재 투자자', sentiment: 'interested', label: '관심 높음' }
-      ]
-    },
-    timing: [
-      { period: '3개월', signal: 'good', label: '투자 적합', reason: '기대요소 > 우려요소' },
-      { period: '6개월', signal: 'good', label: '투자 적합', reason: '구조적 성장 기대' },
-      { period: '1년', signal: 'caution', label: '주의 필요', reason: '변동성 증가 예상' }
-    ],
-    portfolio: {
-      totalStocks: 12,
-      avgReturn: 24.8,
-      sellSignals: 3,
-      alerts: [
-        { type: 'price-burden', title: '가격부담 신호', description: '2개 종목에서 감지됨' },
-        { type: 'volatility', title: '변동성 증가', description: '시장 전반적 영향' }
-      ]
-    },
-    companyEvaluation: {
-      valueProposition: [
-        { checked: true, label: '차별적 혜택 철학 보유' },
-        { checked: true, label: '실질적 실행 증거 확인' },
-        { checked: false, label: '경쟁력 상승 지속성' }
-      ],
-      industryEvaluation: [
-        { name: '빅트렌드 부합도', score: 85, color: 'positive' },
-        { name: '해자 요인', score: 70, color: 'warning' },
-        { name: '성장 변수', score: 60, color: 'warning' }
-      ]
-    },
-    contextAnalysis: {
-      flow: [
-        { icon: Newspaper, label: '뉴스/이슈' },
-        { icon: Brain, label: '투자심리' },
-        { icon: Users, label: '행동 예측' }
-      ],
-      insights: [
-        { label: '최신 이슈', value: 'Fed 금리 동결' },
-        { label: '심리 영향', value: '긍정적 (+68%)', color: 'positive' },
-        { label: '행동 가능성', value: '매수 유도 (확률 72%)', color: 'positive' }
-      ]
-    },
-    flywheel: {
-      currentStep: 4,
-      totalSteps: 7,
-      currentPhase: '시나리오 작성 단계',
-      progress: [
-        { step: '데이터 수집', status: 'completed' },
-        { step: '맥락 분석', status: 'completed' },
-        { step: '중요도 평가', status: 'completed' },
-        { step: '시나리오 작성', status: 'current' },
-        { step: '실질 확인', status: 'pending' }
-      ]
-    }
+  // Fetch data from API using SWR hooks
+  const { psychology, isLoading: psychLoading, isError: psychError, refresh: refreshPsych } = usePsychology();
+  const { timing, isLoading: timingLoading, isError: timingError, refresh: refreshTiming } = useTiming();
+  const { portfolio, isLoading: portfolioLoading, isError: portfolioError, refresh: refreshPortfolio } = usePortfolio();
+  const { evaluation, isLoading: evalLoading, isError: evalError, refresh: refreshEval } = useEvaluation();
+  const { context, isLoading: contextLoading, isError: contextError, refresh: refreshContext } = useContextAnalysis();
+  const { flywheel, isLoading: flywheelLoading, isError: flywheelError, refresh: refreshFlywheel } = useFlywheel();
+
+  // Refresh all data
+  const handleRefreshAll = () => {
+    refreshPsych();
+    refreshTiming();
+    refreshPortfolio();
+    refreshEval();
+    refreshContext();
+    refreshFlywheel();
   };
 
   return (
@@ -265,7 +225,9 @@ const Dashboard = () => {
             <span>Stock Research <span className="highlight">ONE</span></span>
           </div>
           <div className="header-actions">
-            <button className="btn btn-secondary">새로고침</button>
+            <button className="btn btn-secondary" onClick={handleRefreshAll}>
+              새로고침
+            </button>
             <button className="btn btn-primary">데이터 수집</button>
           </div>
         </div>
@@ -275,7 +237,12 @@ const Dashboard = () => {
       <main className="dashboard-main">
         <div className="dashboard-grid">
           {/* 투자자 심리 분석 */}
-          <div className="dashboard-card featured">
+          <DashboardCard
+            className="featured"
+            loading={psychLoading}
+            error={psychError}
+            onRetry={refreshPsych}
+          >
             <div className="card-header">
               <div className="card-icon">
                 <Brain size={20} />
@@ -283,12 +250,12 @@ const Dashboard = () => {
               <h3 className="card-title">투자자 심리 분석</h3>
             </div>
             <div className="card-content">
-              <PsychologyMetrics data={dashboardData.psychology} />
+              {psychology && <PsychologyMetrics data={psychology} />}
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 투자 타이밍 분석 */}
-          <div className="dashboard-card">
+          <DashboardCard loading={timingLoading} error={timingError} onRetry={refreshTiming}>
             <div className="card-header">
               <div className="card-icon">
                 <Clock size={20} />
@@ -296,12 +263,12 @@ const Dashboard = () => {
               <h3 className="card-title">투자 타이밍 분석</h3>
             </div>
             <div className="card-content">
-              <TimingAnalysis data={dashboardData.timing} />
+              {timing && <TimingAnalysis data={timing} />}
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 포트폴리오 관리 */}
-          <div className="dashboard-card">
+          <DashboardCard loading={portfolioLoading} error={portfolioError} onRetry={refreshPortfolio}>
             <div className="card-header">
               <div className="card-icon">
                 <Briefcase size={20} />
@@ -309,12 +276,12 @@ const Dashboard = () => {
               <h3 className="card-title">중장기 포트폴리오</h3>
             </div>
             <div className="card-content">
-              <PortfolioOverview data={dashboardData.portfolio} />
+              {portfolio && <PortfolioOverview data={portfolio} />}
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 기업 평가 워크스페이스 */}
-          <div className="dashboard-card">
+          <DashboardCard loading={evalLoading} error={evalError} onRetry={refreshEval}>
             <div className="card-header">
               <div className="card-icon">
                 <Building size={20} />
@@ -322,12 +289,12 @@ const Dashboard = () => {
               <h3 className="card-title">기업 평가 워크스페이스</h3>
             </div>
             <div className="card-content">
-              <CompanyEvaluation data={dashboardData.companyEvaluation} />
+              {evaluation && <CompanyEvaluation data={evaluation} />}
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 맥락 연결 분석기 */}
-          <div className="dashboard-card">
+          <DashboardCard loading={contextLoading} error={contextError} onRetry={refreshContext}>
             <div className="card-header">
               <div className="card-icon">
                 <GitBranch size={20} />
@@ -335,12 +302,12 @@ const Dashboard = () => {
               <h3 className="card-title">맥락 연결 분석기</h3>
             </div>
             <div className="card-content">
-              <ContextAnalyzer data={dashboardData.contextAnalysis} />
+              {context && <ContextAnalyzer data={context} />}
             </div>
-          </div>
+          </DashboardCard>
 
           {/* 플라이휘 실행 현황 */}
-          <div className="dashboard-card">
+          <DashboardCard loading={flywheelLoading} error={flywheelError} onRetry={refreshFlywheel}>
             <div className="card-header">
               <div className="card-icon">
                 <RefreshCw size={20} />
@@ -348,9 +315,9 @@ const Dashboard = () => {
               <h3 className="card-title">플라이휘 실행 현황</h3>
             </div>
             <div className="card-content">
-              <FlywheelStatus data={dashboardData.flywheel} />
+              {flywheel && <FlywheelStatus data={flywheel} />}
             </div>
-          </div>
+          </DashboardCard>
         </div>
       </main>
     </div>

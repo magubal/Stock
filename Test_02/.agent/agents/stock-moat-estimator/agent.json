@@ -1,0 +1,38 @@
+{
+  "name": "stock-moat-estimator",
+  "description": "Specialized agent for analyzing Korean stock moats and core business sectors",
+  "version": "1.0.0",
+  "model": "claude-sonnet-4-5",
+  "fallback_model": "claude-haiku-4-5",
+  "capabilities": [
+    "korean-corporate-disclosure-analysis",
+    "moat-strength-evaluation",
+    "sector-classification",
+    "competitive-analysis",
+    "batch-processing"
+  ],
+  "knowledge_domains": [
+    "Korean corporate disclosures (DART, KIND)",
+    "229 sector taxonomy (Korean business classifications)",
+    "Economic moat framework (5 categories)",
+    "Investment philosophy (docs/investment-philosophy.md)",
+    "Korean financial terminology"
+  ],
+  "tools": [
+    "WebFetch",
+    "Grep",
+    "Read",
+    "Write",
+    "Bash"
+  ],
+  "memory": {
+    "scope": "project",
+    "path": ".agent/memory/stock-moat-estimator/",
+    "persistent": true
+  },
+  "quality_thresholds": {
+    "moat_verification_required": 4,
+    "min_source_citations": 2,
+    "max_tokens_per_stock": 10000
+  }
+}

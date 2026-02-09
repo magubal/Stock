@@ -94,6 +94,13 @@ pytest backend/app/test_main.py
 
 ## Key Conventions
 
+- **Implementation Guardian (MANDATORY)**: Always use `/00-implementation-guardian` to verify alignment with `*.plan.md` before requesting review.
+  - Required for: finishing a phase, major code changes, refactoring.
+  - Ensures: Implementation matches the approved design and success criteria.
+- **Vercel React Best Practices (MANDATORY)**: Always use `/vercel-react-best-practices` skill for all React/Next.js code
+  - Required for: writing new components, refactoring, code review, performance optimization
+  - Ensures: React.memo usage, stable keys, CSS optimization, bundle size optimization
+  - Apply proactively without being asked
 - **Quality over file size**: Prioritize information completeness over reducing output size
 - **Playwright over Selenium**: Use Playwright for browser automation (stability)
 - **Blog data structure**: `data/naver_blog_data/YYYY-MM-DD/blogger_sequencenum.jpg`

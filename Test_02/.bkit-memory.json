@@ -1,0 +1,57 @@
+{
+  "pdca": {
+    "currentFeature": "stock-research-dashboard",
+    "phase": "do",
+    "startedAt": "2026-02-09T00:00:00Z",
+    "phases": {
+      "plan": {
+        "status": "completed",
+        "completedAt": "2026-02-09T00:00:00Z",
+        "documentPath": "docs/01-plan/features/stock-research-dashboard.plan.md"
+      },
+      "design": {
+        "status": "completed",
+        "completedAt": "2026-02-09T01:00:00Z",
+        "documentPath": "docs/02-design/features/stock-research-dashboard.design.md"
+      },
+      "do": {
+        "status": "in_progress",
+        "startedAt": "2026-02-09T22:00:00Z"
+      }
+    },
+    "history": [
+      {
+        "action": "plan_created",
+        "feature": "stock-research-dashboard",
+        "timestamp": "2026-02-09T00:00:00Z"
+      },
+      {
+        "action": "plan_approved",
+        "feature": "stock-research-dashboard",
+        "timestamp": "2026-02-09T00:30:00Z"
+      },
+      {
+        "action": "design_created",
+        "feature": "stock-research-dashboard",
+        "timestamp": "2026-02-09T01:00:00Z"
+      },
+      {
+        "action": "do_started",
+        "feature": "stock-research-dashboard",
+        "timestamp": "2026-02-09T22:00:00Z"
+      }
+    ]
+  },
+  "project": {
+    "level": "dynamic",
+    "framework": "React + FastAPI",
+    "lastUpdated": "2026-02-09T22:00:00Z",
+    "conventions": {
+      "react": {
+        "alwaysUseVercelBestPractices": true,
+        "autoApply": true,
+        "skillName": "vercel-react-best-practices"
+      }
+    }
+  }
+}

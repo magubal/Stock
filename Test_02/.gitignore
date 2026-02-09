@@ -1,0 +1,33 @@
+# Environment
+.env
+.env.*
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+nul
+Thumbs.db
+.DS_Store
+
+# Temp files
+temp_excel*/
+*.zip
+
+# Data (large files)
+data/
+Data_for_request/
+
+# Excel research data
+researched_stocks*.json
