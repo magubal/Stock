@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -90,7 +90,7 @@ async def get_important_news(
 
 @router.get("/sentiment/{sentiment}")
 async def get_news_by_sentiment(
-    sentiment: str = Query(..., regex="^(positive|negative|neutral)$", description="감성 타입"),
+    sentiment: str = Path(..., regex="^(positive|negative|neutral)$", description="감성 타입"),
     hours: int = Query(24, ge=1, le=168, description="시간 범위(시간)"),
     service: NewsService = Depends(get_news_service)
 ):
@@ -108,7 +108,7 @@ async def get_news_by_sentiment(
 
 @router.get("/stock/{stock_code}")
 async def get_news_by_stock(
-    stock_code: str = Query(..., description="종목 코드"),
+    stock_code: str = Path(..., description="종목 코드"),
     hours: int = Query(24, ge=1, le=168, description="시간 범위(시간)"),
     service: NewsService = Depends(get_news_service)
 ):

@@ -157,3 +157,95 @@ class AnalysisResult(BaseModel):
     importance_score: float
     stock_mentions: List[str]
     key_points: List[str]
+
+# ── Dashboard Response Schemas ──
+
+class InvestorTypeInfo(BaseModel):
+    type: str
+    sentiment: str
+    label: str
+
+class PsychologyResponse(BaseModel):
+    marketHeat: float
+    empathy: float
+    expectation: float
+    investorTypes: List[InvestorTypeInfo]
+
+class TimingItem(BaseModel):
+    period: str
+    signal: str  # good, caution, danger
+    label: str
+    reason: str
+
+class PortfolioAlert(BaseModel):
+    type: str
+    title: str
+    description: str
+
+class PortfolioResponse(BaseModel):
+    totalStocks: int
+    avgReturn: float
+    sellSignals: int
+    alerts: List[PortfolioAlert]
+
+class ValuePropositionItem(BaseModel):
+    checked: bool
+    label: str
+
+class IndustryEvaluationItem(BaseModel):
+    name: str
+    score: float
+    color: str  # positive, warning, danger
+
+class EvaluationResponse(BaseModel):
+    valueProposition: List[ValuePropositionItem]
+    industryEvaluation: List[IndustryEvaluationItem]
+
+class FlywheelStep(BaseModel):
+    step: str
+    status: str  # completed, current, pending
+
+class FlywheelResponse(BaseModel):
+    currentStep: int
+    totalSteps: int
+    currentPhase: str
+    progress: List[FlywheelStep]
+
+# Portfolio Holding Schemas
+class PortfolioHoldingBase(BaseModel):
+    stock_code: str = Field(..., max_length=10)
+    stock_name: str = Field(..., max_length=100)
+    buy_price: float
+    buy_date: datetime
+    quantity: int
+    is_active: bool = True
+
+class PortfolioHoldingCreate(PortfolioHoldingBase):
+    pass
+
+class PortfolioHolding(PortfolioHoldingBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Flywheel State Schemas
+class FlywheelStateBase(BaseModel):
+    cycle_number: int = 1
+    current_step: int = 1
+    step_name: str = Field(..., max_length=100)
+    status: str = "pending"
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    notes: Optional[str] = None
+
+class FlywheelStateCreate(FlywheelStateBase):
+    pass
+
+class FlywheelState(FlywheelStateBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -3,34 +3,42 @@ Context Analysis API Router
 2단계: 맥락연결/영향분석 API 엔드포인트
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timedelta
 
+from ..database import get_db
 from ..services.context_analysis_service import ContextAnalyzer, ContextAnalysis
-from ..models.news import News
+from ..models import News
 from ..services.news_service import NewsService
 
 router = APIRouter(prefix="/context-analysis", tags=["context-analysis"])
 
-# 전역 분석기 인스턴스
+# ContextAnalyzer는 DB 불필요 (순수 분석 엔진)
 analyzer = ContextAnalyzer()
-news_service = NewsService()
+
+
+def get_news_service(db: Session = Depends(get_db)) -> NewsService:
+    return NewsService(db)
 
 @router.post("/analyze/{news_id}")
-async def analyze_news_context(news_id: str):
+async def analyze_news_context(
+    news_id: str,
+    service: NewsService = Depends(get_news_service)
+):
     """특정 뉴스 기사에 대한 맥락 분석 수행"""
     try:
         # 뉴스 데이터 조회
-        news = await news_service.get_news_by_id(news_id)
+        news = await service.get_news_by_id(news_id)
         if not news:
             raise HTTPException(status_code=404, detail="News not found")
-        
+
         # 맥락 분석 수행
         analysis = analyzer.analyze_content(
-            news_id=news.id,
-            title=news.title,
-            content=news.content
+            news_id=news["id"],
+            title=news["title"],
+            content=news["content"]
         )
         
         return {
@@ -75,21 +83,22 @@ async def analyze_news_context(news_id: str):
 @router.get("/recent-analyses")
 async def get_recent_analyses(
     limit: int = Query(10, ge=1, le=100),
-    hours: int = Query(24, ge=1, le=168)  # 최대 1주일
+    hours: int = Query(24, ge=1, le=168),
+    service: NewsService = Depends(get_news_service)
 ):
     """최근 맥락 분석 결과 조회"""
     try:
         # 최근 뉴스 목록 조회
         since = datetime.now() - timedelta(hours=hours)
-        recent_news = await news_service.get_recent_news(limit=limit, since=since)
-        
+        recent_news = await service.get_recent_news(limit=limit, since=since)
+
         analyses = []
         for news in recent_news:
             # 각 뉴스에 대해 맥락 분석 수행
             analysis = analyzer.analyze_content(
-                news_id=news.id,
-                title=news.title,
-                content=news.content
+                news_id=news["id"],
+                title=news["title"],
+                content=news["content"]
             )
             
             analyses.append({
@@ -115,13 +124,14 @@ async def get_recent_analyses(
 
 @router.get("/market-sentiment-summary")
 async def get_market_sentiment_summary(
-    hours: int = Query(24, ge=1, le=168)
+    hours: int = Query(24, ge=1, le=168),
+    service: NewsService = Depends(get_news_service)
 ):
     """시장 심리 요약 (최근 N시간 기준)"""
     try:
         # 최근 뉴스 조회
         since = datetime.now() - timedelta(hours=hours)
-        recent_news = await news_service.get_recent_news(limit=50, since=since)
+        recent_news = await service.get_recent_news(limit=50, since=since)
         
         if not recent_news:
             return {
@@ -141,12 +151,12 @@ async def get_market_sentiment_summary(
         analyses = []
         for news in recent_news:
             analysis = analyzer.analyze_content(
-                news_id=news.id,
-                title=news.title,
-                content=news.content
+                news_id=news["id"],
+                title=news["title"],
+                content=news["content"]
             )
             analyses.append(analysis)
-        
+
         # 종합 감성 분석
         sentiment_counts = {}
         total_sentiment_score = 0
@@ -214,13 +224,14 @@ async def get_market_sentiment_summary(
 @router.get("/investor-behavior-analysis")
 async def get_investor_behavior_analysis(
     investor_type: Optional[str] = Query(None, description="투자자 유형 필터링"),
-    hours: int = Query(24, ge=1, le=168)
+    hours: int = Query(24, ge=1, le=168),
+    service: NewsService = Depends(get_news_service)
 ):
     """투자자별 행동 분석"""
     try:
         # 최근 뉴스 조회
         since = datetime.now() - timedelta(hours=hours)
-        recent_news = await news_service.get_recent_news(limit=50, since=since)
+        recent_news = await service.get_recent_news(limit=50, since=since)
         
         if not recent_news:
             return {
@@ -236,9 +247,9 @@ async def get_investor_behavior_analysis(
         all_behaviors = {}
         for news in recent_news:
             analysis = analyzer.analyze_content(
-                news_id=news.id,
-                title=news.title,
-                content=news.content
+                news_id=news["id"],
+                title=news["title"],
+                content=news["content"]
             )
             
             for behavior in analysis.investor_behaviors:

@@ -116,5 +116,32 @@ class MarketData(Base):
     moving_avg_20 = Column(Float)
     moving_avg_60 = Column(Float)
     rsi = Column(Float)
-    
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 포트폴리오 보유 종목 테이블
+class PortfolioHolding(Base):
+    __tablename__ = "portfolio_holdings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    stock_code = Column(String(10), nullable=False)
+    stock_name = Column(String(100), nullable=False)
+    buy_price = Column(Float, nullable=False)
+    buy_date = Column(DateTime(timezone=True), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 플라이휠 상태 테이블
+class FlywheelState(Base):
+    __tablename__ = "flywheel_state"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cycle_number = Column(Integer, nullable=False, default=1)
+    current_step = Column(Integer, nullable=False, default=1)
+    step_name = Column(String(100), nullable=False)
+    status = Column(String(20), default="pending")  # pending, current, completed
+    started_at = Column(DateTime(timezone=True))
+    completed_at = Column(DateTime(timezone=True))
+    notes = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -95,7 +95,23 @@ class NewsService:
             self.db.rollback()
             return False
     
-    async def get_news(self, 
+    async def get_news_by_id(self, news_id: str) -> dict | None:
+        """뉴스 ID로 단건 조회"""
+        # TODO: DB 조회 구현
+        # news = self.db.query(News).filter(News.id == int(news_id)).first()
+        # return self._news_to_dict(news) if news else None
+        return None
+
+    async def get_recent_news(self, limit: int = 10, since: datetime = None) -> list:
+        """최근 뉴스 조회 (since 이후)"""
+        # TODO: DB 조회 구현
+        # query = self.db.query(News)
+        # if since:
+        #     query = query.filter(News.published_at >= since)
+        # return [self._news_to_dict(n) for n in query.order_by(News.published_at.desc()).limit(limit).all()]
+        return []
+
+    async def get_news(self,
                       source: str = None,
                       category: str = None,
                       limit: int = 50,

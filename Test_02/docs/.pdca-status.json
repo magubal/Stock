@@ -1,7 +1,14 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-09T22:00:00.000Z",
-  "activeFeatures": ["stock-research-dashboard"],
+  "lastUpdated": "2026-02-11T13:18:13.071Z",
+  "activeFeatures": [
+    "stock-research-dashboard",
+    "backend",
+    "schemas",
+    "api",
+    "frontend",
+    "Dashboard"
+  ],
   "primaryFeature": "stock-research-dashboard",
   "features": {
     "stock-research-dashboard": {
@@ -9,6 +16,71 @@
       "startedAt": "2026-02-09T00:00:00Z",
       "planPath": "docs/01-plan/features/stock-research-dashboard.plan.md",
       "designPath": "docs/02-design/features/stock-research-dashboard.design.md"
+    },
+    "backend": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T11:14:01.275Z",
+        "lastUpdated": "2026-02-11T13:18:13.071Z"
+      },
+      "lastFile": "F:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\seed_data.py"
+    },
+    "schemas": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T11:14:23.536Z",
+        "lastUpdated": "2026-02-11T11:14:23.536Z"
+      },
+      "lastFile": "F:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\schemas\\__init__.py"
+    },
+    "api": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T11:15:44.499Z",
+        "lastUpdated": "2026-02-11T12:42:42.437Z"
+      },
+      "lastFile": "F:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\news.py"
+    },
+    "frontend": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T13:00:35.615Z",
+        "lastUpdated": "2026-02-11T13:06:34.584Z"
+      },
+      "lastFile": "F:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\frontend\\src\\lib\\fetcher.js"
+    },
+    "Dashboard": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-11T13:14:41.786Z",
+        "lastUpdated": "2026-02-11T13:15:46.627Z"
+      },
+      "lastFile": "F:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\frontend\\src\\components\\Dashboard\\Dashboard.jsx"
     }
   },
   "pipeline": {
@@ -19,7 +91,7 @@
   "session": {
     "startedAt": "2026-02-09T22:00:00.000Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-02-09T22:00:00.000Z"
+    "lastActivity": "2026-02-11T13:18:13.071Z"
   },
   "history": [
     {
@@ -27,6 +99,222 @@
       "feature": "stock-research-dashboard",
       "phase": "do",
       "action": "started"
+    },
+    {
+      "timestamp": "2026-02-11T11:14:01.275Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:14:23.536Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:15:19.245Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:15:44.499Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:17:03.994Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:30:00.964Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:30:39.050Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:31:35.754Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:31:45.713Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:31:53.561Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:32:10.277Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:32:24.201Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:34:32.316Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:37:38.037Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:38:02.122Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:39:39.615Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:44:15.134Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T11:44:59.398Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T12:16:25.213Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T12:24:45.035Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T12:39:39.577Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T12:42:12.588Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T12:42:42.437Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:00:35.615Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:01:26.157Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:06:34.584Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:08:45.935Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:14:41.786Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:14:49.970Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:14:56.662Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:15:02.961Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:15:11.368Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:15:23.272Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:15:36.836Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:15:46.627Z",
+      "feature": "Dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-11T13:18:13.071Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
     }
   ]
 }

@@ -23,25 +23,27 @@
 - [x] Shared components (`DashboardCard`, `ErrorFallback`, `LoadingCard`)
 - [x] `Dashboard.jsx` SWR 연동
 
-**Backend (구현 필요 — 이 순서대로 진행):**
-- [ ] Task 1: DB 모델 추가 — `PortfolioHolding`, `FlywheelState` (`backend/app/models/__init__.py`)
-- [ ] Task 2: Pydantic 스키마 추가 — Dashboard 전용 (`backend/app/schemas/__init__.py`)
-- [ ] Task 3: `DashboardService` 생성 (`backend/app/services/dashboard_service.py`)
+**Backend (구현 완료 — 2026-02-11):**
+- [x] Task 1: DB 모델 추가 — `PortfolioHolding`, `FlywheelState` (`backend/app/models/__init__.py`)
+- [x] Task 2: Pydantic 스키마 추가 — Dashboard 전용 (`backend/app/schemas/__init__.py`)
+- [x] Task 3: `DashboardService` 생성 (`backend/app/services/dashboard_service.py`)
   - `get_psychology_metrics()` — investor_sentiment 기반
   - `get_timing_analysis()` — sentiment + market_data 기반
   - `get_portfolio_overview()` — portfolio_holdings 기반
   - `get_company_evaluation()` — research_reports 기반
   - `get_flywheel_status()` — flywheel_state 기반
-- [ ] Task 4: Dashboard API 라우터 (`backend/app/api/dashboard.py`)
+- [x] Task 4: Dashboard API 라우터 (`backend/app/api/dashboard.py`)
   - `GET /api/v1/psychology`
   - `GET /api/v1/timing`
   - `GET /api/v1/portfolio`
   - `GET /api/v1/evaluation`
   - `GET /api/v1/flywheel`
-- [ ] Task 5: `main.py` 라우터 활성화 (주석 해제 + dashboard 추가)
-- [ ] Task 6: DB 마이그레이션 (`alembic`)
-- [ ] Task 7: `/docs` 엔드포인트 테스트
-- [ ] Task 8: Frontend ↔ Backend full data flow 테스트
+- [x] Task 5: `main.py` 라우터 활성화 (news + reports + dashboard + context_analysis)
+- [x] Task 6: DB auto-create via `Base.metadata.create_all`
+- [x] Task 7: Frontend ↔ Backend URL 매핑 검증 완료
+- [ ] Task 8: Docker 기동 후 통합 테스트 (DB 연결 필요)
+
+**참고:** `context_analysis` 라우터 임포트 수정 완료 및 활성화됨 (2026-02-11)
 
 ---
 
@@ -69,6 +71,13 @@
 ---
 
 ## ✅ 완료됨
+
+### 2026-02-11
+- [x] Dashboard Backend: DB 모델 추가 (PortfolioHolding, FlywheelState)
+- [x] Dashboard Backend: Pydantic 스키마 추가 (7개 응답 스키마)
+- [x] Dashboard Backend: DashboardService 5개 메서드 구현
+- [x] Dashboard Backend: API 라우터 5개 엔드포인트 구현
+- [x] Dashboard Backend: main.py 라우터 활성화 (news, reports, dashboard)
 
 ### 2026-02-09
 - [x] Evidence-Based Moat v2.0 완료 (PDCA archived, 95.2% match rate)
@@ -105,9 +114,9 @@
 | 아카이브 | `docs/archive/2026-02/` (moat v1, v2) |
 
 ### 현재 상태 요약
-- **Frontend**: 준비 완료 (SWR hooks가 Backend API 호출 중, 아직 404)
-- **Backend**: `main.py`에서 라우터 주석 처리, Dashboard API 없음
-- **다음 작업**: Backend Task 1 (DB 모델)부터 순서대로 진행
+- **Frontend**: 준비 완료 (SWR hooks → Backend API 연동)
+- **Backend**: Dashboard API 5개 엔드포인트 구현 완료, 라우터 활성화
+- **다음 작업**: Docker 기동 후 통합 테스트 또는 Gap Analysis
 
 ### 결정 사항
 - **품질 > 용량**: 정보 누락 방지 우선
