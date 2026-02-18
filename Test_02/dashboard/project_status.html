@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로젝트 개발현황</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #020617;
+            --panel: rgba(15, 23, 42, 0.88);
+            --panel-soft: rgba(30, 41, 59, 0.6);
+            --border: #334155;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #22c55e;
+            --warn: #f59e0b;
+            --idle: #60a5fa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 40%), var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 1.25rem 1rem 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .title-wrap h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .title-wrap p {
+            margin: 0.4rem 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .link-back {
+            color: #cbd5e1;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: var(--panel-soft);
+            border-radius: 10px;
+            padding: 0.55rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-item {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--panel);
+            padding: 0.75rem;
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 0.75rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .summary-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 1rem;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            padding: 1rem;
+        }
+
+        .card h2 {
+            margin: 0 0 0.9rem;
+            font-size: 1rem;
+        }
+
+        .dev-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .dev-row {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--panel-soft);
+            color: var(--text);
+            text-align: left;
+            padding: 0.75rem;
+            cursor: pointer;
+        }
+
+        .dev-row.is-active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3) inset;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .dev-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dev-title {
+            font-size: 0.87rem;
+            font-weight: 700;
+        }
+
+        .dev-meta {
+            margin-top: 0.35rem;
+            color: var(--muted);
+            font-size: 0.76rem;
+        }
+
+        .badge {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 0.72rem;
+            padding: 0.1rem 0.5rem;
+            font-weight: 700;
+        }
+
+        .badge-complete {
+            color: var(--accent);
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .badge-progress {
+            color: var(--warn);
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .badge-pending {
+            color: var(--idle);
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .meta-line {
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .meta-label {
+            color: var(--muted);
+        }
+
+        .list-plain {
+            margin: 0;
+            padding-left: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+        }
+
+        .list-plain code {
+            color: #93c5fd;
+        }
+
+        .check-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #1e293b;
+            padding: 0.36rem 0;
+            font-size: 0.82rem;
+        }
+
+        .check-row:last-child {
+            border-bottom: none;
+        }
+
+        .check-mark-ok {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .check-mark-pending {
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .next-action {
+            margin-top: 0.65rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #1e293b;
+            font-size: 0.8rem;
+            color: #93c5fd;
+        }
+
+        @media (max-width: 980px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-testid="project-status-page">
+    <div class="container">
+        <div class="header">
+            <div class="title-wrap">
+                <h1>개발현황</h1>
+                <p>개발리스트와 상태(완료, 개발중, 미착수)를 기준으로 상세 프로그램/체크리스트를 확인합니다.</p>
+            </div>
+            <a class="link-back" href="index.html">메인 대시보드로</a>
+        </div>
+
+        <section class="summary-grid">
+            <article class="summary-item"><span class="summary-label">전체</span><span class="summary-value" data-testid="project-status-count-total">0</span></article>
+            <article class="summary-item"><span class="summary-label">완료</span><span class="summary-value" data-testid="project-status-count-completed">0</span></article>
+            <article class="summary-item"><span class="summary-label">개발중</span><span class="summary-value" data-testid="project-status-count-in-progress">0</span></article>
+            <article class="summary-item"><span class="summary-label">미착수</span><span class="summary-value" data-testid="project-status-count-pending">0</span></article>
+        </section>
+
+        <section class="layout">
+            <article class="card">
+                <h2>개발 리스트 | 상태</h2>
+                <div class="dev-list" id="dev-list"></div>
+            </article>
+
+            <div class="detail-grid">
+                <article class="card">
+                    <h2 id="detail-title" data-testid="project-status-program-title">상세 개발 프로그램</h2>
+                    <div class="meta-line"><span class="meta-label">요청 ID:</span> <span data-testid="project-status-selected-id">-</span></div>
+                    <div class="meta-line"><span class="meta-label">담당:</span> <span id="detail-owner">-</span></div>
+                    <div class="meta-line"><span class="meta-label">진행 단계:</span> <span id="detail-stage">-</span></div>
+                    <div class="meta-line"><span class="meta-label">기한:</span> <span id="detail-due">-</span></div>
+                    <ol class="list-plain" id="program-list" data-testid="project-status-program-list"></ol>
+                </article>
+
+                <article class="card">
+                    <h2>체크리스트 요약</h2>
+                    <div id="checklist" data-testid="project-status-checklist-list"></div>
+                    <div class="next-action" id="next-action" data-testid="project-status-next-action"></div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/project_status_data.js"></script>
+    <script>
+        const rawItems = Array.isArray(window.PROJECT_STATUS_ITEMS) ? window.PROJECT_STATUS_ITEMS : [];
+        const items = rawItems.map((item) => ({
+            ...item,
+            status: item.status === '진행' ? '개발중' : item.status
+        }));
+
+        const state = {
+            selectedId: null
+        };
+
+        const els = {
+            list: document.getElementById('dev-list'),
+            detailTitle: document.getElementById('detail-title'),
+            selectedId: document.querySelector('[data-testid="project-status-selected-id"]'),
+            owner: document.getElementById('detail-owner'),
+            stage: document.getElementById('detail-stage'),
+            due: document.getElementById('detail-due'),
+            programList: document.getElementById('program-list'),
+            checklist: document.getElementById('checklist'),
+            nextAction: document.getElementById('next-action'),
+            countTotal: document.querySelector('[data-testid="project-status-count-total"]'),
+            countCompleted: document.querySelector('[data-testid="project-status-count-completed"]'),
+            countInProgress: document.querySelector('[data-testid="project-status-count-in-progress"]'),
+            countPending: document.querySelector('[data-testid="project-status-count-pending"]')
+        };
+
+        const getStatusBadgeClass = (status) => {
+            if (status === '완료') return 'badge badge-complete';
+            if (status === '개발중') return 'badge badge-progress';
+            return 'badge badge-pending';
+        };
+
+        const findItemById = (id) => items.find((item) => item.id === id);
+
+        const renderSummary = () => {
+            const completed = items.filter((item) => item.status === '완료').length;
+            const inProgress = items.filter((item) => item.status === '개발중').length;
+            const pending = items.filter((item) => item.status === '미착수').length;
+            els.countTotal.textContent = String(items.length);
+            els.countCompleted.textContent = String(completed);
+            els.countInProgress.textContent = String(inProgress);
+            els.countPending.textContent = String(pending);
+        };
+
+        const renderList = () => {
+            els.list.innerHTML = '';
+            items.forEach((item) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `dev-row${item.id === state.selectedId ? ' is-active' : ''}`;
+                button.dataset.testid = `project-status-row-${item.id}`;
+                button.setAttribute('data-testid', `project-status-row-${item.id}`);
+                button.innerHTML = `
+                    <div class="dev-head">
+                        <span class="dev-title">${item.title}</span>
+                        <span class="${getStatusBadgeClass(item.status)}">${item.status}</span>
+                    </div>
+                    <div class="dev-meta">${item.stage} · ${item.owner}</div>
+                `;
+                button.addEventListener('click', () => {
+                    state.selectedId = item.id;
+                    render();
+                });
+                els.list.appendChild(button);
+            });
+        };
+
+        const renderDetail = () => {
+            const selected = findItemById(state.selectedId) || items[0];
+            if (!selected) {
+                els.detailTitle.textContent = '상세 개발 프로그램';
+                els.selectedId.textContent = '-';
+                els.owner.textContent = '-';
+                els.stage.textContent = '-';
+                els.due.textContent = '-';
+                els.programList.innerHTML = '';
+                els.checklist.innerHTML = '';
+                els.nextAction.textContent = '다음 조치: -';
+                return;
+            }
+
+            els.detailTitle.textContent = selected.title;
+            els.selectedId.textContent = selected.id;
+            els.owner.textContent = selected.owner;
+            els.stage.textContent = selected.stage;
+            els.due.textContent = selected.due;
+            els.programList.innerHTML = '';
+            (selected.programs || []).forEach((program) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${program.name}</strong><br /><code>${program.path}</code><br />${program.description}`;
+                els.programList.appendChild(li);
+            });
+
+            els.checklist.innerHTML = '';
+            (selected.checklist || []).forEach((step) => {
+                const row = document.createElement('div');
+                row.className = 'check-row';
+                row.innerHTML = `<span>${step.label}</span><span class="${step.done ? 'check-mark-ok' : 'check-mark-pending'}">${step.done ? '완료' : '대기'}</span>`;
+                els.checklist.appendChild(row);
+            });
+
+            els.nextAction.textContent = `다음 조치: ${selected.nextAction || '-'}`;
+        };
+
+        const render = () => {
+            renderSummary();
+            renderList();
+            renderDetail();
+        };
+
+        const initialize = () => {
+            const reqId = new URLSearchParams(window.location.search).get('req');
+            if (reqId && findItemById(reqId)) {
+                state.selectedId = reqId;
+            } else if (items.length > 0) {
+                const firstInProgress = items.find((item) => item.status === '개발중');
+                state.selectedId = (firstInProgress || items[0]).id;
+            }
+            render();
+        };
+
+        initialize();
+    </script>
+</body>
+</html>

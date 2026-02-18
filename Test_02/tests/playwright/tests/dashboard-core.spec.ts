@@ -59,19 +59,17 @@ test.describe('dashboard/index.html core regression', () => {
     const cardCount = await page.locator('.dashboard-card').count();
     expect(cardCount).toBeGreaterThanOrEqual(8);
 
-    await page.getByTestId('project-checklist-REQ-017').click();
-    await expect(page.getByTestId('project-status-detail-title')).toContainText(
+    const req017Link = page.getByTestId('project-checklist-REQ-017');
+    await expect(req017Link).toHaveAttribute('href', 'project_status.html?req=REQ-017');
+    await Promise.all([
+      page.waitForURL('**/project_status.html?req=REQ-017'),
+      req017Link.click(),
+    ]);
+    await expect(page.getByTestId('project-status-page')).toBeVisible();
+    await expect(page.getByTestId('project-status-selected-id')).toHaveText('REQ-017');
+    await expect(page.getByTestId('project-status-program-title')).toContainText(
       'REQ-017 프로젝트 현황 체크리스트 패널'
     );
-    await expect(page.getByTestId('project-status-detail-stage')).toHaveText(
-      '구현 및 회귀 테스트'
-    );
-
-    await page.getByTestId('project-checklist-REQ-015').click();
-    await expect(page.getByTestId('project-status-detail-title')).toContainText(
-      'REQ-015 엑셀 기준소스 DB 동기화'
-    );
-    await expect(page.getByTestId('project-status-detail-stage')).toHaveText('운영 반영');
 
     expect(pageErrors).toEqual([]);
     expect(consoleErrors).toEqual([]);
