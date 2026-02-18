@@ -59,17 +59,26 @@ test.describe('dashboard/index.html core regression', () => {
     const cardCount = await page.locator('.dashboard-card').count();
     expect(cardCount).toBeGreaterThanOrEqual(8);
 
-    const req017Link = page.getByTestId('project-checklist-REQ-017');
-    await expect(req017Link).toHaveAttribute('href', 'project_status.html?req=REQ-017');
+    // v2: Progress bar + active cards + view-all link
+    await expect(page.locator('.project-progress-bar')).toBeVisible();
+
+    const viewAllLink = page.getByTestId('project-status-open-default');
+    await expect(viewAllLink).toHaveAttribute('href', 'project_status.html');
+
     await Promise.all([
-      page.waitForURL('**/project_status.html?req=REQ-017'),
-      req017Link.click(),
+      page.waitForURL('**/project_status.html'),
+      viewAllLink.click(),
     ]);
     await expect(page.getByTestId('project-status-page')).toBeVisible();
+
+    // Default filter is '개발중' — switch to '전체' to see all items including REQ-017
+    const allFilterTab = page.locator('.filter-tab', { hasText: /^전체/ });
+    await allFilterTab.click();
+
+    // Select REQ-017 on detail page and verify
+    const req017Row = page.getByTestId('project-status-row-REQ-017');
+    await req017Row.click();
     await expect(page.getByTestId('project-status-selected-id')).toHaveText('REQ-017');
-    await expect(page.getByTestId('project-status-program-title')).toContainText(
-      'REQ-017 프로젝트 현황 체크리스트 패널'
-    );
 
     expect(pageErrors).toEqual([]);
     expect(consoleErrors).toEqual([]);

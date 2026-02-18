@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('project_status.html interactions', () => {
   test('renders summary and updates detail/checklist when list item is clicked', async ({ page }) => {
-    await page.goto('/project_status.html', { waitUntil: 'networkidle' });
+    await page.goto('/project_status.html?filter=all', { waitUntil: 'networkidle' });
 
     await expect(page.getByTestId('project-status-page')).toBeVisible();
     await expect(page.getByTestId('project-status-count-total')).toHaveText('3');

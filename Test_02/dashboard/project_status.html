@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -91,6 +92,65 @@
             font-weight: 700;
         }
 
+        .progress-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636, #2ea043);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-tab:hover {
+            border-color: #475569;
+            color: var(--text);
+        }
+
+        .filter-tab.is-active {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.4);
+            color: var(--accent);
+        }
+
         .layout {
             display: grid;
             grid-template-columns: 1.15fr 1fr;
@@ -180,6 +240,11 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
+            position: sticky;
+            top: 1.25rem;
+            max-height: calc(100vh - 10rem);
+            overflow-y: auto;
+            align-self: start;
         }
 
         .meta-line {
@@ -229,6 +294,18 @@
             font-weight: 700;
         }
 
+        .check-empty {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
+
+        .check-label-done {
+            text-decoration: line-through;
+            color: var(--muted);
+        }
+
         .next-action {
             margin-top: 0.65rem;
             padding-top: 0.6rem;
@@ -245,9 +322,16 @@
             .layout {
                 grid-template-columns: 1fr;
             }
+
+            .detail-grid {
+                position: static;
+                max-height: none;
+                overflow-y: visible;
+            }
         }
     </style>
 </head>
+
 <body data-testid="project-status-page">
     <div class="container">
         <div class="header">
@@ -259,11 +343,22 @@
         </div>
 
         <section class="summary-grid">
-            <article class="summary-item"><span class="summary-label">전체</span><span class="summary-value" data-testid="project-status-count-total">0</span></article>
-            <article class="summary-item"><span class="summary-label">완료</span><span class="summary-value" data-testid="project-status-count-completed">0</span></article>
-            <article class="summary-item"><span class="summary-label">개발중</span><span class="summary-value" data-testid="project-status-count-in-progress">0</span></article>
-            <article class="summary-item"><span class="summary-label">미착수</span><span class="summary-value" data-testid="project-status-count-pending">0</span></article>
+            <article class="summary-item"><span class="summary-label">전체</span><span class="summary-value"
+                    data-testid="project-status-count-total">0</span></article>
+            <article class="summary-item"><span class="summary-label">완료</span><span class="summary-value"
+                    data-testid="project-status-count-completed">0</span></article>
+            <article class="summary-item"><span class="summary-label">개발중</span><span class="summary-value"
+                    data-testid="project-status-count-in-progress">0</span></article>
+            <article class="summary-item"><span class="summary-label">미착수</span><span class="summary-value"
+                    data-testid="project-status-count-pending">0</span></article>
         </section>
+
+        <section class="progress-section" id="progress-section">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </section>
+
+        <nav class="filter-tabs" id="filter-tabs"></nav>
 
         <section class="layout">
             <article class="card">
@@ -274,7 +369,8 @@
             <div class="detail-grid">
                 <article class="card">
                     <h2 id="detail-title" data-testid="project-status-program-title">상세 개발 프로그램</h2>
-                    <div class="meta-line"><span class="meta-label">요청 ID:</span> <span data-testid="project-status-selected-id">-</span></div>
+                    <div class="meta-line"><span class="meta-label">요청 ID:</span> <span
+                            data-testid="project-status-selected-id">-</span></div>
                     <div class="meta-line"><span class="meta-label">담당:</span> <span id="detail-owner">-</span></div>
                     <div class="meta-line"><span class="meta-label">진행 단계:</span> <span id="detail-stage">-</span></div>
                     <div class="meta-line"><span class="meta-label">기한:</span> <span id="detail-due">-</span></div>
@@ -299,7 +395,8 @@
         }));
 
         const state = {
-            selectedId: null
+            selectedId: null,
+            filter: '개발중'
         };
 
         const els = {
@@ -315,7 +412,10 @@
             countTotal: document.querySelector('[data-testid="project-status-count-total"]'),
             countCompleted: document.querySelector('[data-testid="project-status-count-completed"]'),
             countInProgress: document.querySelector('[data-testid="project-status-count-in-progress"]'),
-            countPending: document.querySelector('[data-testid="project-status-count-pending"]')
+            countPending: document.querySelector('[data-testid="project-status-count-pending"]'),
+            progressFill: document.getElementById('progress-fill'),
+            progressText: document.getElementById('progress-text'),
+            filterTabs: document.getElementById('filter-tabs')
         };
 
         const getStatusBadgeClass = (status) => {
@@ -329,27 +429,61 @@
         const renderSummary = () => {
             const completed = items.filter((item) => item.status === '완료').length;
             const inProgress = items.filter((item) => item.status === '개발중').length;
+            const planned = items.filter((item) => item.status === '기획').length;
             const pending = items.filter((item) => item.status === '미착수').length;
             els.countTotal.textContent = String(items.length);
             els.countCompleted.textContent = String(completed);
             els.countInProgress.textContent = String(inProgress);
             els.countPending.textContent = String(pending);
+
+            const pct = items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
+            els.progressFill.style.width = pct + '%';
+            els.progressText.textContent = pct + '% (' + completed + '/' + items.length + ' 완료)';
+
+            const filters = [
+                { key: 'all', label: '전체 ' + items.length },
+                { key: '개발중', label: '개발중 ' + inProgress },
+                { key: '기획', label: '기획 ' + planned },
+                { key: '완료', label: '완료 ' + completed }
+            ];
+            if (pending > 0) filters.push({ key: '미착수', label: '미착수 ' + pending });
+
+            els.filterTabs.innerHTML = '';
+            filters.forEach((f) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'filter-tab' + (state.filter === f.key ? ' is-active' : '');
+                btn.textContent = f.label;
+                btn.addEventListener('click', () => {
+                    state.filter = f.key;
+                    render();
+                });
+                els.filterTabs.appendChild(btn);
+            });
         };
 
         const renderList = () => {
             els.list.innerHTML = '';
-            items.forEach((item) => {
+            const filtered = state.filter === 'all'
+                ? items
+                : items.filter((item) => item.status === state.filter);
+
+            filtered.forEach((item) => {
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = `dev-row${item.id === state.selectedId ? ' is-active' : ''}`;
                 button.dataset.testid = `project-status-row-${item.id}`;
                 button.setAttribute('data-testid', `project-status-row-${item.id}`);
+
+                const ownerText = (item.owner && item.owner !== 'TBD' && item.owner !== '-')
+                    ? ' · ' + item.owner : '';
+
                 button.innerHTML = `
                     <div class="dev-head">
                         <span class="dev-title">${item.title}</span>
                         <span class="${getStatusBadgeClass(item.status)}">${item.status}</span>
                     </div>
-                    <div class="dev-meta">${item.stage} · ${item.owner}</div>
+                    <div class="dev-meta">${item.stage}${ownerText}</div>
                 `;
                 button.addEventListener('click', () => {
                     state.selectedId = item.id;
@@ -359,41 +493,85 @@
             });
         };
 
+        const autoLabel = (program) => {
+            if (program.description && program.description !== 'Related file') {
+                return program.description;
+            }
+            const ext = (program.name.split('.').pop() || '').toLowerCase();
+            const labels = {
+                py: 'Python script', js: 'JavaScript', jsx: 'React component',
+                ts: 'TypeScript', tsx: 'React TypeScript', html: 'HTML page',
+                json: 'Configuration', yml: 'CI/CD workflow', yaml: 'CI/CD workflow',
+                md: 'Documentation', ps1: 'PowerShell script', bat: 'Batch script',
+                txt: 'Text file', css: 'Stylesheet'
+            };
+            return labels[ext] || 'File';
+        };
+
         const renderDetail = () => {
             const selected = findItemById(state.selectedId) || items[0];
             if (!selected) {
                 els.detailTitle.textContent = '상세 개발 프로그램';
                 els.selectedId.textContent = '-';
-                els.owner.textContent = '-';
+                els.owner.closest('.meta-line').style.display = 'none';
                 els.stage.textContent = '-';
-                els.due.textContent = '-';
+                els.due.closest('.meta-line').style.display = 'none';
                 els.programList.innerHTML = '';
                 els.checklist.innerHTML = '';
-                els.nextAction.textContent = '다음 조치: -';
+                els.nextAction.style.display = 'none';
                 return;
             }
 
             els.detailTitle.textContent = selected.title;
             els.selectedId.textContent = selected.id;
-            els.owner.textContent = selected.owner;
-            els.stage.textContent = selected.stage;
-            els.due.textContent = selected.due;
+            els.stage.textContent = selected.stage === '진행' ? '개발중' : selected.stage;
+
+            const ownerLine = els.owner.closest('.meta-line');
+            if (selected.owner && selected.owner !== 'TBD' && selected.owner !== '-') {
+                ownerLine.style.display = '';
+                els.owner.textContent = selected.owner;
+            } else {
+                ownerLine.style.display = 'none';
+            }
+
+            const dueLine = els.due.closest('.meta-line');
+            if (selected.due && selected.due !== '-') {
+                dueLine.style.display = '';
+                els.due.textContent = selected.due;
+            } else {
+                dueLine.style.display = 'none';
+            }
+
             els.programList.innerHTML = '';
             (selected.programs || []).forEach((program) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<strong>${program.name}</strong><br /><code>${program.path}</code><br />${program.description}`;
+                li.innerHTML = `<strong>${program.name}</strong><br /><code>${program.path}</code><br />${autoLabel(program)}`;
                 els.programList.appendChild(li);
             });
 
             els.checklist.innerHTML = '';
-            (selected.checklist || []).forEach((step) => {
-                const row = document.createElement('div');
-                row.className = 'check-row';
-                row.innerHTML = `<span>${step.label}</span><span class="${step.done ? 'check-mark-ok' : 'check-mark-pending'}">${step.done ? '완료' : '대기'}</span>`;
-                els.checklist.appendChild(row);
-            });
+            const checklist = selected.checklist || [];
+            if (checklist.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'check-empty';
+                emptyMsg.textContent = '체크리스트 미등록';
+                els.checklist.appendChild(emptyMsg);
+            } else {
+                checklist.forEach((step) => {
+                    const row = document.createElement('div');
+                    row.className = 'check-row';
+                    const labelClass = step.done ? 'check-label-done' : '';
+                    row.innerHTML = `<span class="${labelClass}">${step.label}</span><span class="${step.done ? 'check-mark-ok' : 'check-mark-pending'}">${step.done ? '완료' : '대기'}</span>`;
+                    els.checklist.appendChild(row);
+                });
+            }
 
-            els.nextAction.textContent = `다음 조치: ${selected.nextAction || '-'}`;
+            if (selected.nextAction && selected.nextAction !== '-') {
+                els.nextAction.style.display = '';
+                els.nextAction.textContent = `다음 조치: ${selected.nextAction}`;
+            } else {
+                els.nextAction.style.display = 'none';
+            }
         };
 
         const render = () => {
@@ -403,7 +581,12 @@
         };
 
         const initialize = () => {
-            const reqId = new URLSearchParams(window.location.search).get('req');
+            const params = new URLSearchParams(window.location.search);
+            const reqId = params.get('req');
+            const filterParam = params.get('filter');
+            if (filterParam && ['all', '개발중', '기획', '완료', '미착수'].includes(filterParam)) {
+                state.filter = filterParam;
+            }
             if (reqId && findItemById(reqId)) {
                 state.selectedId = reqId;
             } else if (items.length > 0) {
@@ -416,4 +599,5 @@
         initialize();
     </script>
 </body>
+
 </html>
