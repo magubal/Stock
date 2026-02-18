@@ -1,0 +1,25 @@
+{
+  "_comment": "업종별 매출 CAGR 임계치 (3년 기준). GICS Sector 기준.",
+  "_updated": "2026-02-15",
+  "thresholds": {
+    "Information Technology": 0.15,
+    "Health Care": 0.12,
+    "Consumer Discretionary": 0.10,
+    "Communication Services": 0.10,
+    "Industrials": 0.08,
+    "Financials": 0.08,
+    "Materials": 0.07,
+    "Consumer Staples": 0.05,
+    "Energy": 0.05,
+    "Real Estate": 0.05,
+    "Utilities": 0.03,
+    "default": 0.10
+  },
+  "cyclical_sectors": [
+    "Energy",
+    "Materials",
+    "Industrials"
+  ],
+  "mega_cap_threshold": 10000000000000,
+  "one_time_spike_ratio": 3.0
+}

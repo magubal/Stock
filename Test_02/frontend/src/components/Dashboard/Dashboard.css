@@ -92,6 +92,88 @@
   padding: 2rem;
 }
 
+/* Toolbar */
+.dashboard-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.dashboard-toolbar .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Monitoring Section */
+.monitoring-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 1rem;
+}
+
+.monitoring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.monitoring-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 8px;
+  border: 1px solid #334155;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.monitoring-link:hover {
+  border-color: #475569;
+  background: rgba(30, 41, 59, 0.8);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.monitoring-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.monitoring-info {
+  flex: 1;
+}
+
+.monitoring-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.monitoring-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.monitoring-arrow {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));

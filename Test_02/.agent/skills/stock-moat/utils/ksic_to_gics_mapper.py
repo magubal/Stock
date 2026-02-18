@@ -26,11 +26,12 @@ class KSICtoGICSMapper:
             '20112': ('Materials', 'Chemicals', 'Basic Chemicals', '화학', '정밀화학'),
             '202': ('Materials', 'Chemicals', 'Fertilizers & Agricultural Chemicals', '화학', '비료/농약'),
             '204': ('Materials', 'Chemicals', 'Specialty Chemicals', '화학', '기타화학'),
-            '20422': ('Consumer Staples', 'Personal Products', 'Cosmetics', '화학', '화장품'),
-            '20423': ('Consumer Staples', 'Household Products', 'Detergents', '화학', '세제'),
+            '20422': ('Consumer Staples', 'Personal Products', 'Cosmetics', '화장품', '화장품'),
+            '20423': ('Consumer Staples', 'Household Products', 'Detergents', '화장품', '생활용품'),
 
             # 의약품 (Health Care - Pharmaceuticals)
             '211': ('Health Care', 'Pharmaceuticals', 'Pharmaceuticals', '바이오', '의약품'),
+            '212': ('Health Care', 'Pharmaceuticals', 'Pharmaceuticals & Biotech', '바이오', '의약품'),
             '21101': ('Health Care', 'Pharmaceuticals', 'Drug Manufacturing', '바이오', '완제의약품'),
             '21102': ('Health Care', 'Biotechnology', 'Biotechnology', '바이오', '바이오의약품'),
 
@@ -52,7 +53,12 @@ class KSICtoGICSMapper:
 
             # 전자부품/반도체 (Information Technology - Semiconductors)
             '261': ('Information Technology', 'Semiconductors', 'Semiconductors', '반도체', '반도체'),
+            '262': ('Information Technology', 'Electronic Components', 'Electronic Components', '반도체', '전자부품'),
+            '2629': ('Information Technology', 'Electronic Components', 'Electronic Components', '반도체', '전자부품'),
+            '263': ('Information Technology', 'Technology Hardware', 'Computer Hardware', '전자', 'IT하드웨어'),
+            '26329': ('Information Technology', 'Technology Hardware', 'Computer Peripherals', '전자', 'IT하드웨어'),
             '264': ('Information Technology', 'Semiconductors', 'Semiconductors', '반도체', '반도체'),  # 전자부품 제조업
+            '265': ('Information Technology', 'Electronic Equipment', 'Display & Optical Equipment', '전자', '디스플레이/광학장비'),
             '26110': ('Information Technology', 'Semiconductors', 'Memory Chips', '반도체', '메모리반도체'),
             '26121': ('Information Technology', 'Semiconductors', 'Non-Memory Chips', '반도체', '시스템반도체'),
             '26122': ('Information Technology', 'Electronic Components', 'Display Panels', '전자', '디스플레이'),
@@ -101,12 +107,27 @@ class KSICtoGICSMapper:
             # IT 서비스/소프트웨어 (Information Technology)
             '424': ('Information Technology', 'Software & Services', 'Internet Services', 'IT', '인터넷'),
             '581': ('Information Technology', 'Software & Services', 'Software', 'IT', '소프트웨어'),
+            '582': ('Information Technology', 'Software & Services', 'Application Software', 'IT', '소프트웨어'),
+            '5821': ('Information Technology', 'Software & Services', 'Application Software', 'IT', '응용SW'),
+            '58211': ('Information Technology', 'Software & Services', 'System Software', 'IT', '시스템SW'),
+            '58219': ('Information Technology', 'Software & Services', 'Application Software', 'IT', '응용SW'),
             '58221': ('Information Technology', 'Software & Services', 'Game Software', '게임', '게임소프트웨어'),
-            '5821': ('Communication Services', 'Media & Entertainment', 'Gaming', '게임', '모바일게임/PC게임'),
+            '58222': ('Information Technology', 'Software & Services', 'Application Software', 'IT', '응용SW'),
+            '5829': ('Information Technology', 'Software & Services', 'Other Software', 'IT', '기타SW'),
+            '591': ('Communication Services', 'Media & Entertainment', 'Movies & Entertainment', '미디어', '영상/방송'),
+            '601': ('Communication Services', 'Media & Entertainment', 'Broadcasting', '미디어', '방송'),
+            '602': ('Communication Services', 'Media & Entertainment', 'Broadcasting', '미디어', '방송'),
             '620': ('Information Technology', 'Software & Services', 'IT Consulting', 'IT', 'IT서비스'),
+            '6201': ('Information Technology', 'Software & Services', 'IT Consulting', 'IT', 'IT컨설팅'),
+            '6202': ('Information Technology', 'Software & Services', 'IT Services', 'IT', '시스템통합'),
             '631': ('Communication Services', 'Media & Entertainment', 'Internet Platforms', 'IT', '플랫폼'),
-            '63120': ('Communication Services', 'Media & Entertainment', 'Internet Platforms', 'IT', '플랫폼'),  # 카카오
+            '63120': ('Communication Services', 'Media & Entertainment', 'Internet Platforms', 'IT', '플랫폼'),
             '639': ('Information Technology', 'Software & Services', 'Data Services', 'IT', '정보서비스'),
+            '63': ('Information Technology', 'Software & Services', 'Data Processing', 'IT', '정보서비스'),
+
+            # 의료기기 (Health Care - Medical Devices)
+            '27112': ('Health Care', 'Health Care Equipment', 'Medical Devices', '바이오', '의료기기'),
+            '27194': ('Health Care', 'Health Care Equipment', 'Medical Instruments', '바이오', '의료기기'),
 
             # 유통/도소매 (Consumer Discretionary - Retailing)
             '4610': ('Consumer Discretionary', 'Retailing', 'General Trading', '유통', '종합상사'),
@@ -193,26 +214,61 @@ class KSICtoGICSMapper:
             '120': ('Consumer Staples', 'Food & Beverage', 'Tobacco', '식품', '담배'),
         }
 
+        # Strong overrides: ALWAYS apply (company-specific names that definitively
+        # indicate the business, regardless of KSIC code)
+        self.strong_name_overrides = {
+            '딥노이드': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/딥러닝'),
+            '마음AI': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/음성합성'),
+            '알체라': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/영상인식'),
+        }
+
+        # Soft overrides: apply only when KSIC confidence < 0.7
+        self.soft_name_overrides = {
+            'AI': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/딥러닝'),
+            '인공지능': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/딥러닝'),
+            '딥러닝': ('Information Technology', 'Software & Services', 'AI Software', 'IT', 'AI/딥러닝'),
+            '바이오': ('Health Care', 'Biotechnology', 'Biotechnology', '바이오', '바이오'),
+            '메디': ('Health Care', 'Health Care Equipment', 'Medical Devices', '바이오', '의료기기'),
+            '헬스': ('Health Care', 'Health Care Technology', 'Health Care IT', '바이오', '헬스케어IT'),
+            '제약': ('Health Care', 'Pharmaceuticals', 'Pharmaceuticals', '바이오', '의약품'),
+            '로봇': ('Industrials', 'Capital Goods', 'Robotics', '제조업', '로보틱스'),
+            '오토메이션': ('Industrials', 'Capital Goods', 'Automation', '제조업', '자동화'),
+            '시큐': ('Information Technology', 'Software & Services', 'Cybersecurity', 'IT', '보안'),
+            '핀테크': ('Financials', 'Diversified Financials', 'Fintech', '금융', '핀테크'),
+            '페이': ('Financials', 'Diversified Financials', 'Fintech', '금융', '핀테크'),
+        }
+
+        # 2-digit fallback for '5x' codes (prevents all 5xxxx -> 운수/물류)
+        self.two_digit_fallback = {
+            '49': ('Industrials', 'Transportation', 'Rail/Land Transport', '운수', '육상운수'),
+            '50': ('Industrials', 'Transportation', 'Water Transport', '운수', '해운'),
+            '51': ('Industrials', 'Transportation', 'Air Transport', '운수', '항공'),
+            '52': ('Industrials', 'Transportation', 'Warehousing', '운수', '물류/창고'),
+            '55': ('Consumer Discretionary', 'Hotels & Leisure', 'Accommodation', '레저', '숙박'),
+            '56': ('Consumer Staples', 'Food & Beverage', 'Food Services', '식품', '외식'),
+            '58': ('Information Technology', 'Software & Services', 'Software Publishing', 'IT', '소프트웨어'),
+            '59': ('Communication Services', 'Media & Entertainment', 'Content Production', '미디어', '콘텐츠'),
+            '60': ('Communication Services', 'Media & Entertainment', 'Broadcasting', '미디어', '방송'),
+            '61': ('Communication Services', 'Telecom', 'Telecom', '통신', '통신'),
+            '62': ('Information Technology', 'Software & Services', 'IT Services', 'IT', 'IT서비스'),
+            '63': ('Information Technology', 'Software & Services', 'Information Services', 'IT', '정보서비스'),
+        }
+
     def map_to_gics(self, ksic_code: str, company_name: str = '') -> Dict:
         """
-        Map KSIC code to GICS classification
-
-        Returns:
-            {
-                'gics_sector': str,
-                'gics_industry_group': str,
-                'gics_industry': str,
-                'korean_sector_top': str,
-                'korean_sector_sub': str,
-                'confidence': float,
-                'reasoning': str
-            }
+        Map KSIC code to GICS classification (3-Layer)
+        
+        Layer 1: Exact/prefix KSIC match
+        Layer 2: 2-digit fallback (refined) + 1-digit fallback
+        Layer 3: Company name keyword override (when confidence < 0.7)
         """
 
-        # Try exact match
+        result = None
+
+        # Layer 1: Try exact match
         if ksic_code in self.ksic_to_gics:
             gics_sector, ind_group, industry, kr_top, kr_sub = self.ksic_to_gics[ksic_code]
-            return {
+            result = {
                 'gics_sector': gics_sector,
                 'gics_industry_group': ind_group,
                 'gics_industry': industry,
@@ -223,62 +279,118 @@ class KSICtoGICSMapper:
                 'source': 'GICS_exact'
             }
 
-        # Try prefix match (5 digits -> 4 -> 3 -> 2)
-        for length in [5, 4, 3, 2]:
-            prefix = ksic_code[:length]
-            for code, (gics_sector, ind_group, industry, kr_top, kr_sub) in self.ksic_to_gics.items():
-                if code == prefix:
-                    confidence = 0.9 - (0.1 * (5 - length))  # 0.9, 0.8, 0.7, 0.6
-                    return {
+        # Layer 1b: Try prefix match (5 -> 4 -> 3 -> 2 digits)
+        if result is None:
+            for length in [5, 4, 3, 2]:
+                prefix = ksic_code[:length]
+                for code, (gics_sector, ind_group, industry, kr_top, kr_sub) in self.ksic_to_gics.items():
+                    if code == prefix:
+                        confidence = 0.9 - (0.1 * (5 - length))
+                        result = {
+                            'gics_sector': gics_sector,
+                            'gics_industry_group': ind_group,
+                            'gics_industry': industry,
+                            'korean_sector_top': kr_top,
+                            'korean_sector_sub': kr_sub,
+                            'confidence': confidence,
+                            'reasoning': f'GICS: {gics_sector} - {industry} (KSIC {ksic_code}, {length}자리 매칭)',
+                            'source': f'GICS_prefix_{length}'
+                        }
+                        break
+                if result is not None:
+                    break
+
+        # Layer 2: 2-digit then 1-digit fallback
+        if result is None:
+            two_digit = ksic_code[:2] if len(ksic_code) >= 2 else ''
+            first_digit = ksic_code[0] if ksic_code else '0'
+
+            if two_digit in self.two_digit_fallback:
+                gics_sector, ind_group, industry, kr_top, kr_sub = self.two_digit_fallback[two_digit]
+                result = {
+                    'gics_sector': gics_sector,
+                    'gics_industry_group': ind_group,
+                    'gics_industry': industry,
+                    'korean_sector_top': kr_top,
+                    'korean_sector_sub': kr_sub,
+                    'confidence': 0.5,
+                    'reasoning': f'GICS: {gics_sector} - {industry} (KSIC {ksic_code}, 2자리 fallback)',
+                    'source': 'GICS_2digit_fallback'
+                }
+            else:
+                fallback_patterns = {
+                    '1': ('Consumer Staples', 'Food & Agriculture', 'Food Products', '식품', '식품'),
+                    '2': ('Materials', 'Chemicals', 'Chemicals', '화학', '화학'),
+                    '3': ('Industrials', 'Capital Goods', 'Industrial Goods', '제조업', '일반제조'),
+                    '4': ('Industrials', 'Capital Goods', 'Construction & Engineering', '건설', '건설'),
+                    '6': ('Financials', 'Diversified Financials', 'Financial Services', '금융', '금융'),
+                    '7': ('Industrials', 'Commercial Services', 'Professional Services', '기타', '전문서비스'),
+                    '8': ('Industrials', 'Commercial Services', 'Education Services', '기타', '교육'),
+                    '9': ('Consumer Discretionary', 'Hotels & Leisure', 'Leisure Services', '레저', '서비스'),
+                }
+                if first_digit in fallback_patterns:
+                    gics_sector, ind_group, industry, kr_top, kr_sub = fallback_patterns[first_digit]
+                    result = {
                         'gics_sector': gics_sector,
                         'gics_industry_group': ind_group,
                         'gics_industry': industry,
                         'korean_sector_top': kr_top,
                         'korean_sector_sub': kr_sub,
-                        'confidence': confidence,
-                        'reasoning': f'GICS: {gics_sector} - {industry} (KSIC {ksic_code}, {length}자리 매칭)',
-                        'source': f'GICS_prefix_{length}'
+                        'confidence': 0.4,
+                        'reasoning': f'GICS: {gics_sector} - {industry} (KSIC {ksic_code}, 대분류 추정)',
+                        'source': 'GICS_fallback'
                     }
 
-        # Fallback: Use broad industry code patterns
-        first_digit = ksic_code[0] if ksic_code else '0'
+        # Layer 3a: Strong name overrides (ALWAYS apply, e.g. company-specific)
+        if company_name:
+            for keyword, override in self.strong_name_overrides.items():
+                if keyword in company_name:
+                    gics_sector, ind_group, industry, kr_top, kr_sub = override
+                    result = {
+                        'gics_sector': gics_sector,
+                        'gics_industry_group': ind_group,
+                        'gics_industry': industry,
+                        'korean_sector_top': kr_top,
+                        'korean_sector_sub': kr_sub,
+                        'confidence': 0.90,
+                        'reasoning': f'GICS: {gics_sector} - {industry} (회사명 "{keyword}" 강제 매칭)',
+                        'source': 'name_strong_override'
+                    }
+                    break
 
-        fallback_patterns = {
-            '1': ('Consumer Staples', 'Food & Agriculture', 'Food Products', '식품', '식품'),
-            '2': ('Materials', 'Chemicals', 'Chemicals', '화학', '화학'),
-            '3': ('Industrials', 'Capital Goods', 'Industrial Goods', '제조업', '일반제조'),
-            '4': ('Industrials', 'Capital Goods', 'Construction & Engineering', '건설', '건설'),  # 건설업 41xxx
-            '5': ('Industrials', 'Transportation', 'Transportation', '운수', '운수/물류'),
-            '6': ('Financials', 'Diversified Financials', 'Financial Services', '금융', '금융'),
-            '7': ('Industrials', 'Commercial Services', 'Professional Services', '기타', '전문서비스'),
-            '8': ('Industrials', 'Commercial Services', 'Education Services', '기타', '교육'),
-            '9': ('Consumer Discretionary', 'Hotels & Leisure', 'Leisure Services', '레저', '서비스'),
-        }
+        # Layer 3b: Soft name overrides (only when confidence < 0.7)
+        if company_name and (result is None or result.get('confidence', 0) < 0.7):
+            for keyword, override in self.soft_name_overrides.items():
+                if keyword in company_name:
+                    gics_sector, ind_group, industry, kr_top, kr_sub = override
+                    override_result = {
+                        'gics_sector': gics_sector,
+                        'gics_industry_group': ind_group,
+                        'gics_industry': industry,
+                        'korean_sector_top': kr_top,
+                        'korean_sector_sub': kr_sub,
+                        'confidence': 0.75,
+                        'reasoning': f'GICS: {gics_sector} - {industry} (회사명 키워드 "{keyword}" 매칭)',
+                        'source': 'name_soft_override'
+                    }
+                    if result is None or override_result['confidence'] > result.get('confidence', 0):
+                        result = override_result
+                    break
 
-        if first_digit in fallback_patterns:
-            gics_sector, ind_group, industry, kr_top, kr_sub = fallback_patterns[first_digit]
-            return {
-                'gics_sector': gics_sector,
-                'gics_industry_group': ind_group,
-                'gics_industry': industry,
-                'korean_sector_top': kr_top,
-                'korean_sector_sub': kr_sub,
-                'confidence': 0.4,
-                'reasoning': f'GICS: {gics_sector} - {industry} (KSIC {ksic_code}, 대분류 추정)',
-                'source': 'GICS_fallback'
+        # Final fallback: Unknown
+        if result is None:
+            result = {
+                'gics_sector': 'Unclassified',
+                'gics_industry_group': 'Other',
+                'gics_industry': 'Other',
+                'korean_sector_top': '기타',
+                'korean_sector_sub': '미분류',
+                'confidence': 0.2,
+                'reasoning': f'KSIC {ksic_code} - 미등록 업종코드',
+                'source': 'unknown'
             }
 
-        # Unknown
-        return {
-            'gics_sector': 'Unclassified',
-            'gics_industry_group': 'Other',
-            'gics_industry': 'Other',
-            'korean_sector_top': '기타',
-            'korean_sector_sub': '미분류',
-            'confidence': 0.2,
-            'reasoning': f'KSIC {ksic_code} - 미등록 업종코드',
-            'source': 'unknown'
-        }
+        return result
 
     def get_moat_drivers_by_gics(self, gics_sector: str, gics_industry: str) -> Dict:
         """

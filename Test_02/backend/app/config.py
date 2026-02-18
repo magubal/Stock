@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # API Keys
     OPENAI_API_KEY: Optional[str] = None
     ALPHA_VANTAGE_API_KEY: Optional[str] = None
+    ANTHROPIC_API_KEY: Optional[str] = None
+    DART_API_KEY: Optional[str] = None
+    FRED_API_KEY: Optional[str] = None
     
     # Scraping
     USER_AGENT: str = "Stock-Research-ONE/1.0"
@@ -33,7 +36,7 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     
-    class Config:
-        env_file = ".env"
+    # Ignore unrelated keys in .env (e.g., ORACLE_* for research scripts).
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()

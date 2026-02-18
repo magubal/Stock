@@ -1,0 +1,113 @@
+/* Liquidity Stress Monitor */
+.liq-page { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+.liq-page .page-title-bar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+.liq-page .page-title-bar h1 { font-size: 1.25rem; font-weight: 600; }
+.liq-page .page-badge { font-size: 0.75rem; padding: 0.25rem 0.75rem; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); border-radius: 20px; color: #f97316; }
+
+/* Stress Banner */
+.stress-banner { padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.stress-banner .banner-main h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+.stress-banner .banner-sub { font-size: 0.875rem; color: #94a3b8; }
+
+/* Gauge */
+.gauge-section { display: flex; align-items: center; gap: 2rem; }
+.gauge-wrapper { position: relative; width: 160px; height: 100px; }
+.gauge-svg { width: 160px; height: 100px; }
+.gauge-label { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); text-align: center; }
+.gauge-score { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+.gauge-level { font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
+
+/* Module Bars */
+.modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.module-bar { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 10px; padding: 1rem; cursor: pointer; transition: all 0.2s ease; }
+.module-bar:hover { border-color: #f97316; transform: translateY(-2px); }
+.module-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.module-name { font-size: 0.8rem; color: #94a3b8; font-weight: 500; }
+.module-score { font-size: 0.9rem; font-weight: 700; }
+.bar-track { width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* KPI Cards */
+.liq-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.liq-kpi-card { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px); transition: all 0.3s ease; cursor: pointer; }
+.liq-kpi-card:hover { border-color: #f97316; box-shadow: 0 0 20px rgba(249,115,22,0.1); }
+.liq-kpi-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.5rem; }
+.liq-kpi-value { font-size: 1.5rem; font-weight: 700; }
+.liq-kpi-change { font-size: 0.75rem; margin-top: 0.25rem; }
+
+/* Chart */
+.chart-section { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.chart-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #f8fafc; }
+.chart-wrapper { position: relative; height: 300px; }
+
+/* News */
+.news-section { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; }
+.news-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #f8fafc; }
+.news-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid rgba(51,65,85,0.5); }
+.news-item:last-child { border-bottom: none; }
+.news-rank { width: 24px; height: 24px; border-radius: 50%; background: rgba(249,115,22,0.15); color: #f97316; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+.news-keyword { flex: 1; font-size: 0.875rem; color: #f8fafc; }
+.news-count { font-size: 0.875rem; font-weight: 600; color: #94a3b8; }
+
+/* Loading */
+.liq-loading { display: flex; justify-content: center; align-items: center; height: 200px; }
+.liq-spinner { width: 40px; height: 40px; border: 3px solid #334155; border-top: 3px solid #f97316; border-radius: 50%; animation: liq-spin 1s linear infinite; }
+@keyframes liq-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.liq-empty { text-align: center; padding: 4rem 2rem; color: #64748b; }
+.liq-empty h3 { font-size: 1.25rem; margin-bottom: 0.5rem; color: #94a3b8; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; animation: liq-fadeIn 0.2s ease; }
+@keyframes liq-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content { background: #0f172a; border: 1px solid #334155; border-radius: 16px; width: 90%; max-width: 680px; max-height: 85vh; overflow-y: auto; padding: 2rem; position: relative; animation: liq-slideUp 0.25s ease; }
+@keyframes liq-slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: 1px solid #334155; border-radius: 6px; color: #94a3b8; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; }
+.modal-close:hover { color: #f8fafc; border-color: #f97316; }
+.modal-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; color: #f8fafc; }
+.modal-subtitle { font-size: 0.8rem; color: #64748b; margin-bottom: 1.5rem; }
+.modal-level-badge { font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 12px; margin-left: 0.5rem; vertical-align: middle; letter-spacing: 0.03em; }
+
+/* Detail grid */
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.detail-item { background: rgba(30,41,59,0.6); border: 1px solid #334155; border-radius: 8px; padding: 0.75rem; }
+.detail-item-label { font-size: 0.7rem; color: #64748b; margin-bottom: 0.25rem; }
+.detail-item-value { font-size: 1.1rem; font-weight: 700; display: flex; align-items: baseline; gap: 0.4rem; }
+.detail-item-change { font-size: 0.7rem; font-weight: 600; }
+.chg-up { color: #ef4444; }
+.chg-down { color: #22c55e; }
+.chg-flat { color: #64748b; }
+.detail-item.selectable { cursor: pointer; transition: all 0.2s; }
+.detail-item.selectable:hover { border-color: #f97316; }
+.detail-item.selected { border-color: #f97316; background: rgba(249,115,22,0.1); }
+.detail-chart-wrapper { position: relative; height: 200px; margin-bottom: 1rem; }
+
+/* Detail explanation / comment */
+.detail-explanation { font-size: 0.8rem; color: #94a3b8; line-height: 1.7; padding: 1rem; background: rgba(30,41,59,0.4); border-radius: 8px; border-left: 3px solid #f97316; white-space: pre-line; }
+.detail-comment { margin-bottom: 1rem; padding: 0.85rem 1rem; background: rgba(15,23,42,0.6); border: 1px solid #334155; border-radius: 8px; font-size: 0.85rem; color: #e2e8f0; line-height: 1.6; display: flex; align-items: flex-start; gap: 0.6rem; }
+.comment-badge { font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 0.1rem; }
+.comment-text { flex: 1; }
+
+/* Source links */
+.detail-sources { margin-top: 1rem; padding: 0.75rem; background: rgba(30,41,59,0.4); border-radius: 8px; border-left: 3px solid #3b82f6; }
+.sources-label { font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.source-link { display: block; font-size: 0.8rem; color: #60a5fa; text-decoration: none; padding: 0.3rem 0; transition: color 0.2s; }
+.source-link:hover { color: #93c5fd; text-decoration: underline; }
+
+/* Diagnosis Strip */
+.banner-diagnosis { margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid rgba(148,163,184,0.1); }
+.diagnosis-reason { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.45rem; display: flex; align-items: center; gap: 0.3rem; }
+.diagnosis-bar { display: flex; height: 18px; border-radius: 4px; overflow: hidden; gap: 2px; }
+.diagnosis-segment { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-weight: 600; color: rgba(255,255,255,0.9); border-radius: 3px; min-width: 20px; transition: opacity 0.2s; cursor: default; }
+.diagnosis-segment:hover { opacity: 0.8; }
+.diagnosis-legend { display: flex; gap: 0.65rem; margin-top: 0.3rem; flex-wrap: wrap; }
+.legend-item { font-size: 0.6rem; color: #64748b; display: flex; align-items: center; gap: 0.2rem; }
+.legend-dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .liq-page { padding: 1rem; }
+    .liq-kpi-grid, .modules-grid { grid-template-columns: 1fr; }
+    .stress-banner { flex-direction: column; text-align: center; }
+    .gauge-section { flex-direction: column; align-items: center; }
+    .modal-content { width: 95%; padding: 1.25rem; }
+}

@@ -85,7 +85,9 @@ class MoatEvaluatorV2:
         ticker: str,
         evidence_collection: EvidenceCollection,
         bm_analysis: BMAnalysis,
-        classification: Dict
+        classification: Dict,
+        financials: Dict = None,
+        multi_year_financials: Dict = None
     ) -> MoatEvaluation:
         """
         Execute evidence-based moat evaluation.
@@ -94,16 +96,49 @@ class MoatEvaluatorV2:
         1. Score each moat type based on evidence quality
         2. Validate 3+ scores require disclosure evidence
         3. Validate 4+ scores require counter-evidence check
-        4. Calculate final strength from top-5 types
-
-        Note: Sustainability check is done separately by pipeline (Step 7).
+        4. Validate size requirements (Network Effect etc.)
+        5. Calculate final strength from top-5 types
         """
         scores = {}
+        if financials is None:
+            financials = {}
+
+        # 1. Financial Gatekeeper (1차 관문)
+        # 펀더멘털이 약한 기업은 증거 분석 전에 점수 상한선을 설정함
+        # 1. Financial Gatekeeper (1차 관문)
+        # 펀더멘털이 약한 기업은 증거 분석 전에 점수 상한선을 설정함
+        gatekeeper_result = self._apply_financial_gatekeeper(financials, multi_year_financials)
+        max_score = gatekeeper_result['max_score']
+        gatekeeper_reasons = gatekeeper_result['reasons']
 
         for moat_type in ALL_MOAT_TYPES:
             evidences = evidence_collection.get_by_type(moat_type)
-            score = self._score_single_type(moat_type, evidences)
-            scores[moat_type] = score
+            score_obj = self._score_single_type(moat_type, evidences)
+            
+            # Apply Gatekeeper Limit
+            if score_obj.score > max_score:
+                score_obj.score = max_score
+                score_obj.downgraded = True
+                reason = " | ".join(gatekeeper_reasons)
+                if score_obj.downgrade_reason:
+                    score_obj.downgrade_reason = f"펀더멘털 제한({reason}) | " + score_obj.downgrade_reason
+                else:
+                    score_obj.downgrade_reason = f"펀더멘털 제한({reason})"
+
+            # Apply size-based validation (Revenue < 1000억) (2차 관문)
+            new_score, size_reason = self._validate_moat_size(
+                moat_type, score_obj.score, financials
+            )
+            
+            if new_score < score_obj.score:
+                score_obj.score = new_score
+                score_obj.downgraded = True
+                if score_obj.downgrade_reason:
+                    score_obj.downgrade_reason += f" | {size_reason}"
+                else:
+                    score_obj.downgrade_reason = size_reason
+            
+            scores[moat_type] = score_obj
 
         # Calculate final strength
         moat_strength = self._calculate_final_strength(scores)
@@ -135,6 +170,83 @@ class MoatEvaluatorV2:
         evaluation.moat_desc = self.generate_moat_desc(evaluation)
 
         return evaluation
+
+
+
+    def _apply_financial_gatekeeper(self, financials: Dict, multi_year_financials: Dict = None) -> Dict:
+        """
+        Check financial fundamentals using the LATEST available data.
+        Returns max_score and reasons.
+        
+        Rules:
+        - Deficit or OPM < 5%: Max 2.0
+        - ROE < 5%: Max 2.5
+        
+        Exception (Mega Cap / Cyclical):
+        - If Revenue > 10 Trillion KRW (Mega Cap), we assume cyclical downturn rather than structural flaw.
+        - Cap relaxed to 4.0 (allow evidence to prove moat) even if margins are low.
+        """
+        max_score = 5
+        reasons = []
+
+        # Determine which financials to use (Latest > Current Year)
+        target_fin = financials
+        target_year = "Current"
+        
+        if multi_year_financials:
+            # Sort years and pick the latest
+            years = sorted(multi_year_financials.keys())
+            if years:
+                latest_year = years[-1]
+                latest_fin = multi_year_financials[latest_year]
+                
+                # Use latest if it has valid data (Revenue check)
+                if latest_fin.get('revenue', 0) > 0:
+                    target_fin = latest_fin
+                    target_year = str(latest_year)
+
+        if not target_fin:
+            return {'max_score': 5, 'reasons': []}
+
+        # Check Revenue Size (Mega Cap Exception)
+        revenue = target_fin.get('revenue', 0)
+        is_mega_cap = revenue >= 10_000_000_000_000  # 10 Trillion KRW
+        
+        # Check Operating Margin
+        opm = target_fin.get('operating_margin')
+        
+        if opm is not None:
+            if opm < 0:
+                # Deficit
+                if is_mega_cap:
+                    max_score = min(max_score, 3) # Mega Cap Deficit: Cap at 3 (Hold)
+                    reasons.append(f"적자지속({target_year}, {opm:.1%}) But 초대형주(방어)")
+                else:
+                    max_score = min(max_score, 2)
+                    reasons.append(f"적자지속({target_year}, {opm:.1%})")
+            elif opm < 0.05:
+                # Low Margin
+                if is_mega_cap:
+                    # Mega Cap Low Margin: Do NOT cap strictly. Allow evidence to speak.
+                    max_score = min(max_score, 4)
+                    reasons.append(f"이익률저조({target_year}, {opm:.1%}) But 초대형주(경기민감)")
+                else:
+                    max_score = min(max_score, 2)
+                    reasons.append(f"이익률저조({target_year}, {opm:.1%})")
+        
+        # Check ROE
+        roe = target_fin.get('roe')
+        if roe is not None and roe < 0.05:
+             if is_mega_cap:
+                 # Mega Cap low ROE: Ignore or slight penalty
+                 pass
+             else:
+                 prev_max = max_score
+                 max_score = min(max_score, 2)  # Strict
+                 if max_score < prev_max:
+                     reasons.append(f"ROE저조({target_year}, {roe:.1%})")
+        
+        return {'max_score': max_score, 'reasons': reasons}
 
     def _score_single_type(
         self,
@@ -210,6 +322,32 @@ class MoatEvaluatorV2:
 
         # 5점: keep as candidate, Step E will validate
         return raw_score, ""
+
+    def _validate_moat_size(
+        self,
+        moat_type: str,
+        current_score: int,
+        financials: Dict
+    ) -> Tuple[int, str]:
+        """
+        Downgrade moat score if company size is too small for specific moats.
+        
+        Network Effect / Data Moat / Platform usually require scale.
+        If Revenue < 1000억 (Small Cap), hard to claim strong network effect (4+).
+        """
+        if current_score < 3:
+            return current_score, ""
+            
+        revenue = financials.get('revenue', 0)
+        # Threshold: 100 Billion KRW (approx $75M)
+        THRESHOLD = 100_000_000_000 
+        
+        target_moats = ['네트워크효과', '데이터학습', '플랫폼', '규모경제']
+        
+        if revenue > 0 and revenue < THRESHOLD and moat_type in target_moats:
+            return 2, f"{current_score}점→2점: 매출 규모({revenue/100_000_000:.0f}억) 작음 - {moat_type} 약함"
+            
+        return current_score, ""
 
     def _calculate_final_strength(self, scores: Dict[str, MoatScore]) -> int:
         """
@@ -399,7 +537,7 @@ class MoatEvaluatorV2:
             elif score.score >= 2:
                 icon = "○"
             else:
-                icon = "·"
+                icon = "."
 
             downgrade = f" ↓{score.downgrade_reason}" if score.downgraded else ""
             lines.append(f"{icon} {kr_name}: {score.score}점 (증거 {score.evidence_count}건, q={score.quality_total:.1f}){downgrade}")
@@ -415,4 +553,4 @@ class MoatEvaluatorV2:
         lines.append("")
         lines.append("[출처: DART 사업보고서, 증거 기반 평가 v2]")
 
-        return '\n'.join(lines)
+        return '\r\n'.join(lines)

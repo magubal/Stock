@@ -70,9 +70,24 @@ class SustainabilityChecker:
             warnings.append(f"영업이익률 {op_margin:.1%}: 해자가 수익을 보호하지 못함 -> 최대 {cap}점")
             adjusted = min(adjusted, cap)
         elif op_margin is not None and op_margin < 0:
-            cap = 3
+            cap = 2
             warnings.append(f"영업이익률 {op_margin:.1%}: 적자 지속 -> 최대 {cap}점")
             adjusted = min(adjusted, cap)
+            
+        # Check latest year in multi-year data (catch recent deficits)
+        if multi_year_financials:
+            years = sorted(multi_year_financials.keys())
+            if years:
+                latest_year = years[-1]
+                latest_fin = multi_year_financials[latest_year]
+                latest_op = latest_fin.get('operating_margin')
+                
+                if latest_op is not None and latest_op < 0:
+                    # If base year was positive but latest is negative
+                    if op_margin is None or op_margin >= 0:
+                        cap = 2
+                        warnings.append(f"최근({latest_year}) 영업이익률 {latest_op:.1%}: 적자 전환 -> 최대 {cap}점")
+                        adjusted = min(adjusted, cap)
 
         # Revenue too small for strong moat claim (< 100억원)
         if revenue > 0 and revenue < 10_000_000_000 and moat_strength >= 4:

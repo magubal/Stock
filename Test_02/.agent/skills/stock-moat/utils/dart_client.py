@@ -248,11 +248,12 @@ class DARTClient:
             'raw_accounts': list
         }
         """
-        # Check cache
+        # Check cache (key includes reprt_code to avoid mixing annual/quarterly)
         cache_key = 'financials'
+        year_key = f"{bsns_year}_{reprt_code}"
         cached = self._load_cache(corp_code, cache_key)
-        if cached and cached.get('years', {}).get(bsns_year):
-            return cached['years'][bsns_year]
+        if cached and cached.get('years', {}).get(year_key):
+            return cached['years'][year_key]
 
         data = self._api_call(
             f"{self.base_url}/fnlttSinglAcnt.json",
@@ -284,11 +285,11 @@ class DARTClient:
         # Parse accounts
         parsed = self._parse_financial_accounts(data['list'], bsns_year)
 
-        # Update cache (multi-year structure)
+        # Update cache (multi-year structure, keyed by year+reprt_code)
         cache_data = self._load_cache(corp_code, cache_key) or {'years': {}}
         if 'years' not in cache_data:
             cache_data['years'] = {}
-        cache_data['years'][bsns_year] = parsed
+        cache_data['years'][year_key] = parsed
         self._save_cache(corp_code, cache_key, cache_data)
 
         return parsed
@@ -385,6 +386,43 @@ class DARTClient:
                 print(f"    ✅ Financials {year}: revenue={fin.get('revenue', 0):,}")
 
         return results
+
+    # ── Shares Outstanding ──────────────────────────────────
+
+    def get_shares_outstanding(self, corp_code: str) -> int:
+        """DART 주식총수현황 API로 보통주 유통주식수 조회.
+        Returns: 보통주 유통주식수 (int), 조회 실패 시 0
+        """
+        from datetime import date as dt_date
+        current_year = dt_date.today().year
+
+        # 최근 3년 사업보고서 시도 (최신 보고서가 아직 없을 수 있음)
+        for year in range(current_year - 1, current_year - 4, -1):
+            try:
+                data = self._api_call(
+                    f"{self.base_url}/stockTotqySttus.json",
+                    {
+                        "crtfc_key": self.api_key,
+                        "corp_code": corp_code,
+                        "bsns_year": str(year),
+                        "reprt_code": "11011",
+                    }
+                )
+                if data and data.get('list'):
+                    for item in data['list']:
+                        se = item.get('se', '')
+                        if '보통주' in se:
+                            # distb_stock_co = 유통주식수, istc_totqy = 발행총수
+                            distb = item.get('distb_stock_co', '0')
+                            distb = int(str(distb).replace(',', '').replace('-', '0') or '0')
+                            if distb > 0:
+                                return distb
+                            istc = item.get('istc_totqy', '0')
+                            return int(str(istc).replace(',', '').replace('-', '0') or '0')
+            except Exception:
+                continue
+
+        return 0
 
     # ── Segment Revenue (DS002) ───────────────────────────────
 
@@ -563,6 +601,51 @@ class DARTClient:
             print(f"    ❌ Error getting business report: {e}")
             return None
 
+    def find_latest_report(self, corp_code: str) -> Optional[Dict]:
+        """
+        Find the latest comprehensive report (Annual or Semi-Annual).
+        Prioritizes by receipt date (rcept_dt).
+        
+        Searches: "사업보고서", "반기보고서"
+        """
+        current_year = datetime.now().year
+        candidates = []
+        
+        # Search range: Current year down to 3 years ago
+        for year in range(current_year, current_year - 4, -1):
+            try:
+                data = self._api_call(
+                    f"{self.base_url}/list.json",
+                    {
+                        "crtfc_key": self.api_key,
+                        "corp_code": corp_code,
+                        "bgn_de": f"{year}0101",
+                        "end_de": f"{int(year)+1}0630",
+                        "pblntf_ty": "A", # 정기공시
+                        "last_reprt_at": "Y"
+                    }
+                )
+                
+                if data and data.get("list"):
+                    for item in data.get("list", []):
+                        nm = item.get("report_nm", "")
+                        # Filter for Annual or Semi-Annual
+                        if "사업보고서" in nm or "반기보고서" in nm:
+                            candidates.append(item)
+            except Exception:
+                pass
+
+        if not candidates:
+            return None
+            
+        # Sort by rcept_dt (descending)
+        # rcept_dt format: YYYYMMDD
+        candidates.sort(key=lambda x: x.get('rcept_dt', '0'), reverse=True)
+        
+        latest = candidates[0]
+        print(f"    ✅ Found latest report: {latest.get('report_nm')} ({latest.get('rcept_dt')})")
+        return latest
+
     def download_business_report(
         self,
         corp_code: str,
@@ -664,6 +747,68 @@ class DARTClient:
 
         except Exception as e:
             print(f"    ❌ Error downloading report: {e}")
+            return None
+
+    def download_report(self, corp_code: str, rcept_no: str) -> Optional[str]:
+        """Download report text directly by rcept_no"""
+        # Check cache (using rcept_no as key)
+        cached = self._load_cache(corp_code, f'report_{rcept_no}')
+        if cached and cached.get('raw_text'):
+            return cached['raw_text']
+
+        print(f"    📄 Downloading report (rcept_no: {rcept_no})...")
+        time.sleep(self._api_delay)
+        
+        try:
+            import zipfile
+            import io
+            from html import unescape
+
+            response = self.session.get(
+                f"{self.base_url}/document.xml",
+                params={"crtfc_key": self.api_key, "rcept_no": rcept_no},
+                timeout=60
+            )
+
+            if response.status_code != 200:
+                print(f"    ⚠️  document.xml HTTP {response.status_code}")
+                return None
+
+            raw_content = response.content
+            if raw_content[:2] != b'PK':
+                return None
+
+            zf = zipfile.ZipFile(io.BytesIO(raw_content))
+            xml_names = [n for n in zf.namelist() if n.endswith('.xml')]
+
+            if not xml_names:
+                return None
+
+            largest_xml = max(xml_names, key=lambda n: zf.getinfo(n).file_size)
+            xml_bytes = zf.read(largest_xml)
+
+            try:
+                xml_data = xml_bytes.decode('utf-8', errors='ignore')
+            except Exception:
+                xml_data = xml_bytes.decode('euc-kr', errors='ignore')
+
+            text = re.sub(r'<[^>]+>', ' ', xml_data)
+            text = unescape(text)
+            text = re.sub(r'\s+', ' ', text).strip()
+
+            if len(text) > 500000:
+                text = text[:500000]
+
+            self._save_cache(corp_code, f'report_{rcept_no}', {
+                'rcept_no': rcept_no,
+                'raw_text': text,
+                'fetched_at': datetime.now().isoformat()
+            })
+            
+            return text
+
+        except Exception as e:
+            print(f"    ❌ Error downloading report {rcept_no}: {e}")
             return None
 
     def download_report_xml(

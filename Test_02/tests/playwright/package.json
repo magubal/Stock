@@ -1,0 +1,14 @@
+{
+  "name": "test-02-playwright-suite",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:dashboard": "playwright test tests/dashboard-core.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}
+

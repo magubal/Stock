@@ -198,13 +198,14 @@ class ExcelIO:
                 # Convert text columns to object dtype to avoid dtype mismatch
                 text_columns = [
                     'core_sector_top', 'core_sector_sub', 'core_desc',
-                    '해자DESC', '검증용desc',
-                    # v2 new columns
+                    '해자DESC', '해지DESC', '검증용desc',
                     'evidence_summary', 'bm_summary', 'sustainability_notes',
                     'ai_review',
                 ]
                 for col in text_columns:
                     if col not in df.columns:
+                        if col == '해지DESC' and '해자DESC' in df.columns: continue
+                        if col == '해자DESC' and '해지DESC' in df.columns: continue
                         df[col] = None  # Add missing columns
                     df[col] = df[col].astype('object')
 
@@ -228,9 +229,14 @@ class ExcelIO:
 
                     row_idx = row_idx[0]
                     for field, value in data.items():
-                        if field in df.columns:
+                        # Handle typo: 해자DESC vs 해지DESC
+                        target_field = field
+                        if field == '해자DESC' and '해자DESC' not in df.columns and '해지DESC' in df.columns:
+                            target_field = '해지DESC'
+                        
+                        if target_field in df.columns:
                             # Type conversion before assignment
-                            if field in ('해자강도', 'evidence_count', 'evidence_quality', 'bm_completeness'):
+                            if target_field in ('해자강도', 'evidence_count', 'evidence_quality', 'bm_completeness'):
                                 # Numeric fields
                                 try:
                                     if pd.notna(value) if not isinstance(value, (int, float)) else True:
@@ -253,10 +259,19 @@ class ExcelIO:
                     if_sheet_exists='overlay'
                 ) as writer:
                     df.to_excel(writer, sheet_name='stock_core_master', index=False)
+                    
+                    # 6. Post-processing: Enable Wrap Text for description columns
+                    from openpyxl.styles import Alignment
+                    ws = writer.sheets['stock_core_master']
+                    wrap_cols = ['해자DESC', '해지DESC', 'core_desc', '검증용desc', 'ai_review', 'sustainability_notes']
+                    for col_idx, col_name in enumerate(df.columns, 1):
+                        if col_name in wrap_cols:
+                            for row in range(2, len(df) + 2):
+                                ws.cell(row=row, column=col_idx).alignment = Alignment(wrapText=True)
 
                 print(f"✅ Batch updated {results['success']} stocks")
 
-                # 6. Remove backup
+                # 7. Remove backup
                 if os.path.exists(self.backup_path):
                     os.remove(self.backup_path)
 

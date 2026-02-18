@@ -54,5 +54,31 @@ def get_dart_api_key() -> str:
     return api_key
 
 
+def get_oracle_config() -> dict:
+    """Oracle 접속정보 반환. 키 없으면 None 값 포함 dict 반환 (에러 안 던짐)"""
+    load_env()
+    return {
+        'dsn': os.getenv('ORACLE_DSN'),
+        'user': os.getenv('ORACLE_USER'),
+        'password': os.getenv('ORACLE_PASSWORD'),
+    }
+
+
+def get_project_root() -> Path:
+    """프로젝트 루트 디렉토리 반환"""
+    current = Path(__file__).resolve()
+    for _ in range(5):
+        current = current.parent
+        if (current / '.env').exists():
+            return current
+    # Fallback to repository root based on this file location
+    return Path(__file__).resolve().parents[4]
+
+
+def get_growth_thresholds_path() -> str:
+    """config/growth_thresholds.json 경로 반환"""
+    return str(get_project_root() / "config" / "growth_thresholds.json")
+
+
 # Auto-load on import
 load_env()

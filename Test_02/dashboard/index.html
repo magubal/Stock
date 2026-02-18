@@ -155,7 +155,222 @@
         .card-content {
             min-height: 200px;
         }
-        
+
+        .monitoring-link {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.75rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border: 1px solid #334155;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .monitoring-link:hover {
+            border-color: #475569;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .monitoring-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .monitoring-desc {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .project-status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .project-status-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .project-summary-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.45);
+            border: 1px solid #334155;
+        }
+
+        .project-summary-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-summary-value {
+            color: #f8fafc;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .project-status-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .project-checklist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .project-checklist-item {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: rgba(30, 41, 59, 0.35);
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .project-checklist-item:hover {
+            border-color: #475569;
+            background: rgba(30, 41, 59, 0.65);
+        }
+
+        .project-checklist-item.is-active {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+            box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.25) inset;
+        }
+
+        .project-checklist-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-checklist-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .project-checklist-meta {
+            margin-top: 0.35rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .project-status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 0.1rem 0.55rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .project-status-badge.status-complete {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .project-status-badge.status-in-progress {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .project-status-badge.status-planned {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .project-status-detail {
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.45);
+            padding: 0.85rem;
+        }
+
+        .project-detail-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-detail-meta {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.35rem;
+            margin-bottom: 0.6rem;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        .project-detail-label {
+            color: #94a3b8;
+        }
+
+        .project-detail-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .project-detail-step {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .project-detail-step:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .project-step-mark {
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .project-step-mark.is-done {
+            color: #22c55e;
+        }
+
+        .project-step-mark.is-pending {
+            color: #64748b;
+        }
+
+        .project-next-action {
+            margin-top: 0.6rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid #1e293b;
+            font-size: 0.75rem;
+            color: #93c5fd;
+        }
+
         /* Psychology Metrics */
         .psychology-metrics {
             display: flex;
@@ -415,6 +630,14 @@
             }
             
             .portfolio-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .project-status-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .project-status-layout {
                 grid-template-columns: 1fr;
             }
         }
@@ -697,6 +920,130 @@
             );
         };
 
+        const PROJECT_STATUS_ITEMS = [
+            {
+                id: 'REQ-015',
+                title: 'REQ-015 엑셀 기준소스 DB 동기화',
+                status: '완료',
+                stage: '운영 반영',
+                owner: 'Data Pipeline',
+                due: '완료',
+                checklist: [
+                    { label: '엑셀 원문 기준 파서 반영', done: true },
+                    { label: 'snapshot/history 테이블 동기화', done: true },
+                    { label: 'bigo_raw 저장 및 손실 데이터 복구', done: true }
+                ],
+                nextAction: '변경 이력 샘플 검증을 주간 배치 리포트에 자동 포함'
+            },
+            {
+                id: 'REQ-016',
+                title: 'REQ-016 19:00 주기 갱신 스케줄러',
+                status: '완료',
+                stage: '운영 반영',
+                owner: 'Ops',
+                due: '완료',
+                checklist: [
+                    { label: '변경 감지 기반 조건부 동기화', done: true },
+                    { label: '작업 스케줄러 등록/해제 스크립트', done: true },
+                    { label: '실행 로그 및 상태 파일 기록', done: true }
+                ],
+                nextAction: '장애 시도 알림(실패 2회 연속) 룰 추가'
+            },
+            {
+                id: 'REQ-017',
+                title: 'REQ-017 프로젝트 현황 체크리스트 패널',
+                status: '진행',
+                stage: '구현 및 회귀 테스트',
+                owner: 'Dashboard',
+                due: '2026-02-19',
+                checklist: [
+                    { label: '카드/클릭형 하위 체크리스트 UI 추가', done: true },
+                    { label: '기존 카드/링크 무결성 회귀 테스트', done: true },
+                    { label: '문서/로그 반영 후 운영 반영', done: false }
+                ],
+                nextAction: '요청 승인 후 상태를 완료로 전환'
+            }
+        ];
+
+        const getProjectStatusClass = (status) => {
+            if (status === '완료') return 'status-complete';
+            if (status === '진행') return 'status-in-progress';
+            return 'status-planned';
+        };
+
+        const ProjectStatusPanel = () => {
+            const [selectedId, setSelectedId] = useState(PROJECT_STATUS_ITEMS[0].id);
+            const selected = PROJECT_STATUS_ITEMS.find((item) => item.id === selectedId) || PROJECT_STATUS_ITEMS[0];
+            const completedCount = PROJECT_STATUS_ITEMS.filter((item) => item.status === '완료').length;
+
+            return (
+                <div className="project-status-panel" data-testid="project-status-panel">
+                    <div className="project-status-summary">
+                        <div className="project-summary-item">
+                            <span className="project-summary-label">전체 항목</span>
+                            <span className="project-summary-value">{PROJECT_STATUS_ITEMS.length}</span>
+                        </div>
+                        <div className="project-summary-item">
+                            <span className="project-summary-label">완료</span>
+                            <span className="project-summary-value">{completedCount}</span>
+                        </div>
+                        <div className="project-summary-item">
+                            <span className="project-summary-label">진행 중</span>
+                            <span className="project-summary-value">{PROJECT_STATUS_ITEMS.length - completedCount}</span>
+                        </div>
+                    </div>
+
+                    <div className="project-status-layout">
+                        <div className="project-checklist-list">
+                            {PROJECT_STATUS_ITEMS.map((item) => (
+                                <button
+                                    type="button"
+                                    key={item.id}
+                                    data-testid={`project-checklist-${item.id}`}
+                                    className={`project-checklist-item ${item.id === selectedId ? 'is-active' : ''}`}
+                                    onClick={() => setSelectedId(item.id)}
+                                >
+                                    <div className="project-checklist-head">
+                                        <span className="project-checklist-title">{item.title}</span>
+                                        <span className={`project-status-badge ${getProjectStatusClass(item.status)}`}>
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                    <div className="project-checklist-meta">{item.stage} · {item.owner}</div>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="project-status-detail" data-testid="project-status-detail">
+                            <div className="project-detail-title" data-testid="project-status-detail-title">
+                                {selected.title}
+                            </div>
+                            <div className="project-detail-meta">
+                                <div><span className="project-detail-label">진행 단계:</span> <span data-testid="project-status-detail-stage">{selected.stage}</span></div>
+                                <div><span className="project-detail-label">담당:</span> {selected.owner}</div>
+                                <div><span className="project-detail-label">기한:</span> {selected.due}</div>
+                            </div>
+
+                            <div className="project-detail-steps">
+                                {selected.checklist.map((step, index) => (
+                                    <div key={`${selected.id}-${index}`} className="project-detail-step">
+                                        <span>{step.label}</span>
+                                        <span className={`project-step-mark ${step.done ? 'is-done' : 'is-pending'}`}>
+                                            {step.done ? '완료' : '대기'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="project-next-action">
+                                다음 조치: {selected.nextAction}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // 메인 대시보드 컴포넌트
         const Dashboard = () => {
             const [loading, setLoading] = useState(true);
@@ -838,6 +1185,51 @@
                                 </div>
                                 <div className="card-content">
                                     <FlywheelStatus data={{}} />
+                                </div>
+                            </div>
+
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="radio"></i>
+                                    </div>
+                                    <h3 className="card-title">시장 모니터링</h3>
+                                </div>
+                                <div className="card-content">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                        <a href="monitor_disclosures.html" className="monitoring-link">
+                                            <span className="monitoring-name">오늘의 공시</span>
+                                            <span className="monitoring-desc">공시 분석 및 심리 파악</span>
+                                        </a>
+                                        <a href="liquidity_stress.html" className="monitoring-link">
+                                            <span className="monitoring-name">유동성 및 신용 스트레스</span>
+                                            <span className="monitoring-desc">6대 모듈 기반 스트레스 인덱스</span>
+                                        </a>
+                                        <a href="crypto_trends.html" className="monitoring-link">
+                                            <span className="monitoring-name">크립토 동향</span>
+                                            <span className="monitoring-desc">유동성/ETF/온체인 레짐</span>
+                                        </a>
+                                        <a href="moat_analysis.html" className="monitoring-link">
+                                            <span className="monitoring-name">해자 분석 대시보드</span>
+                                            <span className="monitoring-desc">2,500+ 종목 Moat/Value 분석</span>
+                                        </a>
+                                        <a href="idea_board.html" className="monitoring-link">
+                                            <span className="monitoring-name">Intelligence Board</span>
+                                            <span className="monitoring-desc">Cross-Data Signal Engine</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="dashboard-card">
+                                <div className="card-header">
+                                    <div className="card-icon">
+                                        <i data-lucide="clipboard-list"></i>
+                                    </div>
+                                    <h3 className="card-title">프로젝트 현황</h3>
+                                </div>
+                                <div className="card-content">
+                                    <ProjectStatusPanel />
                                 </div>
                             </div>
                         </div>

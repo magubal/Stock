@@ -172,6 +172,60 @@ This document serves as the "Communication Log" between:
 > **결과**: 0 에러, 3/3 성공. Financial Reality Check 정상 작동 확인.
 
 ---
+## [2026-02-12] GICS Mapping Fix & AI Verification Redesign
+
+### 🚀 Major Changes
+- **Refined GICS Sector Mapping (3-Layer Fix)**
+    - *Rationale*: Specialized sectors like AI/Software were being misclassified (e.g., Deepnoid as "Game Software").
+    - *Solution*: Implemented Layer 1 (KSIC Expansion), Layer 2 (2-Digit Fallback), and Layer 3 (Strong Keyword Overrides).
+    - *Verification*: Passed 9-stock stress test including Polaris Office, Alchera, Deepnoid.
+- **AI Verification Redesign (Claude Opus 4.6 Thinking)**
+    - *Rationale*: Previous AI verifier saw Rule-Based scores, leading to bias. Claude 3.5 Sonnet lacked sufficient depth.
+    - *Solution*: Rewrote `ai_verifier.py` to use Claude 4.6 (Thinking Mode) with no visibility into Rule-Based scores.
+    - *Optimization*: Trigger AI analysis only for Rule-Based Moat Score >= 4 to save costs.
+- **Excel Formatting Consistency (Final Phase 1 Polish)**
+    - *Rationale*: Formatting for Rule-Based vs AI reports was inconsistent; Excel display was flattened without 'Wrap Text'.
+    - *Solution*: Merged Rule-Based and AI review into a single `해자DESC` field. Fixed `excel_io.py` to force 'Wrap Text' styling and handle '해지DESC' typos.
+    - *Impact*: Professional multi-line report display for all 100 target stocks.
+
+---
 ## [2026-02-10] Planned: Future Workflow Enhancement
 - **Action**: Use `bkit` for structured planning.
 - **Protocol**: Gemini reads plan → Implements → Logs changes here → Claude verifies against log.
+- **Status**: Phase 1 Comprehensive Polish Complete.
+
+---
+## [2026-02-14] Idea Board Operational Handoff
+
+### Major Changes
+- Stabilized Idea Board workflow for practical operations in `Test_02`.
+- Fixed card drag behavior (DnD usability + StrictMode compatibility in dev runtime).
+- Added structured AI triage output fields and persistence:
+  - summary / evidence / risks / next step / confidence.
+- Added card-click review modal for in-progress cards:
+  - result details display
+  - manual status save from popup.
+
+### Backend Updates
+- `backend/app/schemas/collab.py`
+  - Added triage result fields to request schema.
+- `backend/app/api/collab.py`
+  - Persist triage result into `_triage.result`.
+  - Reflect result details into idea content build path.
+- `backend/tests/test_collab_triage.py`
+  - Added test for structured result persistence and idea reflection.
+
+### Frontend Updates
+- `frontend/src/pages/IdeaBoard.jsx`
+  - Added triage result input controls.
+  - Added result badge on cards.
+  - Added review modal with result blocks + manual status save.
+- `frontend/src/index.jsx`
+  - Removed `React.StrictMode` wrapper to restore stable `react-beautiful-dnd` behavior in current setup.
+
+### Verification
+- Backend tests: `OK` (7 tests)
+- Frontend build: `vite build` success
+- Runtime checks:
+  - `http://localhost:3000` responding
+  - `http://localhost:8001/health` responding

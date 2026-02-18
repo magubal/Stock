@@ -108,7 +108,9 @@ def process_all_stocks(input_excel, output_excel, limit=None):
                 'gics_industry': row.get('GICS Industry', '')
             }
             
-            evaluation = evaluator.evaluate(name, code, evidences, bm, financials, classification)
+            evaluation = evaluator.evaluate(
+                name, code, evidences, bm, classification, financials=financials
+            )
             
             # 5. Store Result
             results.append({

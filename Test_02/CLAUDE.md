@@ -92,6 +92,13 @@ pytest backend/app/test_main.py
 - `.agent/skills/` — Agent skill definitions (ui-ux-pro-max, data-collection, analysis, decision, research)
 - `docs/investment-philosophy.md` — Core investment philosophy document
 
+## Custom Commands
+
+- **`/brain <주제>`** — 브레인스토밍 워크플로우 실행
+  - 사용자가 `/brain`, `brain`, `브레인스토밍` 뒤에 주제를 입력하면 `.agent/skills/brainstorm-bkit/SKILL.md` 프로토콜을 실행한다.
+  - 흐름: 문제 정의 → 제약 수집(1~3개 질문) → 대안 생성(2~4개) → 비교표 → 추천안 → Design Brief 출력 → `/pdca plan` handoff
+  - 코드 작성 금지. 의사결정만 한다.
+
 ## Key Conventions
 
 - **Implementation Guardian (MANDATORY)**: Always use `/00-implementation-guardian` to verify alignment with `*.plan.md` before requesting review.
@@ -106,6 +113,13 @@ pytest backend/app/test_main.py
 - **Blog data structure**: `data/naver_blog_data/YYYY-MM-DD/blogger_sequencenum.jpg`
 - **Request tracking**: New feature requests must be registered in `REQUESTS.md` using the REQ-XXX format
 - **Continuous improvement**: When no TODOs remain, reference `docs/investment-philosophy.md` to identify system gaps
+- **DEMO Data Convention (MANDATORY)**: All seed/test/demo data must be clearly distinguishable from real data.
+  - DB records: `source` field must be `"DEMO"` (not "Manual", "Test", etc.)
+  - Collab packets: `source_ai` field must be `"DEMO"`
+  - News headlines: prefix with `[DEMO]`
+  - UI auto-detection: dashboards check `source==="DEMO"` and render red DEMO badge
+  - Seed scripts: print `[SEED]` prefix in console output
+  - Never mix demo and real data without clear distinction in the UI
 
 ## Environment Variables
 

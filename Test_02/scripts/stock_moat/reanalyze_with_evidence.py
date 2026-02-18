@@ -72,7 +72,9 @@ def run_full_analysis(stock_name, stock_code):
     # Mock classification for now
     classification = {'gics_sector': 'Unknown', 'gics_industry': 'Unknown'} 
     
-    evaluation = evaluator.evaluate(stock_name, stock_code, evidences, bm, financials, classification)
+    evaluation = evaluator.evaluate(
+        stock_name, stock_code, evidences, bm, classification, financials=financials
+    )
     print(f"   - Moat Score: {evaluation.moat_strength}/5")
 
     # 5. Reporting

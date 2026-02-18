@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Pulse - Stock Research ONE</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #a855f7;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .page-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            color: #a855f7;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        .btn-back:hover {
+            color: #a855f7;
+            border-color: #a855f7;
+        }
+
+        .btn-refresh {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-refresh:hover {
+            background: rgba(168, 85, 247, 0.25);
+        }
+
+        .update-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Main */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        /* One-liner Banner */
+        .oneliner-banner {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            border: 1px solid;
+        }
+
+        .oneliner-banner.regime-normal {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.1), rgba(148, 163, 184, 0.03));
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+
+        .oneliner-banner.regime-alert {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.03));
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .oneliner-banner.regime-critical {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.03));
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .oneliner-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #f8fafc;
+        }
+
+        .oneliner-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            margin-right: 0.5rem;
+        }
+
+        .tag-estimate {
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+        }
+
+        /* Gauge Grid */
+        .gauge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .gauge-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 0.875rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .gauge-card:hover {
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+        }
+
+        .gauge-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.35rem;
+        }
+
+        .gauge-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 0.2rem;
+        }
+
+        .gauge-delta {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .gauge-delta-sub {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.1rem;
+        }
+
+        .delta-up { color: #22c55e; }
+        .delta-down { color: #ef4444; }
+        .delta-flat { color: #94a3b8; }
+
+        .gauge-regime {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 0.25rem;
+        }
+
+        /* Source Cards Grid */
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 900px) {
+            .source-grid { grid-template-columns: 1fr; }
+        }
+
+        .source-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .source-card:hover {
+            border-color: #475569;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .source-card.importance-high { border-left: 4px solid #ef4444; }
+        .source-card.importance-mid { border-left: 4px solid #f59e0b; }
+        .source-card.importance-low { border-left: 4px solid #475569; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .importance-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-high {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .badge-mid {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .badge-low {
+            background: rgba(100, 116, 139, 0.15);
+            color: #64748b;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .card-question {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Summary Lines */
+        .summary-lines {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-line {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        .summary-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            margin-right: 0.35rem;
+        }
+
+        .tag-observed {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+
+        .tag-interpreted {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+        }
+
+        .tag-action {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        /* Card Metrics Mini */
+        .card-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .metric-item {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .metric-item span {
+            font-weight: 600;
+        }
+
+        /* External Link Button */
+        .external-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 6px;
+            color: #c084fc;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-top: auto;
+        }
+
+        .external-link:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+            color: #e9d5ff;
+        }
+
+        /* Manual Input Area */
+        .manual-area {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            border: 1px dashed #334155;
+        }
+
+        .manual-title {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .manual-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .manual-row label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            min-width: 80px;
+        }
+
+        .manual-row input, .manual-row select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 0.3rem 0.5rem;
+            color: #f8fafc;
+            font-size: 0.8rem;
+            width: 120px;
+        }
+
+        .manual-row input:focus, .manual-row select:focus {
+            border-color: #a855f7;
+            outline: none;
+        }
+
+        .manual-save-btn {
+            padding: 0.3rem 0.75rem;
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 4px;
+            color: #c084fc;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 0.35rem;
+        }
+
+        .manual-save-btn:hover { background: rgba(168, 85, 247, 0.35); }
+
+        .manual-saved {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* Transfer Check */
+        .transfer-block {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+
+        .transfer-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+
+        .transfer-paths {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .transfer-path {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(100, 116, 139, 0.1);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #94a3b8;
+        }
+
+        .transfer-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .transfer-check input[type="checkbox"] {
+            accent-color: #a855f7;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Loading */
+        .loading-pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #a855f7;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .loading-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .error-text {
+            font-size: 0.8rem;
+            color: #ef4444;
+        }
+
+        /* Gauge Detail Modal (Overlay) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal-panel {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .modal-title-area h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .modal-title-area p {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.15rem;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #1e293b;
+            color: #f8fafc;
+            border-color: #475569;
+        }
+
+        .modal-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-kpi {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+
+        .modal-kpi-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-kpi-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .modal-kpi-sub {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.1rem;
+        }
+
+        .modal-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.7;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            border-left: 3px solid #a855f7;
+        }
+
+        .modal-refs {
+            margin-top: 0.25rem;
+        }
+
+        .modal-refs-title {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-ref-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 0.75rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #c084fc;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-ref-link:hover {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: rgba(168, 85, 247, 0.3);
+            color: #e9d5ff;
+        }
+
+        .modal-ref-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: rgba(168, 85, 247, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a855f7;
+            flex-shrink: 0;
+        }
+
+        .gauge-card { cursor: pointer; }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // ============================================
+        // API Configuration
+        // ============================================
+        const API = {
+            coingecko: {
+                global: 'https://api.coingecko.com/api/v3/global',
+                ethBtc: 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=btc,usd',
+                cacheDuration: 300,
+            },
+            defillama: {
+                stablecoins: 'https://stablecoins.llama.fi/stablecoins?includePrices=false',
+                stablecoinChains: 'https://stablecoins.llama.fi/stablecoinchains',
+                cacheDuration: 600,
+            },
+            fearGreed: {
+                url: 'https://api.alternative.me/fng/?limit=2',
+                cacheDuration: 3600,
+            }
+        };
+
+        // ============================================
+        // Utility Functions
+        // ============================================
+        function formatNum(n, decimals = 1) {
+            if (n == null || isNaN(n)) return '-';
+            if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(decimals) + 'T';
+            if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(decimals) + 'B';
+            if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(decimals) + 'M';
+            return n.toLocaleString(undefined, { maximumFractionDigits: decimals });
+        }
+
+        function formatDelta(val, suffix = '%') {
+            if (val == null || isNaN(val)) return '-';
+            const sign = val > 0 ? '+' : '';
+            return sign + val.toFixed(1) + suffix;
+        }
+
+        function deltaClass(val) {
+            if (val == null) return 'delta-flat';
+            if (val > 0.1) return 'delta-up';
+            if (val < -0.1) return 'delta-down';
+            return 'delta-flat';
+        }
+
+        function deltaArrow(val) {
+            if (val == null) return '';
+            if (val > 0.1) return '\u25B2 ';
+            if (val < -0.1) return '\u25BC ';
+            return '\u2501 ';
+        }
+
+        // Cache helpers
+        async function fetchWithCache(key, fetchFn, durationSec) {
+            try {
+                const cached = sessionStorage.getItem(key);
+                if (cached) {
+                    const { data, ts } = JSON.parse(cached);
+                    if (Date.now() - ts < durationSec * 1000) return data;
+                }
+            } catch (e) { /* ignore parse errors */ }
+            const data = await fetchFn();
+            try {
+                sessionStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
+            } catch (e) { /* ignore quota errors */ }
+            return data;
+        }
+
+        // localStorage manual data
+        function loadManual(key) {
+            try {
+                const raw = localStorage.getItem('crypto_manual_' + key);
+                return raw ? JSON.parse(raw) : null;
+            } catch { return null; }
+        }
+
+        function saveManual(key, data) {
+            data.updatedAt = new Date().toISOString();
+            localStorage.setItem('crypto_manual_' + key, JSON.stringify(data));
+        }
+
+        // ============================================
+        // Data Fetching
+        // ============================================
+        async function fetchCoinGeckoGlobal() {
+            return fetchWithCache('cg_global', async () => {
+                const res = await fetch(API.coingecko.global);
+                if (!res.ok) throw new Error('CoinGecko API error');
+                const json = await res.json();
+                return json.data;
+            }, API.coingecko.cacheDuration);
+        }
+
+        async function fetchEthBtc() {
+            return fetchWithCache('cg_ethbtc', async () => {
+                const res = await fetch(API.coingecko.ethBtc);
+                if (!res.ok) throw new Error('CoinGecko ETH/BTC error');
+                return res.json();
+            }, API.coingecko.cacheDuration);
+        }
+
+        async function fetchFearGreed() {
+            return fetchWithCache('fg_index', async () => {
+                const res = await fetch(API.fearGreed.url);
+                if (!res.ok) throw new Error('Fear & Greed API error');
+                return res.json();
+            }, API.fearGreed.cacheDuration);
+        }
+
+        async function fetchStablecoins() {
+            return fetchWithCache('dl_stablecoins', async () => {
+                const res = await fetch(API.defillama.stablecoins);
+                if (!res.ok) throw new Error('DefiLlama stablecoins error');
+                return res.json();
+            }, API.defillama.cacheDuration);
+        }
+
+        async function fetchStablecoinChains() {
+            return fetchWithCache('dl_stablechain', async () => {
+                const res = await fetch(API.defillama.stablecoinChains);
+                if (!res.ok) throw new Error('DefiLlama chains error');
+                return res.json();
+            }, API.defillama.cacheDuration);
+        }
+
+        // ============================================
+        // Trigger Engine
+        // ============================================
+        function calcTriggersA(mktCapChange1d, volRatio, btcDom7dDelta) {
+            const triggers = {
+                mktCapBig: Math.abs(mktCapChange1d || 0) >= 3,
+                volumeSpike: (volRatio || 0) >= 1.5,
+                domShift: Math.abs(btcDom7dDelta || 0) >= 0.7,
+            };
+            return triggers;
+        }
+
+        function calcTriggersB(manual) {
+            if (!manual) return {};
+            return {
+                flowConsistency: manual.direction === 'inflow' || manual.direction === 'outflow',
+                flowMagnitude: Math.abs(manual.flow1d || 0) >= (manual.flowThreshold || 100),
+                decoupling: manual.decoupling || false,
+            };
+        }
+
+        function calcTriggersC(manual) {
+            if (!manual) return {};
+            const thresholds = [0, 1, 3, 5, 7];
+            const crossed = thresholds.some(t =>
+                (manual.prevZScore < t && manual.zScore >= t) ||
+                (manual.prevZScore >= t && manual.zScore < t)
+            );
+            return { regimeChange: crossed };
+        }
+
+        function calcTriggersD(supplyChangePct, chainRotationPp) {
+            return {
+                supplyGrowth: Math.abs(supplyChangePct || 0) >= 1.5,
+                chainRotation: Math.abs(chainRotationPp || 0) >= 1.0,
+            };
+        }
+
+        function getImportance(triggers) {
+            // MVRV special: regime change = always HIGH
+            if (triggers.regimeChange) return 'HIGH';
+            const count = Object.values(triggers).filter(Boolean).length;
+            if (count >= 2) return 'HIGH';
+            if (count >= 1) return 'MID';
+            return 'LOW';
+        }
+
+        // ============================================
+        // Summary Generation
+        // ============================================
+        function genSummaryA(data) {
+            if (!data) return { observed: '데이터 로딩 중...', interpreted: '-', action: '-' };
+            const mc = data.mktCapChange1d;
+            const vr = data.volRatio;
+            const bd = data.btcDom7dDelta;
+
+            const observed = `Market Cap 1D ${formatDelta(mc)}, Volume/7D avg \u00D7${(vr || 0).toFixed(1)}, BTC.D 7D ${formatDelta(bd, 'pp')}`;
+
+            let interpreted;
+            if (mc < -3 && vr > 1.5) interpreted = '\uAC70\uB798\uB7C9 \uD655\uB300 + \uD558\uB77D \u2192 \uD328\uB2C9 \uB9E4\uB3C4 \uB610\uB294 \uB9AC\uBC38\uB7F0\uC2F1';
+            else if (mc > 3 && vr > 1.5) interpreted = '\uAC70\uB798\uB7C9 \uB3D9\uBC18 \uC0C1\uC2B9 \u2192 \uC704\uD5D8\uC120\uD638 \uAC15\uD654, \uC8FC\uC2DD \uC804\uC774 \uCCB4\uD06C';
+            else if (Math.abs(bd) > 0.7) interpreted = `BTC \uB3C4\uBBF8\uB10C\uC2A4 ${formatDelta(bd, 'pp')} \u2192 ${bd > 0 ? '\uC54C\uD2B8 \uC57D\uC138, BTC \uC4F0\uB9BC' : '\uC54C\uD2B8 \uC2DC\uC98C \uCD08\uC785 \uAC00\uB2A5'}`;
+            else interpreted = '\uC8FC\uC694 \uC9C0\uD45C \uBCC0\uB3D9 \uBC94\uC704 \uB0B4, \uD2B9\uC774\uC0AC\uD56D \uC5C6\uC74C';
+
+            const tc = Object.values(calcTriggersA(mc, vr, bd)).filter(Boolean).length;
+            const action = tc >= 2 ? '\uC0C1\uC138 \uD655\uC778 \uD544\uC694 \u2192 \uD074\uB9AD\uD558\uC5EC \uCC28\uD2B8 \uAC80\uC99D \uAD8C\uC7A5'
+                : tc === 1 ? '\uCC38\uACE0 \uC218\uC900, \uB2E4\uB978 \uCE74\uB4DC\uC640 \uAD50\uCC28 \uD655\uC778'
+                : '\uB300\uAE30, \uD2B9\uBCC4 \uD655\uC778 \uBD88\uD544\uC694';
+
+            return { observed, interpreted, action };
+        }
+
+        function genSummaryB(manual) {
+            if (!manual) return {
+                observed: '\uC218\uB3D9 \uC785\uB825 \uD544\uC694 (ETF \uB370\uC774\uD130 \uC785\uB825 \uD6C4 \uC800\uC7A5)',
+                interpreted: 'CoinMarketCap\uC5D0\uC11C \uD655\uC778 \uD6C4 \uC785\uB825\uD574\uC8FC\uC138\uC694',
+                action: '\uC678\uBD80 \uB9C1\uD06C \uD074\uB9AD \u2192 \uB370\uC774\uD130 \uD655\uC778 \uD6C4 \uC785\uB825'
+            };
+            const { flow1d, flow5d, direction } = manual;
+            const observed = `ETH ETF 1D ${flow1d > 0 ? '+' : ''}$${flow1d}M, 5D \uB204\uC801 ${flow5d > 0 ? '+' : ''}$${flow5d}M (${direction === 'inflow' ? '\uC720\uC785' : direction === 'outflow' ? '\uC720\uCD9C' : '\uD63C\uD569'})`;
+
+            let interpreted;
+            if (direction === 'inflow' && flow1d > 0) interpreted = '\uAE30\uAD00 \uC218\uAE09 \uC9C0\uC18D \uC720\uC785 \u2192 ETH \uC218\uC694 \uAE30\uBC18 \uD655\uBCF4';
+            else if (direction === 'outflow') interpreted = '\uAE30\uAD00 \uC774\uD0C8 \uC9C0\uC18D \u2192 ETH \uC57D\uC138 \uC555\uB825, \uC8FC\uC2DD \uC804\uC774 \uC81C\uD55C\uC801';
+            else interpreted = '\uBC29\uD5A5\uC131 \uBD88\uBA85\uD655, \uCD94\uAC00 \uAD00\uCC30 \uD544\uC694';
+
+            const action = direction === 'inflow' ? 'ETF \uC0C1\uC138 \uAD6C\uC131 \uD655\uC778 \u2192 \uC5B4\uB5A4 ETF\uC5D0 \uC9D1\uC911\uB418\uB294\uC9C0 \uD074\uB9AD' : '\uB300\uAE30, ETF \uD750\uB984 \uC548\uC815\uD654 \uD6C4 \uC7AC\uD655\uC778';
+            return { observed, interpreted, action };
+        }
+
+        function genSummaryC(manual) {
+            if (!manual) return {
+                observed: '\uC218\uB3D9 \uC785\uB825 \uD544\uC694 (MVRV Z-Score \uC785\uB825 \uD6C4 \uC800\uC7A5)',
+                interpreted: 'BitcoinMagazinePro\uC5D0\uC11C \uD655\uC778 \uD6C4 \uC785\uB825\uD574\uC8FC\uC138\uC694',
+                action: '\uC678\uBD80 \uB9C1\uD06C \uD074\uB9AD \u2192 \uB370\uC774\uD130 \uD655\uC778 \uD6C4 \uC785\uB825'
+            };
+            const regimeLabels = {
+                deep_undervalued: '\uADF9\uC800\uD3C9\uAC00', accumulation: '\uCD95\uC801', neutral: '\uC911\uB9BD',
+                overheating_early: '\uACFC\uC5F4 \uCD08\uC785', overheating: '\uACFC\uC5F4', extreme: '\uADF9\uB2E8 \uACFC\uC5F4'
+            };
+            const observed = `MVRV Z-Score: ${manual.zScore} (${regimeLabels[manual.regime] || manual.regime})`;
+
+            const thresholds = [0, 1, 3, 5, 7];
+            const crossed = thresholds.find(t =>
+                (manual.prevZScore < t && manual.zScore >= t) || (manual.prevZScore >= t && manual.zScore < t)
+            );
+
+            let interpreted;
+            if (crossed !== undefined) interpreted = `\uC784\uACC4\uB300 ${crossed} \uB3CC\uD30C \u2192 \uC0AC\uC774\uD074 \uB808\uC9D0 \uC804\uD658 \uC2E0\uD638!`;
+            else if (manual.zScore > 5) interpreted = '\uACFC\uC5F4 \uAD6C\uAC04 \uC9C0\uC18D \u2192 \uCC28\uC775\uC2E4\uD604 \uD0C0\uC774\uBC0D \uBAA8\uB2C8\uD130\uB9C1';
+            else if (manual.zScore < 1) interpreted = '\uC800\uD3C9\uAC00 \uAD6C\uAC04 \u2192 \uC7A5\uAE30 \uB9E4\uC218 \uAD00\uC810 \uC720\uD6A8';
+            else interpreted = '\uB808\uC9D0 \uBCC0\uD654 \uC5C6\uC74C, \uD604 \uAD6C\uAC04 \uC720\uC9C0';
+
+            const action = crossed !== undefined
+                ? '\uC989\uC2DC \uD074\uB9AD \u2192 \uCC28\uD2B8\uC5D0\uC11C \uB3CC\uD30C \uD328\uD134 \uD655\uC778 \uD544\uC218'
+                : '\uC815\uAE30 \uCCB4\uD06C \uC218\uC900, \uAE34\uAE09 \uD655\uC778 \uBD88\uD544\uC694';
+            return { observed, interpreted, action };
+        }
+
+        function genSummaryD(data) {
+            if (!data) return { observed: '\uB370\uC774\uD130 \uB85C\uB529 \uC911...', interpreted: '-', action: '-' };
+            const { supplyChangePct, topChainName, topChainDelta } = data;
+
+            const observed = `\uC2A4\uD14C\uC774\uBE14 \uCD1D\uB7C9 7D ${formatDelta(supplyChangePct)}, ${topChainName || '-'} ${formatDelta(topChainDelta, 'pp')}`;
+
+            let interpreted;
+            if (supplyChangePct > 1) interpreted = `\uB2EC\uB7EC \uC720\uB3D9\uC131 \uC99D\uAC00 \u2192 '${topChainName}' \uCCB4\uC778\uC73C\uB85C \uC790\uAE08 \uC774\uB3D9`;
+            else if (supplyChangePct < -1) interpreted = '\uB2EC\uB7EC \uC720\uB3D9\uC131 \uAC10\uC18C \u2192 \uB9AC\uC2A4\uD06C\uC624\uD504 \uD658\uACBD, \uC8FC\uC2DD \uC804\uC774 \uC57D\uD654';
+            else interpreted = '\uC720\uB3D9\uC131 \uBCC0\uD654 \uBBF8\uBBF8, \uCCB4\uC778 \uB85C\uD14C\uC774\uC158\uB9CC \uAD00\uCC30';
+
+            const action = Math.abs(supplyChangePct) > 2 || Math.abs(topChainDelta) > 1
+                ? 'DefiLlama \uC0C1\uC138 \uD655\uC778 \u2192 \uCCB4\uC778\uBCC4 \uBD84\uD3EC \uBCC0\uD654 \uAC80\uC99D'
+                : '\uB300\uAE30, \uD070 \uBCC0\uD654 \uC5C6\uC74C';
+            return { observed, interpreted, action };
+        }
+
+        function genOneLiner(cards) {
+            const high = cards.filter(c => c.importance === 'HIGH');
+            const mid = cards.filter(c => c.importance === 'MID');
+            if (high.length === 0 && mid.length === 0) {
+                return { text: '\uD06C\uB9BD\uD1A0 \uC2DC\uC7A5 \uD2B9\uC774\uC0AC\uD56D \uC5C6\uC74C. \uC815\uAE30 \uBAA8\uB2C8\uD130\uB9C1 \uC218\uC900.', regime: 'normal' };
+            }
+            const primary = high[0] || mid[0];
+            const regime = high.length >= 2 ? 'critical' : high.length >= 1 ? 'alert' : 'normal';
+            return { text: `${primary.summary.interpreted} \u2192 ${primary.summary.action}`, regime };
+        }
+
+        // ============================================
+        // Gauge Detail Definitions
+        // ============================================
+        const GAUGE_DETAILS = {
+            mktCap: {
+                title: 'Total Crypto Market Cap',
+                subtitle: '전체 암호화폐 시가총액',
+                description: '전체 암호화폐 시장의 시가총액 합계입니다. 1D/7D 변화율이 ±3% 이상이면 유의미한 시장 변동으로 봅니다. 시가총액이 상승하면서 거래량도 증가하면 위험선호(Risk-On) 환경, 하락+거래량 감소는 관망, 하락+거래량 급증은 패닉 가능성입니다.',
+                refs: [
+                    { name: 'CoinMarketCap - Global Charts', url: 'https://coinmarketcap.com/charts/' },
+                    { name: 'CoinGecko - Global Crypto Stats', url: 'https://www.coingecko.com/en/global-charts' },
+                ]
+            },
+            volume: {
+                title: '24h Trading Volume',
+                subtitle: '24시간 거래량',
+                description: '전체 암호화폐의 24시간 거래량입니다. 7일 평균 대비 1.5배 이상이면 비정상적 활동(거래량 스파이크)으로 판단합니다. 가격 상승 + 거래량 증가는 추세 확인, 가격 하락 + 거래량 증가는 패닉 매도 또는 큰 손 리밸런싱 가능성입니다.',
+                refs: [
+                    { name: 'CoinMarketCap - Charts', url: 'https://coinmarketcap.com/charts/' },
+                    { name: 'CoinGecko - Volume', url: 'https://www.coingecko.com/en/global-charts' },
+                ]
+            },
+            btcDom: {
+                title: 'BTC Dominance',
+                subtitle: 'BTC 시가총액 점유율',
+                description: 'BTC의 전체 암호화폐 시가총액 대비 점유율입니다. 7D 변화가 +0.7pp 이상이면 "BTC로 자금 쏠림(알트 약세)", -0.7pp 이상 하락이면 "알트 시즌 초입 가능"입니다. 도미넌스가 높아지면 BTC 중심 방어적 장세, 낮아지면 위험선호 확산입니다.',
+                refs: [
+                    { name: 'CoinMarketCap - Dominance Chart', url: 'https://coinmarketcap.com/charts/#dominance-percentage' },
+                    { name: 'TradingView - BTC.D', url: 'https://www.tradingview.com/symbols/BTC.D/' },
+                ]
+            },
+            ethBtc: {
+                title: 'ETH/BTC',
+                subtitle: 'Ethereum vs Bitcoin 상대 가격',
+                description: 'ETH의 BTC 대비 상대 가치입니다. ETH/BTC 상승은 "ETH 주도 장세(DeFi/스마트컨트랙트 부흥)", 하락은 "BTC 주도, 안전자산 선호"를 의미합니다. ETH ETF 유입과 함께 ETH/BTC 상승이면 기관 ETH 선호 신호, 유입인데도 하락이면 디커플링(지연 반영)입니다.',
+                refs: [
+                    { name: 'CoinGecko - ETH/BTC', url: 'https://www.coingecko.com/en/coins/ethereum/btc' },
+                    { name: 'TradingView - ETHBTC', url: 'https://www.tradingview.com/symbols/ETHBTC/' },
+                ]
+            },
+            ethEtf: {
+                title: 'ETH ETF Net Flow',
+                subtitle: 'Ethereum ETF 순유입/유출',
+                description: 'Ethereum ETF의 일별 순 자금 유출입입니다. 5거래일 중 4일 이상 같은 방향이면 "추세 형성", 1D flow가 최근 20일 상위 10% 규모면 "유의미한 규모"로 판단합니다. 유입 지속인데 ETH/BTC가 약세면 "지연 반영" 또는 "헤지 수요" 가능성입니다.',
+                refs: [
+                    { name: 'CoinMarketCap - Ethereum ETF', url: 'https://coinmarketcap.com/etf/ethereum/' },
+                    { name: 'Farside Investors - ETH ETF Flows', url: 'https://farside.co.uk/ethereum-etf-flow-all-data/' },
+                ]
+            },
+            mvrv: {
+                title: 'MVRV Z-Score',
+                subtitle: 'Bitcoin Market Value to Realized Value',
+                description: 'BTC의 시장가치(MV) 대 실현가치(RV) 비율을 표준화한 지표입니다 (오태민 관점). Z < 0 = 극저평가(역사적 매수 구간), 0~2 = 축적, 2~3 = 중립, 3~5 = 과열 초입, 5~7 = 과열(차익실현 고려), > 7 = 극단 과열. 임계대(0, 1, 3, 5, 7) 돌파 시 "사이클 레짐 전환 신호"로 무조건 HIGH 중요도입니다.',
+                refs: [
+                    { name: 'Bitcoin Magazine Pro - MVRV Z-Score', url: 'https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/' },
+                    { name: 'LookIntoBitcoin - MVRV', url: 'https://www.lookintobitcoin.com/charts/mvrv-zscore/' },
+                ]
+            },
+            stablecoin: {
+                title: 'Stablecoin Supply',
+                subtitle: '스테이블코인 총 공급량',
+                description: '전체 스테이블코인(USDT, USDC, DAI 등) 발행량 합계입니다. 7D 증가율이 상위 20%면 "새로운 달러 유동성 유입"으로 위험자산에 긍정적입니다. 체인별 점유율 변화가 1pp 이상이면 "자금 로테이션(예: ETH→SOL, Tron→ETH)" 발생 중입니다.',
+                refs: [
+                    { name: 'DefiLlama - Stablecoins by Chain', url: 'https://defillama.com/stablecoins/chains' },
+                    { name: 'DefiLlama - Stablecoins Overview', url: 'https://defillama.com/stablecoins' },
+                ]
+            },
+            fearGreed: {
+                title: 'Crypto Fear & Greed Index',
+                subtitle: '공포 & 탐욕 지수',
+                description: 'BTC 변동성, 거래량, SNS 언급, 설문, 도미넌스, 트렌드를 종합한 심리 지표입니다. 0~24 = 극단 공포(역발상 매수 구간), 25~44 = 공포, 45~55 = 중립, 56~75 = 탐욕, 76~100 = 극단 탐욕(주의). 극단 구간에서의 반전이 가장 중요한 시그널입니다.',
+                refs: [
+                    { name: 'Alternative.me - Fear & Greed Index', url: 'https://alternative.me/crypto/fear-and-greed-index/' },
+                    { name: 'CoinMarketCap - Fear & Greed', url: 'https://coinmarketcap.com/charts/#fear-and-greed-index' },
+                ]
+            },
+        };
+
+        // GaugeDetailModal Component
+        function GaugeDetailModal({ gaugeKey, gauges, stableChainInfo, manualEtf, manualMvrv, fgData, onClose }) {
+            const def = GAUGE_DETAILS[gaugeKey];
+            if (!def) return null;
+
+            // Build KPI items based on gauge type
+            let kpis = [];
+            switch (gaugeKey) {
+                case 'mktCap':
+                    kpis = [
+                        { label: '\uD604\uC7AC', value: '$' + formatNum(gauges.mktCap), delta: gauges.mktCapChange1d, suffix: '% (1D)' },
+                        { label: 'BTC \uC810\uC720\uC728', value: (gauges.btcDom?.toFixed(1) || '-') + '%' },
+                        { label: 'ETH \uC810\uC720\uC728', value: (gauges.ethDom?.toFixed(1) || '-') + '%' },
+                    ];
+                    break;
+                case 'volume':
+                    kpis = [
+                        { label: '24h Volume', value: '$' + formatNum(gauges.vol) },
+                        { label: 'vs 7D \uD3C9\uADE0', value: '-', note: 'Phase 2\uC5D0\uC11C \uC790\uB3D9 \uACC4\uC0B0' },
+                    ];
+                    break;
+                case 'btcDom':
+                    kpis = [
+                        { label: '\uD604\uC7AC BTC.D', value: (gauges.btcDom?.toFixed(1) || '-') + '%' },
+                        { label: 'ETH.D', value: (gauges.ethDom?.toFixed(1) || '-') + '%' },
+                        { label: '7D \u0394', value: '-', note: 'Phase 2' },
+                    ];
+                    break;
+                case 'ethBtc':
+                    kpis = [
+                        { label: 'ETH/BTC', value: gauges.ethBtc?.toFixed(4) || '-' },
+                        { label: 'ETH.D', value: (gauges.ethDom?.toFixed(1) || '-') + '%' },
+                        { label: 'BTC.D', value: (gauges.btcDom?.toFixed(1) || '-') + '%' },
+                    ];
+                    break;
+                case 'ethEtf':
+                    kpis = manualEtf ? [
+                        { label: '1D Flow', value: '$' + manualEtf.flow1d + 'M', delta: manualEtf.flow1d },
+                        { label: '5D \uB204\uC801', value: '$' + (manualEtf.flow5d || '?') + 'M', delta: manualEtf.flow5d },
+                        { label: '5D \uBC29\uD5A5', value: manualEtf.direction === 'inflow' ? '\uC720\uC785' : manualEtf.direction === 'outflow' ? '\uC720\uCD9C' : '\uD63C\uD569' },
+                    ] : [{ label: '\uC0C1\uD0DC', value: '\uC218\uB3D9 \uC785\uB825 \uD544\uC694' }];
+                    break;
+                case 'mvrv':
+                    kpis = manualMvrv ? [
+                        { label: 'Z-Score', value: String(manualMvrv.zScore) },
+                        { label: '\uB808\uC9D0', value: mvrvRegimeLabel(manualMvrv.regime) },
+                        { label: '\uC774\uC804 Z', value: String(manualMvrv.prevZScore) },
+                    ] : [{ label: '\uC0C1\uD0DC', value: '\uC218\uB3D9 \uC785\uB825 \uD544\uC694' }];
+                    break;
+                case 'stablecoin':
+                    kpis = [
+                        { label: '\uCD1D \uACF5\uAE09\uB7C9', value: '$' + formatNum(gauges.stableTotal) },
+                        { label: '7D \u0394', value: formatDelta(stableChainInfo.supplyChangePct), delta: stableChainInfo.supplyChangePct },
+                        { label: 'Top Chain', value: stableChainInfo.topChainName },
+                    ];
+                    break;
+                case 'fearGreed': {
+                    const fg = gauges.fg;
+                    const prev = fgData?.data?.[1] ? Number(fgData.data[1].value) : null;
+                    kpis = [
+                        { label: '\uD604\uC7AC', value: fg != null ? String(fg) : '-', color: fg != null ? fgColor(fg) : null },
+                        { label: '\uB808\uC9D0', value: fg != null ? fgLabel(fg) : '-', color: fg != null ? fgColor(fg) : null },
+                        { label: '\uC5B4\uC81C', value: prev != null ? String(prev) : '-', color: prev != null ? fgColor(prev) : null },
+                    ];
+                    break;
+                }
+            }
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-panel" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title-area">
+                                <h2>{def.title}</h2>
+                                <p>{def.subtitle}</p>
+                            </div>
+                            <button className="modal-close" onClick={onClose}>{'\u00D7'}</button>
+                        </div>
+                        <div className="modal-body">
+                            {/* KPIs */}
+                            <div className="modal-kpi-grid">
+                                {kpis.map((k, i) => (
+                                    <div key={i} className="modal-kpi">
+                                        <div className="modal-kpi-label">{k.label}</div>
+                                        <div className="modal-kpi-value" style={k.color ? { color: k.color } : {}}>
+                                            {k.value}
+                                        </div>
+                                        {k.delta != null && (
+                                            <div className={`modal-kpi-sub ${deltaClass(k.delta)}`}>
+                                                {deltaArrow(k.delta)}{formatDelta(k.delta, k.suffix || '%')}
+                                            </div>
+                                        )}
+                                        {k.note && <div style={{ fontSize: '0.65rem', color: '#475569', marginTop: '0.15rem' }}>{k.note}</div>}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Description */}
+                            <div className="modal-desc">{def.description}</div>
+
+                            {/* Reference Links */}
+                            <div className="modal-refs">
+                                <div className="modal-refs-title">{'\uCC38\uC870:'}</div>
+                                {def.refs.map((r, i) => (
+                                    <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" className="modal-ref-link">
+                                        <div className="modal-ref-icon">
+                                            <i data-lucide="external-link" style={{ width: 12, height: 12 }}></i>
+                                        </div>
+                                        {r.name}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ============================================
+        // MVRV Regime helpers
+        // ============================================
+        function mvrvRegimeColor(regime) {
+            const map = {
+                deep_undervalued: '#22c55e', accumulation: '#4ade80', neutral: '#fbbf24',
+                overheating_early: '#f97316', overheating: '#ef4444', extreme: '#dc2626'
+            };
+            return map[regime] || '#94a3b8';
+        }
+
+        function mvrvRegimeLabel(regime) {
+            const map = {
+                deep_undervalued: '\uADF9\uC800\uD3C9\uAC00', accumulation: '\uCD95\uC801', neutral: '\uC911\uB9BD',
+                overheating_early: '\uACFC\uC5F4\uCD08\uC785', overheating: '\uACFC\uC5F4', extreme: '\uADF9\uB2E8'
+            };
+            return map[regime] || '-';
+        }
+
+        function fgColor(val) {
+            if (val <= 24) return '#ef4444';
+            if (val <= 44) return '#f97316';
+            if (val <= 55) return '#fbbf24';
+            if (val <= 75) return '#4ade80';
+            return '#22c55e';
+        }
+
+        function fgLabel(val) {
+            if (val <= 24) return 'Extreme Fear';
+            if (val <= 44) return 'Fear';
+            if (val <= 55) return 'Neutral';
+            if (val <= 75) return 'Greed';
+            return 'Extreme Greed';
+        }
+
+        // ============================================
+        // Main App Component
+        // ============================================
+        function CryptoPulse() {
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [globalData, setGlobalData] = useState(null);
+            const [ethBtcData, setEthBtcData] = useState(null);
+            const [fgData, setFgData] = useState(null);
+            const [stableData, setStableData] = useState(null);
+            const [chainData, setChainData] = useState(null);
+            const [manualEtf, setManualEtf] = useState(loadManual('ethEtf'));
+            const [manualMvrv, setManualMvrv] = useState(loadManual('mvrv'));
+            const [lastUpdate, setLastUpdate] = useState(null);
+            const [transferCheck, setTransferCheck] = useState(false);
+            const [selectedGauge, setSelectedGauge] = useState(null);
+
+            const loadAll = useCallback(async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const [g, eb, fg, sc, sch] = await Promise.allSettled([
+                        fetchCoinGeckoGlobal(),
+                        fetchEthBtc(),
+                        fetchFearGreed(),
+                        fetchStablecoins(),
+                        fetchStablecoinChains(),
+                    ]);
+                    if (g.status === 'fulfilled') setGlobalData(g.value);
+                    if (eb.status === 'fulfilled') setEthBtcData(eb.value);
+                    if (fg.status === 'fulfilled') setFgData(fg.value);
+                    if (sc.status === 'fulfilled') setStableData(sc.value);
+                    if (sch.status === 'fulfilled') setChainData(sch.value);
+
+                    const anyOk = [g, eb, fg, sc, sch].some(r => r.status === 'fulfilled');
+                    if (!anyOk) setError('API \uC5F0\uACB0 \uC2E4\uD328. \uC7A0\uC2DC \uD6C4 \uC0C8\uB85C\uACE0\uCE68 \uD574\uC8FC\uC138\uC694.');
+                    setLastUpdate(new Date());
+                } catch (e) {
+                    setError(e.message);
+                } finally {
+                    setLoading(false);
+                }
+            }, []);
+
+            useEffect(() => {
+                loadAll();
+            }, [loadAll]);
+
+            useEffect(() => {
+                if (typeof lucide !== 'undefined') {
+                    setTimeout(() => lucide.createIcons(), 50);
+                }
+            });
+
+            // ---- Derived data ----
+            const gauges = useMemo(() => {
+                const mktCap = globalData?.total_market_cap?.usd;
+                const mktCapChange1d = globalData?.market_cap_change_percentage_24h_usd;
+                const vol = globalData?.total_volume?.usd;
+                const btcDom = globalData?.market_cap_percentage?.btc;
+                const ethDom = globalData?.market_cap_percentage?.eth;
+                const ethBtc = ethBtcData?.ethereum?.btc;
+                const fg = fgData?.data?.[0] ? Number(fgData.data[0].value) : null;
+
+                // Stablecoin total
+                let stableTotal = null;
+                let stableTotal7dAgo = null;
+                if (stableData?.peggedAssets) {
+                    stableTotal = stableData.peggedAssets.reduce((sum, a) => sum + (a.circulating?.peggedUSD || 0), 0);
+                    // 7d ago approximation from peggedAssets history
+                    stableTotal7dAgo = stableData.peggedAssets.reduce((sum, a) => {
+                        const circ = a.circulating?.peggedUSD || 0;
+                        const change7d = a.circulatingPrevDay?.peggedUSD || circ; // fallback
+                        return sum + change7d;
+                    }, 0);
+                }
+
+                return {
+                    mktCap, mktCapChange1d, vol, btcDom, ethDom, ethBtc, fg,
+                    stableTotal, stableTotal7dAgo,
+                    ethEtf: manualEtf, mvrv: manualMvrv,
+                };
+            }, [globalData, ethBtcData, fgData, stableData, manualEtf, manualMvrv]);
+
+            // Stablecoin chain top delta
+            const stableChainInfo = useMemo(() => {
+                if (!chainData || !Array.isArray(chainData)) return { topChainName: '-', topChainDelta: 0, supplyChangePct: 0 };
+                // Top 2 chains
+                const sorted = [...chainData].sort((a, b) => (b.totalCirculatingUSD?.peggedUSD || 0) - (a.totalCirculatingUSD?.peggedUSD || 0));
+                const top = sorted[0];
+                // Supply change pct (approximate)
+                const totalNow = chainData.reduce((s, c) => s + (c.totalCirculatingUSD?.peggedUSD || 0), 0);
+                const stableChangePct = gauges.stableTotal && gauges.stableTotal7dAgo
+                    ? ((gauges.stableTotal - gauges.stableTotal7dAgo) / gauges.stableTotal7dAgo) * 100 : 0;
+
+                return {
+                    topChainName: top?.name || '-',
+                    topChainDelta: 0, // Need historical data for real delta
+                    supplyChangePct: stableChangePct,
+                };
+            }, [chainData, gauges]);
+
+            // Card importance & summaries
+            const cards = useMemo(() => {
+                const triA = calcTriggersA(gauges.mktCapChange1d, 1.0, 0); // vol ratio needs 7d avg
+                const triB = calcTriggersB(manualEtf);
+                const triC = calcTriggersC(manualMvrv);
+                const triD = calcTriggersD(stableChainInfo.supplyChangePct, stableChainInfo.topChainDelta);
+
+                const dataA = {
+                    mktCapChange1d: gauges.mktCapChange1d,
+                    volRatio: 1.0, // placeholder
+                    btcDom7dDelta: 0, // need historical
+                };
+
+                return [
+                    { id: 'overview', importance: getImportance(triA), triggers: triA, summary: genSummaryA(dataA) },
+                    { id: 'ethEtf', importance: getImportance(triB), triggers: triB, summary: genSummaryB(manualEtf) },
+                    { id: 'mvrv', importance: getImportance(triC), triggers: triC, summary: genSummaryC(manualMvrv) },
+                    { id: 'stablecoin', importance: getImportance(triD), triggers: triD, summary: genSummaryD(stableChainInfo) },
+                ];
+            }, [gauges, manualEtf, manualMvrv, stableChainInfo]);
+
+            const oneLiner = useMemo(() => genOneLiner(cards), [cards]);
+
+            // ---- Manual input handlers ----
+            function handleSaveEtf(data) {
+                saveManual('ethEtf', data);
+                setManualEtf({ ...data, updatedAt: new Date().toISOString() });
+            }
+
+            function handleSaveMvrv(data) {
+                saveManual('mvrv', data);
+                setManualMvrv({ ...data, updatedAt: new Date().toISOString() });
+            }
+
+            // ---- Render ----
+            return (
+                <div className="container">
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-content">
+                            <div className="header-left">
+                                <div className="logo">
+                                    <div className="logo-icon">
+                                        <i data-lucide="bitcoin" style={{ width: 24, height: 24 }}></i>
+                                    </div>
+                                    Crypto Pulse
+                                </div>
+                                <span className="page-badge">Market Monitor</span>
+                            </div>
+                            <div className="header-actions">
+                                {lastUpdate && (
+                                    <span className="update-time">
+                                        {lastUpdate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} updated
+                                    </span>
+                                )}
+                                <button className="btn btn-refresh" onClick={loadAll}>
+                                    <i data-lucide="refresh-cw" style={{ width: 14, height: 14 }}></i>
+                                    {'\uC0C8\uB85C\uACE0\uCE68'}
+                                </button>
+                                <a href="index.html" className="btn btn-back">
+                                    <i data-lucide="arrow-left" style={{ width: 14, height: 14 }}></i>
+                                    {'\uB300\uC2DC\uBCF4\uB4DC'}
+                                </a>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="main">
+                        {/* One-liner Banner */}
+                        <div className={`oneliner-banner regime-${oneLiner.regime}`}>
+                            <div className="oneliner-text">
+                                <span className="oneliner-tag tag-estimate">{'\uCD94\uC815'}</span>
+                                {oneLiner.text}
+                            </div>
+                        </div>
+
+                        {/* Gauge Grid */}
+                        <div className="gauge-grid">
+                            <div className="gauge-card" onClick={() => setSelectedGauge('mktCap')}>
+                                <div className="gauge-label">Total Market Cap</div>
+                                <div className="gauge-value">${formatNum(gauges.mktCap)}</div>
+                                <div className={`gauge-delta ${deltaClass(gauges.mktCapChange1d)}`}>
+                                    {deltaArrow(gauges.mktCapChange1d)}{formatDelta(gauges.mktCapChange1d)} (1D)
+                                </div>
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('volume')}>
+                                <div className="gauge-label">24h Volume</div>
+                                <div className="gauge-value">${formatNum(gauges.vol)}</div>
+                                <div className="gauge-delta delta-flat">vs 7D avg: -</div>
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('btcDom')}>
+                                <div className="gauge-label">BTC Dominance</div>
+                                <div className="gauge-value">{gauges.btcDom?.toFixed(1) || '-'}%</div>
+                                <div className="gauge-delta delta-flat">7D: -</div>
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('ethBtc')}>
+                                <div className="gauge-label">ETH/BTC</div>
+                                <div className="gauge-value">{gauges.ethBtc?.toFixed(4) || '-'}</div>
+                                <div className="gauge-delta delta-flat">ETH.D: {gauges.ethDom?.toFixed(1) || '-'}%</div>
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('ethEtf')}>
+                                <div className="gauge-label">ETH ETF Flow</div>
+                                <div className="gauge-value">
+                                    {manualEtf ? `$${manualEtf.flow1d}M` : '-'}
+                                </div>
+                                <div className={`gauge-delta ${manualEtf ? deltaClass(manualEtf.flow1d) : 'delta-flat'}`}>
+                                    {manualEtf ? `5D: $${manualEtf.flow5d || '?'}M` : '\uC218\uB3D9 \uC785\uB825'}
+                                </div>
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('mvrv')}>
+                                <div className="gauge-label">MVRV Z-Score</div>
+                                <div className="gauge-value">{manualMvrv?.zScore || '-'}</div>
+                                {manualMvrv?.regime && (
+                                    <div className="gauge-regime" style={{
+                                        background: `${mvrvRegimeColor(manualMvrv.regime)}22`,
+                                        color: mvrvRegimeColor(manualMvrv.regime),
+                                    }}>
+                                        {mvrvRegimeLabel(manualMvrv.regime)}
+                                    </div>
+                                )}
+                                {!manualMvrv && <div className="gauge-delta delta-flat">{'\uC218\uB3D9 \uC785\uB825'}</div>}
+                            </div>
+
+                            <div className="gauge-card" onClick={() => setSelectedGauge('stablecoin')}>
+                                <div className="gauge-label">Stablecoin Supply</div>
+                                <div className="gauge-value">${formatNum(gauges.stableTotal)}</div>
+                                <div className={`gauge-delta ${deltaClass(stableChainInfo.supplyChangePct)}`}>
+                                    {deltaArrow(stableChainInfo.supplyChangePct)}{formatDelta(stableChainInfo.supplyChangePct)} (7D)
+                                </div>
+                            </div>
+
+                            {gauges.fg != null && (
+                                <div className="gauge-card" onClick={() => setSelectedGauge('fearGreed')}>
+                                    <div className="gauge-label">Fear & Greed</div>
+                                    <div className="gauge-value" style={{ color: fgColor(gauges.fg) }}>{gauges.fg}</div>
+                                    <div className="gauge-delta" style={{ color: fgColor(gauges.fg) }}>
+                                        {fgLabel(gauges.fg)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Gauge Detail Modal */}
+                        {selectedGauge && (
+                            <GaugeDetailModal
+                                gaugeKey={selectedGauge}
+                                gauges={gauges}
+                                stableChainInfo={stableChainInfo}
+                                manualEtf={manualEtf}
+                                manualMvrv={manualMvrv}
+                                fgData={fgData}
+                                onClose={() => setSelectedGauge(null)}
+                            />
+                        )}
+
+                        {/* Source Cards */}
+                        <div className="source-grid">
+                            {/* Card A: Crypto Overview */}
+                            <SourceCard
+                                title="Crypto Overview"
+                                question="\uC624\uB298 \uC2DC\uC7A5\uC5D0 \uC704\uD5D8\uC120\uD638\uAC00 \uBD99\uC5C8\uB294\uAC00?"
+                                importance={cards[0].importance}
+                                summary={cards[0].summary}
+                                metrics={[
+                                    { label: 'Mkt Cap 1D', value: formatDelta(gauges.mktCapChange1d), cls: deltaClass(gauges.mktCapChange1d) },
+                                    { label: 'BTC.D', value: `${gauges.btcDom?.toFixed(1) || '-'}%`, cls: 'delta-flat' },
+                                    { label: 'Vol', value: `$${formatNum(gauges.vol)}`, cls: 'delta-flat' },
+                                ]}
+                                linkUrl="https://coinmarketcap.com/charts/"
+                                linkLabel="CoinMarketCap Charts"
+                            />
+
+                            {/* Card B: Ethereum ETF */}
+                            <SourceCard
+                                title="Ethereum ETF"
+                                question="ETH\uC5D0 \uAE30\uAD00\uC131 \uC218\uAE09\uC774 \uB4E4\uC5B4\uC624\uB294\uAC00?"
+                                importance={cards[1].importance}
+                                summary={cards[1].summary}
+                                metrics={manualEtf ? [
+                                    { label: '1D Flow', value: `$${manualEtf.flow1d}M`, cls: deltaClass(manualEtf.flow1d) },
+                                    { label: '5D Flow', value: `$${manualEtf.flow5d || '?'}M`, cls: deltaClass(manualEtf.flow5d) },
+                                    { label: 'Direction', value: manualEtf.direction === 'inflow' ? '\uC720\uC785' : manualEtf.direction === 'outflow' ? '\uC720\uCD9C' : '\uD63C\uD569', cls: 'delta-flat' },
+                                ] : []}
+                                linkUrl="https://coinmarketcap.com/etf/ethereum/"
+                                linkLabel="ETH ETF on CoinMarketCap"
+                                manualInput={
+                                    <ManualEtfInput initial={manualEtf} onSave={handleSaveEtf} />
+                                }
+                            />
+
+                            {/* Card C: MVRV Z-Score */}
+                            <SourceCard
+                                title="MVRV Z-Score"
+                                question="BTC\uAC00 \uC9C0\uAE08 \uC2FC\uAC00, \uBE44\uC2FC\uAC00? (\uC0AC\uC774\uD074 \uC704\uCE58)"
+                                importance={cards[2].importance}
+                                summary={cards[2].summary}
+                                metrics={manualMvrv ? [
+                                    { label: 'Z-Score', value: manualMvrv.zScore, cls: 'delta-flat' },
+                                    { label: '\uB808\uC9D0', value: mvrvRegimeLabel(manualMvrv.regime), cls: 'delta-flat' },
+                                    { label: 'Prev', value: manualMvrv.prevZScore, cls: 'delta-flat' },
+                                ] : []}
+                                linkUrl="https://www.bitcoinmagazinepro.com/charts/mvrv-zscore/"
+                                linkLabel="MVRV Z-Score Chart"
+                                manualInput={
+                                    <ManualMvrvInput initial={manualMvrv} onSave={handleSaveMvrv} />
+                                }
+                            />
+
+                            {/* Card D: Stablecoin */}
+                            <SourceCard
+                                title="Stablecoin & Chain"
+                                question="\uC2DC\uC7A5\uC5D0 \uB2EC\uB7EC \uC720\uB3D9\uC131\uC774 \uC0C8\uB85C \uB4E4\uC5B4\uC624\uB294\uAC00?"
+                                importance={cards[3].importance}
+                                summary={cards[3].summary}
+                                metrics={[
+                                    { label: 'Total', value: `$${formatNum(gauges.stableTotal)}`, cls: 'delta-flat' },
+                                    { label: '7D \u0394', value: formatDelta(stableChainInfo.supplyChangePct), cls: deltaClass(stableChainInfo.supplyChangePct) },
+                                    { label: 'Top Chain', value: stableChainInfo.topChainName, cls: 'delta-flat' },
+                                ]}
+                                linkUrl="https://defillama.com/stablecoins/chains"
+                                linkLabel="DefiLlama Stablecoins"
+                            />
+                        </div>
+
+                        {/* Transfer Check */}
+                        <div className="transfer-block">
+                            <div className="transfer-title">{'\uC8FC\uC2DD \uC804\uC774 \uCCB4\uD06C'}</div>
+                            <div className="transfer-paths">
+                                <div className="transfer-path">{'\uD06C\uB9BD\uD1A0 \u2192 \uB098\uC2A4\uB2E5 \u2192 \uCF54\uC2A4\uD53C \uC131\uC7A5\uC8FC'}</div>
+                                <div className="transfer-path">{'\uB2EC\uB7EC \u2192 \uC2A4\uD14C\uC774\uBE14\uCF54\uC778 \u2192 \uD06C\uB9BD\uD1A0'}</div>
+                                <div className="transfer-path">{'ETF \uC218\uAE09 \u2192 \uC2DC\uC7A5 \uC720\uB3D9\uC131'}</div>
+                            </div>
+                            <label className="transfer-check">
+                                <input type="checkbox"
+                                    checked={transferCheck}
+                                    onChange={(e) => setTransferCheck(e.target.checked)}
+                                />
+                                {'\uD06C\uB9BD\uD1A0 \uAC15\uC138\uAC00 \uC8FC\uC2DD\uC73C\uB85C \uBC88\uC9C0\uB294 \uC870\uAC74 \uCDA9\uC871?'}
+                            </label>
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        // ============================================
+        // Sub Components
+        // ============================================
+        function SourceCard({ title, question, importance, summary, metrics, linkUrl, linkLabel, manualInput }) {
+            const badgeCls = importance === 'HIGH' ? 'badge-high' : importance === 'MID' ? 'badge-mid' : 'badge-low';
+            const cardCls = `source-card importance-${importance.toLowerCase()}`;
+
+            return (
+                <div className={cardCls}>
+                    <div className="card-header">
+                        <span className={`importance-badge ${badgeCls}`}>{importance}</span>
+                        <span className="card-title">{title}</span>
+                    </div>
+                    <div className="card-question">{question}</div>
+
+                    <div className="summary-lines">
+                        <div className="summary-line">
+                            <span className="summary-tag tag-observed">{'\uD655\uC778'}</span>
+                            {summary.observed}
+                        </div>
+                        <div className="summary-line">
+                            <span className="summary-tag tag-interpreted">{'\uCD94\uC815'}</span>
+                            {summary.interpreted}
+                        </div>
+                        <div className="summary-line">
+                            <span className="summary-tag tag-action">{'\uD589\uB3D9'}</span>
+                            {summary.action}
+                        </div>
+                    </div>
+
+                    {metrics.length > 0 && (
+                        <div className="card-metrics">
+                            {metrics.map((m, i) => (
+                                <div key={i} className="metric-item">
+                                    {m.label}: <span className={m.cls}>{m.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {manualInput}
+
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="external-link">
+                        <i data-lucide="external-link" style={{ width: 14, height: 14 }}></i>
+                        {linkLabel} {'\u2192'}
+                    </a>
+                </div>
+            );
+        }
+
+        function ManualEtfInput({ initial, onSave }) {
+            const [flow1d, setFlow1d] = useState(initial?.flow1d || '');
+            const [flow5d, setFlow5d] = useState(initial?.flow5d || '');
+            const [direction, setDirection] = useState(initial?.direction || 'mixed');
+
+            return (
+                <div className="manual-area">
+                    <div className="manual-title">{'\uC218\uB3D9 \uC785\uB825 (CoinMarketCap \uCC38\uC870)'}</div>
+                    <div className="manual-row">
+                        <label>1D Flow ($M)</label>
+                        <input type="number" value={flow1d}
+                            onChange={e => setFlow1d(e.target.value)}
+                            placeholder="+120" />
+                    </div>
+                    <div className="manual-row">
+                        <label>5D Flow ($M)</label>
+                        <input type="number" value={flow5d}
+                            onChange={e => setFlow5d(e.target.value)}
+                            placeholder="+340" />
+                    </div>
+                    <div className="manual-row">
+                        <label>5D {'\uBC29\uD5A5'}</label>
+                        <select value={direction} onChange={e => setDirection(e.target.value)}>
+                            <option value="inflow">{'\uC720\uC785 (4\uC77C+)'}</option>
+                            <option value="outflow">{'\uC720\uCD9C (4\uC77C+)'}</option>
+                            <option value="mixed">{'\uD63C\uD569'}</option>
+                        </select>
+                    </div>
+                    <button className="manual-save-btn" onClick={() => onSave({
+                        flow1d: Number(flow1d), flow5d: Number(flow5d), direction
+                    })}>{'\uC800\uC7A5'}</button>
+                    {initial?.updatedAt && (
+                        <div className="manual-saved">{'\uCD5C\uC885'}: {new Date(initial.updatedAt).toLocaleString('ko-KR')}</div>
+                    )}
+                </div>
+            );
+        }
+
+        function ManualMvrvInput({ initial, onSave }) {
+            const [zScore, setZScore] = useState(initial?.zScore || '');
+            const [prevZScore, setPrevZScore] = useState(initial?.prevZScore || '');
+            const [regime, setRegime] = useState(initial?.regime || 'neutral');
+
+            return (
+                <div className="manual-area">
+                    <div className="manual-title">{'\uC218\uB3D9 \uC785\uB825 (BitcoinMagazinePro \uCC38\uC870)'}</div>
+                    <div className="manual-row">
+                        <label>Z-Score</label>
+                        <input type="number" step="0.1" value={zScore}
+                            onChange={e => setZScore(e.target.value)}
+                            placeholder="3.2" />
+                    </div>
+                    <div className="manual-row">
+                        <label>{'\uC774\uC804'} Z</label>
+                        <input type="number" step="0.1" value={prevZScore}
+                            onChange={e => setPrevZScore(e.target.value)}
+                            placeholder="2.8" />
+                    </div>
+                    <div className="manual-row">
+                        <label>{'\uB808\uC9D0'}</label>
+                        <select value={regime} onChange={e => setRegime(e.target.value)}>
+                            <option value="deep_undervalued">{'\uADF9\uC800\uD3C9\uAC00 (< 0)'}</option>
+                            <option value="accumulation">{'\uCD95\uC801 (0~2)'}</option>
+                            <option value="neutral">{'\uC911\uB9BD (2~3)'}</option>
+                            <option value="overheating_early">{'\uACFC\uC5F4\uCD08\uC785 (3~5)'}</option>
+                            <option value="overheating">{'\uACFC\uC5F4 (5~7)'}</option>
+                            <option value="extreme">{'\uADF9\uB2E8 (> 7)'}</option>
+                        </select>
+                    </div>
+                    <button className="manual-save-btn" onClick={() => onSave({
+                        zScore: Number(zScore), prevZScore: Number(prevZScore), regime
+                    })}>{'\uC800\uC7A5'}</button>
+                    {initial?.updatedAt && (
+                        <div className="manual-saved">{'\uCD5C\uC885'}: {new Date(initial.updatedAt).toLocaleString('ko-KR')}</div>
+                    )}
+                </div>
+            );
+        }
+
+        // Render
+        ReactDOM.render(<CryptoPulse />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>

@@ -1,325 +1,440 @@
-"""
-AI Verifier - Final quality gate using GPT-4o
-Reviews all collected data from a professional investor's perspective.
+﻿"""
+AI Verifier v2 - Independent moat verification.
 
-Responsibilities:
-1. Verify moat evaluation consistency with evidence
-2. Check for overlooked risks or opportunities
-3. Provide professional investor's opinion on moat strength
-4. Flag any discrepancies between data and scores
-
-Requires OPENAI_API_KEY in .env
+Compatible with both:
+- New signature verify(company, ticker, classification, report_sections, ...)
+- Legacy signature verify(company, ticker, moat_strength, moat_desc, ... , classification)
 """
 
 import json
-import sys
 import os
-from typing import Dict, Optional
+import re
+import sys
+import urllib.error
+import urllib.request
+from typing import Any, Dict, List, Optional, Tuple
 
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
 
 
 class AIVerifier:
-    """GPT-4o based professional investor review"""
+    """Independent Moat Evaluator."""
 
-    def __init__(self, api_key: str = None):
-        if api_key is None:
-            api_key = os.getenv("OPENAI_API_KEY", "")
+    def __init__(self, api_key: str = None, load_from_env: bool = False):
+        # Deterministic behavior for tests:
+        # api_key=None => disabled unless caller explicitly requests env loading.
+        if api_key is None and load_from_env:
+            from config import load_env
+            load_env()
+            api_key = os.getenv("ANTHROPIC_API_KEY")
+
         self.api_key = api_key
-        self.model = "gpt-4o"
-        self.enabled = bool(api_key and api_key != "your-openai-api-key-here")
+        self.model = "claude-opus-4-6"
+        self.enabled = bool(api_key)
 
     def verify(
         self,
         company_name: str,
         ticker: str,
-        moat_strength: int,
-        moat_desc: str,
-        bm_summary: str,
-        evidence_summary: str,
-        sustainability_notes: str,
         classification: Dict,
+        report_sections: Dict,
         financials: Dict = None,
+        multi_year_financials: Dict = None,
+        bm_analysis: Dict = None,
+        evidence_items: List = None,
+        # Legacy params (kept for backward compatibility)
+        moat_strength: int = None,
+        moat_desc: str = "",
+        bm_summary: str = "",
+        evidence_summary: str = "",
+        sustainability_notes: str = "",
     ) -> Dict:
-        """
-        Run AI verification on moat evaluation.
-
-        Returns: {
-            'verified': bool,
-            'ai_opinion': str,
-            'adjusted_strength': int or None,
-            'adjustment_reason': str,
-            'risk_flags': [str],
-            'opportunity_flags': [str],
-            'confidence': float,  # 0.0-1.0
-            'raw_response': str,
-            'error': str or None
-        }
-        """
-        if not self.enabled:
-            return {
-                'verified': False,
-                'ai_opinion': 'OPENAI_API_KEY not configured',
-                'adjusted_strength': None,
-                'adjustment_reason': '',
-                'risk_flags': [],
-                'opportunity_flags': [],
-                'confidence': 0.0,
-                'raw_response': '',
-                'error': 'API key not set'
-            }
-
-        # Build prompt
-        prompt = self._build_prompt(
-            company_name, ticker, moat_strength, moat_desc,
-            bm_summary, evidence_summary, sustainability_notes,
-            classification, financials
+        (
+            classification,
+            report_sections,
+            financials,
+            multi_year_financials,
+            bm_analysis,
+            evidence_items,
+            moat_strength,
+            moat_desc,
+            bm_summary,
+            evidence_summary,
+            sustainability_notes,
+        ) = self._coerce_legacy_inputs(
+            classification,
+            report_sections,
+            financials,
+            multi_year_financials,
+            bm_analysis,
+            evidence_items,
+            moat_strength,
+            moat_desc,
+            bm_summary,
+            evidence_summary,
+            sustainability_notes,
         )
 
-        # Call GPT-4o
-        response = self._call_openai(prompt)
-
-        if response is None:
+        if not self.enabled:
             return {
-                'verified': False,
-                'ai_opinion': 'API call failed',
-                'adjusted_strength': None,
-                'adjustment_reason': '',
-                'risk_flags': [],
-                'opportunity_flags': [],
-                'confidence': 0.0,
-                'raw_response': '',
-                'error': 'OpenAI API call failed'
+                "verified": False,
+                "ai_opinion": "ANTHROPIC_API_KEY not configured",
+                "independent_strength": None,
+                "adjusted_strength": None,
+                "adjustment_reason": "",
+                "risk_flags": [],
+                "opportunity_flags": [],
+                "confidence": 0.0,
+                "raw_response": "",
+                "error": "API key not set",
             }
 
-        # Parse response
-        return self._parse_response(response, moat_strength)
+        prompt = self._build_independent_prompt(
+            company_name=company_name,
+            ticker=ticker,
+            classification=classification,
+            report_sections=report_sections,
+            financials=financials,
+            multi_year_financials=multi_year_financials,
+            bm_analysis=bm_analysis,
+            evidence_items=evidence_items,
+        )
 
-    def _build_prompt(
+        response = self._call_claude(prompt)
+        if response is None:
+            return {
+                "verified": False,
+                "ai_opinion": "API call failed",
+                "independent_strength": None,
+                "adjusted_strength": None,
+                "adjustment_reason": "",
+                "risk_flags": [],
+                "opportunity_flags": [],
+                "confidence": 0.0,
+                "raw_response": "",
+                "error": "Claude API call failed",
+            }
+
+        result = self._parse_response(response)
+
+        if moat_strength is not None and result.get("independent_strength") is not None:
+            gap = abs(result["independent_strength"] - moat_strength)
+            result["rule_based_strength"] = moat_strength
+            result["score_gap"] = gap
+            if gap >= 2:
+                result["gap_flag"] = True
+                result["adjustment_reason"] = (
+                    f"AI({result['independent_strength']}) vs "
+                    f"Rule-Based({moat_strength}) gap={gap}"
+                )
+
+        result["adjusted_strength"] = result.get("independent_strength", moat_strength)
+        return result
+
+    def generate_ai_review_text(self, result: Dict[str, Any]) -> str:
+        if not result:
+            return "AI review: no result"
+
+        if not result.get("verified"):
+            reason = result.get("error") or result.get("ai_opinion") or "disabled"
+            return f"AI review skipped: {reason}"
+
+        score = result.get("independent_strength")
+        opinion = result.get("ai_opinion", "")
+        confidence = result.get("confidence", 0)
+        risks = ", ".join(result.get("risk_flags", [])[:3]) or "none"
+        opportunities = ", ".join(result.get("opportunity_flags", [])[:3]) or "none"
+
+        return (
+            f"AI independent score: {score}/5\n"
+            f"Confidence: {confidence}\n"
+            f"Opinion: {opinion}\n"
+            f"Risks: {risks}\n"
+            f"Opportunities: {opportunities}"
+        )
+
+    def _coerce_legacy_inputs(
+        self,
+        classification,
+        report_sections,
+        financials,
+        multi_year_financials,
+        bm_analysis,
+        evidence_items,
+        moat_strength,
+        moat_desc,
+        bm_summary,
+        evidence_summary,
+        sustainability_notes,
+    ) -> Tuple[Dict, Dict, Dict, Dict, Dict, List, Optional[int], str, str, str, str]:
+        # New signature path.
+        if isinstance(classification, dict) and isinstance(report_sections, dict):
+            return (
+                classification,
+                report_sections,
+                financials if isinstance(financials, dict) else {},
+                multi_year_financials if isinstance(multi_year_financials, dict) else {},
+                bm_analysis if isinstance(bm_analysis, dict) else {},
+                evidence_items if isinstance(evidence_items, list) else [],
+                moat_strength,
+                moat_desc,
+                bm_summary,
+                evidence_summary,
+                sustainability_notes,
+            )
+
+        # Legacy positional path.
+        legacy_strength = moat_strength if moat_strength is not None else (
+            int(classification) if isinstance(classification, (int, float)) else None
+        )
+        legacy_classification = evidence_items if isinstance(evidence_items, dict) else {}
+        legacy_moat_desc = moat_desc or (report_sections if isinstance(report_sections, str) else "")
+        legacy_bm_summary = bm_summary or (financials if isinstance(financials, str) else "")
+        legacy_evidence_summary = evidence_summary or (
+            multi_year_financials if isinstance(multi_year_financials, str) else ""
+        )
+        legacy_sustainability_notes = sustainability_notes or (
+            bm_analysis if isinstance(bm_analysis, str) else ""
+        )
+
+        return (
+            legacy_classification,
+            {},
+            {},
+            {},
+            {},
+            [],
+            legacy_strength,
+            legacy_moat_desc,
+            legacy_bm_summary,
+            legacy_evidence_summary,
+            legacy_sustainability_notes,
+        )
+
+    def _build_independent_prompt(
         self,
         company_name: str,
         ticker: str,
-        moat_strength: int,
-        moat_desc: str,
-        bm_summary: str,
-        evidence_summary: str,
-        sustainability_notes: str,
         classification: Dict,
+        report_sections: Dict,
         financials: Dict = None,
+        multi_year_financials: Dict = None,
+        bm_analysis: Dict = None,
+        evidence_items: List = None,
     ) -> str:
-        """Build the verification prompt for GPT-4o"""
+        sector = classification.get("korean_sector_top") or classification.get("gics_sector") or "unknown"
+        industry = classification.get("gics_industry", "")
 
-        # Financial summary
-        fin_text = "재무 데이터 없음"
-        if financials:
-            parts = []
-            rev = financials.get('revenue', 0)
-            if rev > 0:
-                parts.append(f"매출: {rev/1_000_000_000_000:.1f}조원")
-            op = financials.get('operating_margin')
-            if op is not None:
-                parts.append(f"영업이익률: {op:.1%}")
-            roe = financials.get('roe')
-            if roe is not None:
-                parts.append(f"ROE: {roe:.1%}")
-            dr = financials.get('debt_ratio')
-            if dr is not None:
-                parts.append(f"부채비율: {dr:.0%}")
-            fin_text = ', '.join(parts) if parts else "재무 데이터 없음"
+        report_text = self._extract_report_highlights(report_sections)
+        fin_text = self._format_multi_year_financials(financials, multi_year_financials)
+        evidence_text = self._format_evidence_items(evidence_items)
+        bm_text = self._format_bm_analysis(bm_analysis)
 
-        sector = classification.get('korean_sector_top', '미분류')
-        gics = classification.get('gics_sector', '')
+        return (
+            "You are an independent equity moat analyst.\n"
+            "Evaluate moat strength on a 1-5 scale based only on provided data.\n\n"
+            f"Company: {company_name} ({ticker})\n"
+            f"Sector: {sector} / {industry}\n\n"
+            "[Business report]\n"
+            f"{report_text}\n\n"
+            "[Financials]\n"
+            f"{fin_text}\n\n"
+            "[Evidence items]\n"
+            f"{evidence_text}\n\n"
+            "[Business model]\n"
+            f"{bm_text}\n\n"
+            "Return strict JSON:\n"
+            "{\n"
+            "  \"independent_strength\": 1-5,\n"
+            "  \"reasoning\": \"...\",\n"
+            "  \"moat_types_found\": [\"...\"],\n"
+            "  \"risk_flags\": [\"...\"],\n"
+            "  \"opportunity_flags\": [\"...\"],\n"
+            "  \"opinion\": \"...\",\n"
+            "  \"confidence\": 0.0-1.0\n"
+            "}"
+        )
 
-        return f"""당신은 한국 주식시장 전문 투자자입니다. 아래 기업의 해자(moat) 평가 결과를 검증해주세요.
+    def _call_claude(self, prompt: str) -> Optional[str]:
+        url = "https://api.anthropic.com/v1/messages"
+        payload = {
+            "model": self.model,
+            "max_tokens": 1200,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "anthropic-version": "2023-06-01",
+                "x-api-key": self.api_key,
+            },
+        )
 
-## 기업 정보
-- 회사명: {company_name} ({ticker})
-- 섹터: {sector} (GICS: {gics})
-- 재무: {fin_text}
-
-## 현재 해자 평가 결과
-해자강도: {moat_strength}/5
-
-### 해자 상세
-{moat_desc}
-
-### BM 분석
-{bm_summary}
-
-### 증거 요약
-{evidence_summary}
-
-### 지속가능성 검증
-{sustainability_notes}
-
-## 검증 요청
-전문투자자 관점에서 아래 항목을 검증해주세요:
-
-1. **점수 적정성**: 현재 해자강도 {moat_strength}점이 증거와 일치하는가?
-   - 과대평가(증거 대비 점수가 높음) 또는 과소평가(증거 대비 점수가 낮음)?
-   - 조정이 필요하면 몇 점이 적정한가?
-
-2. **간과된 리스크**: 위 데이터에서 놓친 위험 요인이 있는가?
-
-3. **간과된 기회**: 위 데이터에서 놓친 강점이나 기회가 있는가?
-
-4. **최종 의견**: 전문투자자로서 이 회사의 해자에 대한 한 줄 평가
-
-## 응답 형식 (반드시 아래 JSON 형식으로)
-```json
-{{
-  "adjusted_strength": {moat_strength},
-  "adjustment_reason": "조정 사유 (변경 없으면 빈 문자열)",
-  "risk_flags": ["리스크1", "리스크2"],
-  "opportunity_flags": ["기회1"],
-  "opinion": "전문투자자 한 줄 평가",
-  "confidence": 0.8
-}}
-```
-"""
-
-    def _call_openai(self, prompt: str) -> Optional[str]:
-        """Call OpenAI GPT-4o API"""
         try:
-            import requests
-
-            response = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "당신은 한국 주식시장 전문 투자 애널리스트입니다. "
-                                       "기업의 경쟁우위(해자)를 객관적으로 평가합니다. "
-                                       "증거 없는 추측은 하지 않으며, 보수적으로 판단합니다. "
-                                       "반드시 요청된 JSON 형식으로만 응답합니다."
-                        },
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.3,
-                    "max_tokens": 1000
-                },
-                timeout=30
-            )
-
-            if response.status_code != 200:
-                print(f"    ❌ OpenAI API error: {response.status_code}")
-                try:
-                    err = response.json()
-                    print(f"    ❌ Detail: {err.get('error', {}).get('message', '')}")
-                except Exception:
-                    pass
+            with urllib.request.urlopen(req, timeout=45) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("content", [])
+            if not content:
                 return None
-
-            data = response.json()
-            content = data['choices'][0]['message']['content']
-            return content
-
-        except Exception as e:
-            print(f"    ❌ OpenAI API call failed: {e}")
+            return content[0].get("text", "")
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
             return None
 
-    def _parse_response(self, response: str, original_strength: int) -> Dict:
-        """Parse GPT-4o response into structured result"""
-        result = {
-            'verified': True,
-            'ai_opinion': '',
-            'adjusted_strength': None,
-            'adjustment_reason': '',
-            'risk_flags': [],
-            'opportunity_flags': [],
-            'confidence': 0.5,
-            'raw_response': response,
-            'error': None
+    def _parse_response(self, response_text: str) -> Dict[str, Any]:
+        raw = response_text or ""
+        parsed = self._safe_parse_json(raw)
+
+        if parsed is None:
+            return {
+                "verified": True,
+                "independent_strength": None,
+                "ai_opinion": raw[:500],
+                "risk_flags": [],
+                "opportunity_flags": [],
+                "confidence": 0.0,
+                "raw_response": raw,
+            }
+
+        strength = parsed.get("independent_strength")
+        if isinstance(strength, str) and strength.isdigit():
+            strength = int(strength)
+        if isinstance(strength, (int, float)):
+            strength = max(1, min(5, int(round(strength))))
+        else:
+            strength = None
+
+        confidence = parsed.get("confidence", 0.0)
+        try:
+            confidence = float(confidence)
+        except (TypeError, ValueError):
+            confidence = 0.0
+
+        return {
+            "verified": True,
+            "independent_strength": strength,
+            "ai_opinion": parsed.get("opinion") or parsed.get("reasoning") or "",
+            "risk_flags": parsed.get("risk_flags", []) if isinstance(parsed.get("risk_flags", []), list) else [],
+            "opportunity_flags": parsed.get("opportunity_flags", [])
+            if isinstance(parsed.get("opportunity_flags", []), list)
+            else [],
+            "confidence": confidence,
+            "raw_response": raw,
         }
 
-        # Try to extract JSON from response
+    def _safe_parse_json(self, text: str) -> Optional[Dict[str, Any]]:
+        if not text:
+            return None
+        text = text.strip()
         try:
-            # Find JSON block
-            json_start = response.find('{')
-            json_end = response.rfind('}') + 1
-            if json_start >= 0 and json_end > json_start:
-                json_str = response[json_start:json_end]
-                parsed = json.loads(json_str)
+            obj = json.loads(text)
+            return obj if isinstance(obj, dict) else None
+        except json.JSONDecodeError:
+            pass
 
-                result['adjusted_strength'] = parsed.get('adjusted_strength', original_strength)
-                result['adjustment_reason'] = parsed.get('adjustment_reason', '')
-                result['risk_flags'] = parsed.get('risk_flags', [])
-                result['opportunity_flags'] = parsed.get('opportunity_flags', [])
-                result['ai_opinion'] = parsed.get('opinion', '')
-                result['confidence'] = parsed.get('confidence', 0.5)
+        # Extract first JSON object from mixed text.
+        match = re.search(r"\{[\s\S]*\}", text)
+        if not match:
+            return None
+        try:
+            obj = json.loads(match.group(0))
+            return obj if isinstance(obj, dict) else None
+        except json.JSONDecodeError:
+            return None
 
-                # Validate adjusted strength is within bounds
-                if result['adjusted_strength'] is not None:
-                    result['adjusted_strength'] = max(1, min(5, result['adjusted_strength']))
+    def _extract_report_highlights(self, report_sections: Dict, max_chars: int = 8000) -> str:
+        if not report_sections or not isinstance(report_sections, dict):
+            return "No report sections"
 
-                return result
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
-            result['error'] = f"JSON parsing failed: {e}"
+        keys = [
+            "business_overview",
+            "management_review",
+            "risk_factors",
+            "competitive_status",
+            "rd_status",
+            "business_all",
+        ]
 
-        # Fallback: use raw text as opinion
-        result['ai_opinion'] = response[:500]
-        return result
+        chunks = []
+        for k in keys:
+            value = report_sections.get(k)
+            if isinstance(value, str) and value.strip():
+                chunks.append(f"[{k}] {value.strip()}")
 
-    def generate_ai_review_text(self, verify_result: Dict) -> str:
-        """Generate AI review text for Excel storage"""
-        if not verify_result.get('verified'):
-            return f"[AI 검증 미실행] {verify_result.get('error', 'unknown')}"
+        text = "\n\n".join(chunks) if chunks else str(report_sections)[:max_chars]
+        return text[:max_chars]
 
-        lines = ["[AI 검증 (GPT-4o)]"]
+    def _format_multi_year_financials(
+        self,
+        financials: Optional[Dict],
+        multi_year_financials: Optional[Dict]
+    ) -> str:
+        lines = []
+        if isinstance(multi_year_financials, dict) and multi_year_financials:
+            for yr in sorted(multi_year_financials.keys()):
+                fin = multi_year_financials.get(yr, {}) or {}
+                rev = fin.get("revenue", 0)
+                op = fin.get("operating_income", 0)
+                opm = fin.get("operating_margin")
+                lines.append(
+                    f"{yr}: revenue={rev:,}, op_income={op:,}, op_margin={opm if opm is not None else 'N/A'}"
+                )
 
-        # Opinion
-        if verify_result.get('ai_opinion'):
-            lines.append(f"의견: {verify_result['ai_opinion']}")
+        if not lines and isinstance(financials, dict) and financials:
+            rev = financials.get("revenue", 0)
+            op = financials.get("operating_income", 0)
+            opm = financials.get("operating_margin")
+            lines.append(f"latest: revenue={rev:,}, op_income={op:,}, op_margin={opm if opm is not None else 'N/A'}")
 
-        # Adjustment
-        adj = verify_result.get('adjusted_strength')
-        reason = verify_result.get('adjustment_reason', '')
-        if adj is not None and reason:
-            lines.append(f"조정: {adj}점 ({reason})")
+        return "\n".join(lines) if lines else "No financial data"
 
-        # Risks
-        risks = verify_result.get('risk_flags', [])
-        if risks:
-            lines.append(f"리스크: {'; '.join(risks)}")
+    def _format_evidence_items(self, evidence_items: Optional[List], max_items: int = 10) -> str:
+        if not evidence_items:
+            return "No evidence items"
 
-        # Opportunities
-        opps = verify_result.get('opportunity_flags', [])
-        if opps:
-            lines.append(f"기회: {'; '.join(opps)}")
+        sorted_items = sorted(
+            evidence_items,
+            key=lambda x: getattr(x, "quality_score", 0),
+            reverse=True,
+        )[:max_items]
 
-        # Confidence
-        conf = verify_result.get('confidence', 0)
-        lines.append(f"신뢰도: {conf:.0%}")
+        lines = []
+        for i, ev in enumerate(sorted_items, 1):
+            moat_type = getattr(ev, "moat_type", "unknown")
+            quality = getattr(ev, "quality_score", 0)
+            text = getattr(ev, "evidence_text", "")
+            source = getattr(ev, "source", "")
+            lines.append(f"#{i} [{moat_type}] q={quality}: {text[:240]}")
+            if source:
+                lines.append(f"  source={source}")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
+    def _format_bm_analysis(self, bm_analysis: Optional[Dict]) -> str:
+        if not bm_analysis:
+            return "No BM analysis"
 
-# Test
-if __name__ == "__main__":
-    sys.path.insert(0, os.path.dirname(__file__))
-    from config import load_env
-    load_env()
+        if hasattr(bm_analysis, "__dict__") and not isinstance(bm_analysis, dict):
+            bm = bm_analysis.__dict__
+        else:
+            bm = bm_analysis if isinstance(bm_analysis, dict) else {"raw": str(bm_analysis)}
 
-    verifier = AIVerifier()
-    print(f"AI Verifier enabled: {verifier.enabled}")
-    print(f"Model: {verifier.model}")
+        keys = [
+            "customer",
+            "value_proposition",
+            "revenue_model",
+            "cost_structure",
+            "key_resources",
+            "distribution",
+        ]
+        lines = []
+        for k in keys:
+            v = bm.get(k)
+            if v:
+                lines.append(f"{k}: {v}")
 
-    if not verifier.enabled:
-        print("\n⚠️  OPENAI_API_KEY not set. AI verification will be skipped.")
-        print("To enable, set a valid key in .env file.")
-        # Test with mock
-        result = verifier.verify(
-            "삼성전자", "005930", 3,
-            "해자강도: 3/5", "BM 분석 요약", "증거 요약", "지속가능성",
-            {'gics_sector': 'IT', 'korean_sector_top': '반도체'}
-        )
-        print(f"\nMock result: {result}")
-    else:
-        print("✅ API key configured. Ready for AI verification.")
+        return "\n".join(lines) if lines else str(bm)[:1500]

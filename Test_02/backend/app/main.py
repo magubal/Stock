@@ -28,10 +28,14 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:3002",
         "http://localhost:5173",
+        "http://localhost:8080",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
         "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -39,11 +43,22 @@ app.add_middleware(
 )
 
 # API routers
-from .api import news, reports, dashboard, context_analysis
+from .api import news, reports, dashboard, context_analysis, liquidity_stress
 app.include_router(news.router)
 app.include_router(reports.router)
 app.include_router(dashboard.router)
 app.include_router(context_analysis.router)
+app.include_router(liquidity_stress.router)
+from .api import ideas, daily_work, insights, collab, cross_module, signals
+app.include_router(ideas.router)
+app.include_router(daily_work.router)
+app.include_router(insights.router)
+app.include_router(collab.router)
+app.include_router(cross_module.router)
+app.include_router(signals.router)
+from .api import monitoring, moat_dashboard
+app.include_router(monitoring.router)
+app.include_router(moat_dashboard.router)
 
 # Root endpoint
 @app.get("/")

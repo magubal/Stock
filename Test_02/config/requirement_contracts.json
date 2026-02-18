@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "contracts": [
+    {
+      "req_id": "REQ-007",
+      "name": "일관성 모니터링 (Consistency Monitoring) Contract",
+      "purpose": "요구사항-계획-설계-구현-검증 간 일관성 유지",
+      "required_context_fields": [
+        "req_id",
+        "source_path",
+        "entity_type",
+        "entity_id",
+        "requirement_refs",
+        "plan_refs",
+        "design_refs",
+        "test_tags"
+      ],
+      "required_truthy_fields": [
+        "traceability_ok",
+        "consistency_monitoring_enabled"
+      ],
+      "allowed_source_prefixes": [
+        "backend.app.api.collab",
+        "scripts.idea_pipeline",
+        "scripts.stock_moat",
+        "scripts.moat_dashboard",
+        "scripts.demo"
+      ],
+      "required_design_refs": [
+        "docs/plans/2026-02-15-global-monitoring-guard-design.md",
+        "docs/plans/2026-02-15-global-monitoring-guard-implementation.md"
+      ],
+      "required_requirement_refs": [
+        "REQUESTS.md#REQ-007",
+        "REQUESTS.md#REQ-008",
+        "REQUESTS.md#REQ-009"
+      ],
+      "required_plan_refs": [
+        "docs/plans/2026-02-15-global-monitoring-guard-implementation.md"
+      ],
+      "required_test_tags": [
+        "monitoring_guard"
+      ]
+    }
+  ]
+}

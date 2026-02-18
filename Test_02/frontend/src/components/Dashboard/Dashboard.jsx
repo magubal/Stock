@@ -1,5 +1,6 @@
 import React from 'react';
-import { Brain, Clock, Briefcase, Building, GitBranch, RefreshCw, TrendingUp, Check, Circle, Loader, AlertTriangle, Activity, Users, Newspaper, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Brain, Clock, Briefcase, Building, GitBranch, RefreshCw, TrendingUp, Check, Circle, Loader, AlertTriangle, Activity, Users, Newspaper, ArrowRight, Radio, ChevronRight, Gauge, Lightbulb, FileText } from 'lucide-react';
 import './Dashboard.css';
 import { usePsychology } from '../../hooks/usePsychology';
 import { useTiming } from '../../hooks/useTiming';
@@ -240,26 +241,61 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="header-content">
-          <div className="logo">
-            <div className="logo-icon">
-              <TrendingUp size={24} />
-            </div>
-            <span>Stock Research <span className="highlight">ONE</span></span>
-          </div>
-          <div className="header-actions">
-            <button className="btn btn-secondary" onClick={handleRefreshAll}>
-              새로고침
-            </button>
-            <button className="btn btn-primary">데이터 수집</button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="dashboard-main">
+        <div className="dashboard-toolbar">
+          <button className="btn btn-secondary" onClick={handleRefreshAll}>
+            <RefreshCw size={14} /> 새로고침
+          </button>
+        </div>
+
+        {/* Market Monitoring Section */}
+        <div className="monitoring-section">
+          <h2 className="section-title"><Radio size={18} /> 시장 모니터링</h2>
+          <div className="monitoring-grid">
+            <Link to="/disclosures" className="monitoring-link">
+              <div className="monitoring-icon" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>
+                <FileText size={18} />
+              </div>
+              <div className="monitoring-info">
+                <div className="monitoring-name">오늘의 공시</div>
+                <div className="monitoring-desc">공시 분석 및 심리 파악</div>
+              </div>
+              <ChevronRight size={16} className="monitoring-arrow" />
+            </Link>
+            <Link to="/liquidity-stress" className="monitoring-link">
+              <div className="monitoring-icon" style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#f97316' }}>
+                <Gauge size={18} />
+              </div>
+              <div className="monitoring-info">
+                <div className="monitoring-name">유동성 및 신용 스트레스</div>
+                <div className="monitoring-desc">6대 모듈 기반 스트레스 인덱스</div>
+              </div>
+              <ChevronRight size={16} className="monitoring-arrow" />
+            </Link>
+            <Link to="/crypto-trends" className="monitoring-link">
+              <div className="monitoring-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>
+                <Activity size={18} />
+              </div>
+              <div className="monitoring-info">
+                <div className="monitoring-name">크립토 동향</div>
+                <div className="monitoring-desc">유동성/ETF/온체인 레짐</div>
+              </div>
+              <ChevronRight size={16} className="monitoring-arrow" />
+            </Link>
+            <Link to="/intelligence" className="monitoring-link">
+              <div className="monitoring-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
+                <Lightbulb size={18} />
+              </div>
+              <div className="monitoring-info">
+                <div className="monitoring-name">Intelligence Board</div>
+                <div className="monitoring-desc">Cross-Data Signal Engine</div>
+              </div>
+              <ChevronRight size={16} className="monitoring-arrow" />
+            </Link>
+          </div>
+        </div>
+
         <div className="dashboard-grid">
           {/* 투자자 심리 분석 */}
           <DashboardCard

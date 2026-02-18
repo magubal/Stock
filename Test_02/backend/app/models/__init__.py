@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Text, Float, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
@@ -145,3 +145,77 @@ class FlywheelState(Base):
     completed_at = Column(DateTime(timezone=True))
     notes = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ── Liquidity & Credit Stress Monitor Tables ──
+
+class LiquidityMacro(Base):
+    """일별 FRED 매크로 지표 (HY OAS, IG OAS, SOFR, 역리포, 국채금리)"""
+    __tablename__ = "liquidity_macro"
+
+    date = Column(String(10), primary_key=True)  # YYYY-MM-DD
+    hy_oas = Column(Float)
+    ig_oas = Column(Float)
+    sofr = Column(Float)
+    rrp_balance = Column(Float)
+    dgs2 = Column(Float)
+    dgs10 = Column(Float)
+    dgs30 = Column(Float)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class LiquidityPrice(Base):
+    """일별 ETF/지수 종가 (VIX, HYG, TLT, KRE 등)"""
+    __tablename__ = "liquidity_price"
+
+    date = Column(String(10), primary_key=True)
+    symbol = Column(String(20), primary_key=True)
+    close = Column(Float)
+    high = Column(Float)
+    low = Column(Float)
+    volume = Column(Float)
+
+
+class LiquidityNews(Base):
+    """일별 뉴스 키워드 카운트"""
+    __tablename__ = "liquidity_news"
+
+    date = Column(String(10), primary_key=True)
+    keyword = Column(String(100), primary_key=True)
+    count = Column(Integer, default=0)
+    sample_titles = Column(Text)
+
+
+class FedTone(Base):
+    """Fed 스피치 톤 분석"""
+    __tablename__ = "fed_tone"
+
+    date = Column(String(10), primary_key=True)
+    liquidity_score = Column(Float, default=0.0)
+    credit_score = Column(Float, default=0.0)
+    stability_score = Column(Float, default=0.0)
+
+
+class StressIndex(Base):
+    """종합 유동성·크레딧 스트레스 인덱스"""
+    __tablename__ = "stress_index"
+
+    date = Column(String(10), primary_key=True)
+    vol_score = Column(Float)
+    credit_score = Column(Float)
+    funding_score = Column(Float)
+    treasury_score = Column(Float)
+    news_score = Column(Float)
+    fed_tone_score = Column(Float)
+    total_score = Column(Float)
+    level = Column(String(20))  # normal, watch, caution, stress, crisis
+
+# 아이디어 관리 테이블
+from .idea import Idea
+from .daily_work import DailyWork
+from .insight import Insight
+from .idea_evidence import IdeaEvidence
+from .collab import CollabPacket, CollabSession, CollabPacketHistory
+from .signal import Signal
+from .monitoring import MonitoringIncident, MonitoringDecision, MonitoringEvent
+from .moat_data import MoatStockSnapshot, MoatStockSyncRun, MoatStockHistory

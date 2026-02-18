@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "idea-collab": {
+      "command": "f:/PSJ/AntigravityWorkPlace/Stock/Test_02/backend/venv/Scripts/python.exe",
+      "args": [
+        "f:/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/idea_pipeline/mcp_server.py"
+      ],
+      "env": {
+        "DATABASE_URL": "sqlite:///f:/PSJ/AntigravityWorkPlace/Stock/Test_02/backend/stock_research.db"
+      }
+    }
+  }
+}

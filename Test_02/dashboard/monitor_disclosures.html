@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공시 모니터링 - Stock Research ONE</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .monitor-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        /* Header */
+        .monitor-header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .page-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            color: #22c55e;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        .btn-back:hover {
+            color: #22c55e;
+            border-color: #22c55e;
+        }
+
+        /* Main Content */
+        .monitor-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sentiment Banner */
+        .sentiment-banner {
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .sentiment-positive {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .sentiment-cautious {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .sentiment-negative {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .sentiment-neutral {
+            background: linear-gradient(135deg, rgba(148, 163, 184, 0.15), rgba(148, 163, 184, 0.05));
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .banner-main h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .banner-sub {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .banner-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .banner-stat {
+            text-align: center;
+        }
+
+        .banner-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .banner-stat-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .text-green {
+            color: #22c55e;
+        }
+
+        .text-red {
+            color: #ef4444;
+        }
+
+        .text-yellow {
+            color: #f59e0b;
+        }
+
+        .text-gray {
+            color: #94a3b8;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: #22c55e;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-icon-red {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .kpi-icon-green {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .kpi-icon-yellow {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-detail {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #94a3b8;
+        }
+
+        .filter-btn:hover {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        .filter-btn.active {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        /* Disclosure Feed */
+        .disclosure-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .disclosure-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 4px solid;
+        }
+
+        .disclosure-card:hover {
+            background: rgba(15, 23, 42, 0.9);
+            transform: translateX(4px);
+        }
+
+        .disclosure-positive {
+            border-left-color: #22c55e;
+        }
+
+        .disclosure-negative {
+            border-left-color: #ef4444;
+        }
+
+        .disclosure-neutral {
+            border-left-color: #64748b;
+        }
+
+        .disclosure-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .disclosure-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .badge-positive {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .badge-negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .badge-neutral {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+        }
+
+        .disclosure-body {
+            flex: 1;
+        }
+
+        .disclosure-company {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .disclosure-company-code {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: 0.5rem;
+        }
+
+        .disclosure-title {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.15rem;
+        }
+
+        .disclosure-score {
+            font-size: 0.875rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .score-positive {
+            color: #22c55e;
+        }
+
+        .score-negative {
+            color: #ef4444;
+        }
+
+        .score-neutral {
+            color: #64748b;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #334155;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+        }
+
+        /* Cluster Alert */
+        .cluster-alerts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cluster-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 6px;
+            color: #f59e0b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cluster-item:hover {
+            background: rgba(245, 158, 11, 0.25);
+            border-color: #f59e0b;
+        }
+
+        .cluster-item.cluster-active {
+            background: rgba(245, 158, 11, 0.35);
+            border-color: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .monitor-main {
+                padding: 1rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sentiment-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .banner-stats {
+                justify-content: center;
+            }
+
+            .disclosure-card {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useCallback } = React;
+
+        // ─── SentimentBanner ──────────────────────────────────
+
+        const SentimentBanner = React.memo(({ summary }) => {
+            if (!summary) return null;
+
+            const label = summary.sentiment_label || '분석 중';
+            const score = summary.daily_score || 0;
+
+            let bannerClass = 'sentiment-neutral';
+            if (score >= 2) bannerClass = 'sentiment-positive';
+            else if (score <= -2 && score > -5) bannerClass = 'sentiment-cautious';
+            else if (score <= -5) bannerClass = 'sentiment-negative';
+
+            const scoreColor = score > 0 ? 'text-green' : score < 0 ? 'text-red' : 'text-gray';
+
+            return (
+                <div className={`sentiment-banner ${bannerClass}`}>
+                    <div className="banner-main">
+                        <h2>오늘의 시장 심리: <strong>{label}</strong></h2>
+                        <div className="banner-sub">
+                            일일 종합 점수: <span className={scoreColor} style={{ fontWeight: 700 }}>{score > 0 ? '+' : ''}{score}</span>
+                            {' · '}총 {summary.total || 0}건 공시
+                        </div>
+                    </div>
+                    <div className="banner-stats">
+                        <div className="banner-stat">
+                            <div className="banner-stat-value text-green">{summary.risk_on || 0}</div>
+                            <div className="banner-stat-label">Risk-On</div>
+                        </div>
+                        <div className="banner-stat">
+                            <div className="banner-stat-value text-red">{summary.risk_off || 0}</div>
+                            <div className="banner-stat-label">Risk-Off</div>
+                        </div>
+                        <div className="banner-stat">
+                            <div className="banner-stat-value text-gray">{summary.neutral || 0}</div>
+                            <div className="banner-stat-label">Neutral</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        });
+
+        // ─── KPICards ─────────────────────────────────────────
+
+        const KPICards = React.memo(({ summary, onClusterClick, activeCluster }) => {
+            if (!summary) return null;
+
+            return (
+                <div className="kpi-grid">
+                    <div className="kpi-card">
+                        <div className="kpi-header">
+                            <div className="kpi-icon kpi-icon-red">
+                                <i data-lucide="trending-down" style={{ width: 20, height: 20 }}></i>
+                            </div>
+                            <span className="kpi-label">희석 이벤트 (Dilution)</span>
+                        </div>
+                        <div className="kpi-value text-red">{summary.dilution_count || 0}건</div>
+                        <div className="kpi-detail">CB / BW / 유상증자 발행 건수</div>
+                    </div>
+                    <div className="kpi-card">
+                        <div className="kpi-header">
+                            <div className="kpi-icon kpi-icon-green">
+                                <i data-lucide="trending-up" style={{ width: 20, height: 20 }}></i>
+                            </div>
+                            <span className="kpi-label">환원 이벤트 (Return)</span>
+                        </div>
+                        <div className="kpi-value text-green">{summary.buyback_count || 0}건</div>
+                        <div className="kpi-detail">자사주매입 / 배당 결정 건수</div>
+                    </div>
+                    <div className="kpi-card">
+                        <div className="kpi-header">
+                            <div className="kpi-icon kpi-icon-yellow">
+                                <i data-lucide="alert-triangle" style={{ width: 20, height: 20 }}></i>
+                            </div>
+                            <span className="kpi-label">클러스터 알림</span>
+                        </div>
+                        {(summary.cluster_alerts || []).length > 0 ? (
+                            <div className="cluster-alerts">
+                                {summary.cluster_alerts.map((alert, i) => (
+                                    <div key={i}
+                                        className={`cluster-item ${activeCluster === alert ? 'cluster-active' : ''}`}
+                                        onClick={() => onClusterClick && onClusterClick(alert)}>
+                                        <i data-lucide="zap" style={{ width: 14, height: 14 }}></i>
+                                        {alert}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="kpi-value text-green" style={{ fontSize: '1.25rem' }}>정상</div>
+                                <div className="kpi-detail">동일 이벤트 집중 발생 없음</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        });
+
+        // ─── DisclosureCard ───────────────────────────────────
+
+        const DisclosureCard = React.memo(({ item }) => {
+            const sentiment = item.sentiment || 'neutral';
+            const score = item.impact_score || 0;
+
+            const cardClass = sentiment === 'positive' ? 'disclosure-positive'
+                : sentiment === 'negative' ? 'disclosure-negative'
+                    : 'disclosure-neutral';
+
+            const badgeClass = sentiment === 'positive' ? 'badge-positive'
+                : sentiment === 'negative' ? 'badge-negative'
+                    : 'badge-neutral';
+
+            const scoreClass = score > 0 ? 'score-positive'
+                : score < 0 ? 'score-negative'
+                    : 'score-neutral';
+
+            const handleClick = (e) => {
+                e.preventDefault();
+                if (item.url) {
+                    window.open(item.url, '_blank',
+                        'width=1000,height=975,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no');
+                }
+            };
+
+            return (
+                <div className={`disclosure-card ${cardClass}`}
+                    onClick={handleClick}
+                    style={{ cursor: item.url ? 'pointer' : 'default' }}>
+                    <div className="disclosure-time">{item.time || ''}</div>
+                    <div className={`disclosure-badge ${badgeClass}`}>{item.badge || '기타'}</div>
+                    <div className="disclosure-body">
+                        <div>
+                            <span className="disclosure-company">{item.company || ''}</span>
+                            {item.code && <span className="disclosure-company-code">({item.code})</span>}
+                        </div>
+                        <div className="disclosure-title">{item.title || ''}</div>
+                    </div>
+                    <div className={`disclosure-score ${scoreClass}`}>
+                        {score > 0 ? '+' : ''}{score}
+                    </div>
+                </div>
+            );
+        });
+
+        // ─── Main App ────────────────────────────────────────
+
+        const DisclosureMonitor = () => {
+            const [data, setData] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [filter, setFilter] = useState('all');
+            const [clusterAlert, setClusterAlert] = useState(null);
+
+            // 클러스터 알림 텍스트 → event_class 매핑
+            const CLUSTER_LABEL_TO_CLASSES = {
+                'CB 발행': ['cb_issuance'],
+                'BW 발행': ['bw_issuance'],
+                '유상증자': ['rights_offering'],
+                '공급계약': ['supply_contract'],
+                '자사주매입': ['buyback'],
+                '배당': ['dividend'],
+                '소송': ['lawsuit'],
+                '거래정지': ['suspension'],
+                '실적공시': ['earnings_surprise', 'earnings_guidance'],
+            };
+
+            useEffect(() => {
+                const loadData = async () => {
+                    try {
+                        setLoading(true);
+                        const response = await fetch('data/latest_disclosures.json');
+                        if (!response.ok) throw new Error('데이터를 불러올 수 없습니다.');
+                        const json = await response.json();
+                        setData(json);
+                    } catch (err) {
+                        setError(err.message);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                loadData();
+            }, []);
+
+            // Lucide 아이콘 초기화 (data 로드 후)
+            useEffect(() => {
+                if (!loading) {
+                    setTimeout(() => { lucide.createIcons(); }, 100);
+                }
+            }, [loading, filter]);
+
+            const stats = useMemo(() => {
+                if (!data?.disclosures) return { performance: 0, contract: 0, lawsuit: 0, suspension: 0 };
+                return {
+                    performance: data.disclosures.filter(d => ['earnings_surprise', 'earnings_guidance', 'earnings_variance'].includes(d.event_class)).length,
+                    contract: data.disclosures.filter(d => d.event_class === 'supply_contract').length,
+                    lawsuit: data.disclosures.filter(d => d.event_class === 'lawsuit').length,
+                    suspension: data.disclosures.filter(d => d.event_class === 'suspension').length,
+                };
+            }, [data]);
+
+            const filteredDisclosures = useMemo(() => {
+                if (!data?.disclosures) return [];
+                let result = [];
+                let shouldSort = false;
+
+                // 클러스터 알림 필터 (최우선)
+                if (clusterAlert) {
+                    // "14개사 동시 CB 발행" → "CB 발행" 추출
+                    const labelMatch = clusterAlert.match(/\d+개사 동시 (.+)/);
+                    if (labelMatch) {
+                        const label = labelMatch[1];
+                        const classes = CLUSTER_LABEL_TO_CLASSES[label];
+                        if (classes) {
+                            result = data.disclosures.filter(d => classes.includes(d.event_class));
+                        } else {
+                            // 매핑에 없는 경우 event_class가 label과 동일한 항목
+                            result = data.disclosures.filter(d => d.event_class === label);
+                        }
+                    } else {
+                        result = data.disclosures;
+                    }
+                    shouldSort = true;
+                }
+                else if (filter === 'all') result = data.disclosures;
+                else if (filter === 'positive') result = data.disclosures.filter(d => d.sentiment === 'positive');
+                else if (filter === 'negative') result = data.disclosures.filter(d => d.sentiment === 'negative');
+                else if (filter === 'neutral') result = data.disclosures.filter(d => d.sentiment === 'neutral');
+
+                // Detailed filters
+                else if (filter === 'performance') { result = data.disclosures.filter(d => ['earnings_surprise', 'earnings_guidance', 'earnings_variance'].includes(d.event_class)); shouldSort = true; }
+                else if (filter === 'contract') { result = data.disclosures.filter(d => d.event_class === 'supply_contract'); shouldSort = true; }
+                else if (filter === 'lawsuit') { result = data.disclosures.filter(d => d.event_class === 'lawsuit'); shouldSort = true; }
+                else if (filter === 'suspension') { result = data.disclosures.filter(d => d.event_class === 'suspension'); shouldSort = true; }
+                else result = data.disclosures;
+
+                if (shouldSort) {
+                    return [...result].sort((a, b) => a.company.localeCompare(b.company, 'ko'));
+                }
+
+                return result;
+            }, [data, filter, clusterAlert]);
+
+            const handleFilterChange = useCallback((newFilter) => {
+                setFilter(newFilter);
+                setClusterAlert(null);  // 필터 버튼 클릭 시 클러스터 선택 해제
+            }, []);
+
+            const handleClusterClick = useCallback((alertText) => {
+                // 같은 클러스터 재클릭 → 전체로 복귀
+                if (clusterAlert === alertText) {
+                    setClusterAlert(null);
+                    setFilter('all');
+                } else {
+                    setClusterAlert(alertText);
+                    setFilter('all');  // 필터 버튼은 "전체" 상태로 표시
+                }
+            }, [clusterAlert]);
+
+            if (loading) {
+                return (
+                    <div className="monitor-container">
+                        <Header />
+                        <div className="monitor-main">
+                            <div className="loading-spinner"><div className="spinner"></div></div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (error) {
+                return (
+                    <div className="monitor-container">
+                        <Header />
+                        <div className="monitor-main">
+                            <div className="empty-state">
+                                <h3>데이터 로딩 실패</h3>
+                                <p>{error}</p>
+                                <p style={{ marginTop: '1rem', fontSize: '0.875rem' }}>
+                                    collect_disclosures.py → analyze_disclosures.py 를 먼저 실행하세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="monitor-container">
+                    <Header date={data?.date} />
+                    <div className="monitor-main">
+                        <SentimentBanner summary={data?.summary} />
+                        <KPICards summary={data?.summary} onClusterClick={handleClusterClick} activeCluster={clusterAlert} />
+
+                        {/* Filter */}
+                        <div className="filter-bar">
+                            <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('all')}>
+                                전체 ({data?.summary?.total || 0})
+                            </button>
+                            <button className={`filter-btn ${filter === 'positive' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('positive')}>
+                                Risk-On ({data?.summary?.risk_on || 0})
+                            </button>
+                            <button className={`filter-btn ${filter === 'negative' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('negative')}>
+                                Risk-Off ({data?.summary?.risk_off || 0})
+                            </button>
+                            <button className={`filter-btn ${filter === 'neutral' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('neutral')}>
+                                Neutral ({data?.summary?.neutral || 0})
+                            </button>
+
+                            <div style={{ width: '1px', height: '24px', background: '#334155', margin: '0 0.5rem' }}></div>
+
+                            <button className={`filter-btn ${filter === 'performance' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('performance')}>
+                                실적 ({stats.performance})
+                            </button>
+                            <button className={`filter-btn ${filter === 'contract' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('contract')}>
+                                계약 ({stats.contract})
+                            </button>
+                            <button className={`filter-btn ${filter === 'lawsuit' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('lawsuit')}>
+                                소송 ({stats.lawsuit})
+                            </button>
+                            <button className={`filter-btn ${filter === 'suspension' ? 'active' : ''}`}
+                                onClick={() => handleFilterChange('suspension')}>
+                                거래정지 ({stats.suspension})
+                            </button>
+                        </div>
+
+                        {/* Feed */}
+                        <div className="disclosure-feed">
+                            {filteredDisclosures.length > 0 ? (
+                                filteredDisclosures.map((item, idx) => (
+                                    <DisclosureCard key={`${item.code}-${item.time}-${idx}`} item={item} />
+                                ))
+                            ) : (
+                                <div className="empty-state">
+                                    <h3>해당 분류의 공시가 없습니다</h3>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ─── Header ──────────────────────────────────────────
+
+        const Header = React.memo(({ date }) => (
+            <div className="monitor-header">
+                <div className="header-content">
+                    <div className="header-left">
+                        <div className="logo">
+                            <div className="logo-icon">
+                                <i data-lucide="radio" style={{ width: 22, height: 22 }}></i>
+                            </div>
+                            <span>Stock Research <span style={{ color: '#22c55e' }}>ONE</span></span>
+                        </div>
+                        <span className="page-badge">공시 모니터링{date ? ` · ${date}` : ''}</span>
+                    </div>
+                    <div className="header-actions">
+                        <a href="index.html" className="btn btn-back">
+                            <i data-lucide="arrow-left" style={{ width: 16, height: 16 }}></i>
+                            메인 대시보드
+                        </a>
+                        <button className="btn btn-secondary" onClick={() => window.location.reload()}>
+                            <i data-lucide="refresh-cw" style={{ width: 16, height: 16 }}></i>
+                            새로고침
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ));
+
+        // ─── Render ──────────────────────────────────────────
+        ReactDOM.render(<DisclosureMonitor />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>

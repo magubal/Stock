@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Board — Stock Research ONE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+        /* Header */
+        .header { background: #1e293b; border-bottom: 1px solid #334155; padding: 0.75rem 2rem; display: flex; align-items: center; gap: 1rem; }
+        .header a { color: #94a3b8; text-decoration: none; font-size: 0.875rem; }
+        .header a:hover { color: #f8fafc; }
+        .header h1 { font-size: 1.25rem; color: #f8fafc; flex: 1; }
+        .badge { padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-blue { background: #3b82f6; color: white; }
+        .badge-green { background: #22c55e; color: white; }
+        .badge-amber { background: #f59e0b; color: #1e293b; }
+        .badge-red { background: #ef4444; color: white; }
+        .badge-gray { background: #475569; color: #e2e8f0; }
+        .badge-purple { background: #a855f7; color: white; }
+        .btn { background: #334155; border: 1px solid #475569; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+        .btn:hover { background: #475569; color: #f8fafc; }
+        .btn-primary { background: #3b82f6; border-color: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #22c55e; border-color: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; border-color: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+
+        /* Main layout: Split panel */
+        .main { display: flex; height: calc(100vh - 52px); overflow: hidden; }
+        .signal-feed { width: 35%; min-width: 340px; border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .detail-panel { flex: 1; overflow-y: auto; }
+
+        /* Signal Feed */
+        .feed-header { padding: 1rem 1.25rem; border-bottom: 1px solid #334155; background: #1e293b; }
+        .feed-header h2 { font-size: 0.95rem; color: #f8fafc; margin-bottom: 0.5rem; }
+        .feed-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .feed-controls select, .feed-controls input { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .feed-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
+
+        /* Signal Card */
+        .signal-card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 0.875rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; }
+        .signal-card:hover { border-color: #3b82f6; background: #1e293b; }
+        .signal-card.active { border-color: #3b82f6; background: #172554; }
+        .signal-card-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.375rem; }
+        .conf-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .conf-text { font-size: 0.8rem; font-weight: 700; }
+        .signal-card-title { font-size: 0.875rem; font-weight: 600; color: #f8fafc; flex: 1; }
+        .signal-card-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; font-size: 0.7rem; color: #64748b; }
+        .signal-card-action { font-size: 0.75rem; color: #94a3b8; margin-top: 0.375rem; line-height: 1.4; }
+        .signal-card-bottom { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.375rem; font-size: 0.7rem; color: #64748b; }
+        .gap-warn { color: #f59e0b; }
+
+        /* Detail Panel */
+        .detail-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #475569; font-size: 1rem; }
+        .detail-content { padding: 1.5rem; }
+        .detail-header { margin-bottom: 1.5rem; }
+        .detail-header h2 { font-size: 1.25rem; color: #f8fafc; margin-bottom: 0.5rem; }
+        .detail-header p { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; }
+        .detail-conf { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem; }
+        .conf-bar-bg { flex: 1; max-width: 200px; height: 8px; background: #334155; border-radius: 4px; overflow: hidden; }
+        .conf-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+
+        /* Detail Sections */
+        .detail-section { background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 1rem; }
+        .detail-section-header { padding: 0.75rem 1rem; border-bottom: 1px solid #334155; font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
+        .detail-section-body { padding: 1rem; }
+
+        /* Evidence items */
+        .evidence-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid #1e293b; }
+        .evidence-item:last-child { border-bottom: none; }
+        .evidence-module { font-size: 0.7rem; color: #3b82f6; background: #172554; padding: 2px 6px; border-radius: 4px; min-width: 80px; text-align: center; }
+        .evidence-label { font-size: 0.8rem; color: #e2e8f0; flex: 1; }
+        .evidence-value { font-size: 0.875rem; font-weight: 600; color: #f8fafc; }
+
+        /* AI Interpretation */
+        .ai-text { font-size: 0.85rem; color: #e2e8f0; line-height: 1.6; margin-bottom: 0.75rem; }
+        .ai-hypothesis { background: #172554; border-left: 3px solid #3b82f6; padding: 0.5rem 0.75rem; border-radius: 0 4px 4px 0; font-size: 0.8rem; color: #93c5fd; margin-bottom: 0.75rem; }
+        .ai-actions { list-style: none; }
+        .ai-actions li { font-size: 0.8rem; color: #94a3b8; padding: 0.25rem 0; }
+        .ai-actions li::before { content: "→ "; color: #22c55e; }
+        .ai-unavailable { color: #64748b; font-size: 0.85rem; font-style: italic; }
+
+        /* Gap items */
+        .gap-item { background: #1c1917; border: 1px solid #44403c; border-radius: 6px; padding: 0.625rem; margin-bottom: 0.5rem; }
+        .gap-item:last-child { margin-bottom: 0; }
+        .gap-module { font-size: 0.75rem; color: #f59e0b; font-weight: 600; }
+        .gap-reason { font-size: 0.8rem; color: #d6d3d1; margin-top: 0.25rem; }
+        .gap-impact { font-size: 0.7rem; color: #78716c; margin-top: 0.125rem; }
+
+        /* Recommendation items */
+        .rec-item { background: #022c22; border: 1px solid #065f46; border-radius: 6px; padding: 0.625rem; margin-bottom: 0.5rem; }
+        .rec-item:last-child { margin-bottom: 0; }
+        .rec-name { font-size: 0.8rem; color: #22c55e; font-weight: 600; }
+        .rec-synergy { font-size: 0.8rem; color: #a7f3d0; margin-top: 0.25rem; line-height: 1.4; }
+        .rec-boost { font-size: 0.7rem; color: #4ade80; margin-top: 0.25rem; }
+        .rec-url { font-size: 0.7rem; margin-top: 0.25rem; }
+        .rec-url a { color: #6ee7b7; }
+
+        /* Action buttons */
+        .action-bar { display: flex; gap: 0.75rem; padding: 1rem 0; }
+
+        /* Loading / Empty */
+        .loading { text-align: center; padding: 2rem; color: #475569; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #334155; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Generate bar */
+        .generate-bar { padding: 0.75rem 1.25rem; border-bottom: 1px solid #334155; background: #172554; display: flex; align-items: center; gap: 0.75rem; }
+        .generate-bar .status { font-size: 0.8rem; color: #93c5fd; flex: 1; }
+
+        /* DEMO banner */
+        .demo-banner { background: #7f1d1d; border-bottom: 1px solid #991b1b; padding: 0.5rem 2rem; font-size: 0.75rem; color: #fca5a5; display: flex; align-items: center; gap: 0.5rem; }
+        .demo-banner strong { color: #fecaca; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main { flex-direction: column; }
+            .signal-feed { width: 100%; min-width: unset; max-height: 40vh; border-right: none; border-bottom: 1px solid #334155; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <a href="index.html">← Dashboard</a>
+        <h1>Intelligence Board</h1>
+        <span class="badge badge-blue">Signal Engine v1.0</span>
+        <button class="btn" onclick="generateSignals()">Generate Signals</button>
+        <button class="btn" onclick="loadSignals()">Refresh</button>
+    </div>
+
+    <div id="demoBanner" class="demo-banner" style="display:none;">
+        <strong>DEMO</strong> <span id="demoCount">0</span>건의 DEMO 데이터가 포함되어 있습니다
+    </div>
+
+    <div class="main">
+        <!-- Signal Feed (Left 35%) -->
+        <div class="signal-feed">
+            <div class="feed-header">
+                <h2>Signal Feed</h2>
+                <div class="feed-controls">
+                    <select id="filterStatus" onchange="loadSignals()">
+                        <option value="">All Status</option>
+                        <option value="new" selected>New</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select id="filterCategory" onchange="loadSignals()">
+                        <option value="">All Category</option>
+                        <option value="RISK">RISK</option>
+                        <option value="SECTOR">SECTOR</option>
+                        <option value="PORTFOLIO">PORTFOLIO</option>
+                        <option value="THEME">THEME</option>
+                    </select>
+                </div>
+            </div>
+            <div class="generate-bar">
+                <span class="status" id="genStatus">Ready — Click "Generate Signals" to detect cross-data patterns</span>
+            </div>
+            <div class="feed-list" id="feedList">
+                <div class="loading">Load signals or generate new ones</div>
+            </div>
+        </div>
+
+        <!-- Detail Panel (Right 65%) -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-empty">
+                Select a signal from the feed to view details
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const API = 'http://localhost:8000';
+    let signals = [];
+    let selectedSignalId = null;
+
+    // ─── Confidence Color ───
+    function confColor(c) {
+        if (c >= 0.8) return '#ef4444';
+        if (c >= 0.6) return '#f59e0b';
+        if (c >= 0.4) return '#94a3b8';
+        return '#64748b';
+    }
+    function confLabel(c) {
+        if (c >= 0.8) return 'HIGH';
+        if (c >= 0.6) return 'MED';
+        if (c >= 0.4) return 'LOW';
+        return 'WEAK';
+    }
+    function categoryBadgeClass(cat) {
+        const map = { RISK: 'badge-red', SECTOR: 'badge-blue', PORTFOLIO: 'badge-purple', THEME: 'badge-green' };
+        return map[cat] || 'badge-gray';
+    }
+
+    // ─── Time Ago ───
+    function timeAgo(isoStr) {
+        if (!isoStr) return '';
+        const d = new Date(isoStr);
+        const diff = (Date.now() - d.getTime()) / 1000;
+        if (diff < 60) return 'just now';
+        if (diff < 3600) return Math.floor(diff / 60) + 'min ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    // ─── DEMO check ───
+    function isDemo(source) {
+        return source && (source === 'DEMO' || source.startsWith('[DEMO]'));
+    }
+
+    // ─── Generate Signals ───
+    async function generateSignals() {
+        const genStatus = document.getElementById('genStatus');
+        genStatus.textContent = 'Generating signals...';
+        try {
+            const res = await fetch(API + '/api/v1/signals/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ days: 3 }),
+            });
+            const data = await res.json();
+            genStatus.textContent = `Generated ${data.signals_count} signals at ${new Date().toLocaleTimeString()}`;
+            loadSignals();
+        } catch (e) {
+            genStatus.textContent = 'Error: ' + e.message;
+        }
+    }
+
+    // ─── Load Signals ───
+    async function loadSignals() {
+        const feedList = document.getElementById('feedList');
+        feedList.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+        const status = document.getElementById('filterStatus').value;
+        const category = document.getElementById('filterCategory').value;
+        let url = API + '/api/v1/signals?limit=50';
+        if (status) url += '&status=' + status;
+        if (category) url += '&category=' + category;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            signals = data.signals || [];
+
+            if (signals.length === 0) {
+                feedList.innerHTML = '<div class="loading">No signals found. Try generating new signals.</div>';
+                return;
+            }
+
+            feedList.innerHTML = signals.map(s => renderSignalCard(s)).join('');
+
+            // Reselect if still valid
+            if (selectedSignalId && signals.find(s => s.id === selectedSignalId)) {
+                document.querySelector(`.signal-card[data-id="${selectedSignalId}"]`)?.classList.add('active');
+            }
+        } catch (e) {
+            feedList.innerHTML = '<div class="loading">API connection error: ' + e.message + '</div>';
+        }
+    }
+
+    // ─── Render Signal Card ───
+    function renderSignalCard(s) {
+        const color = confColor(s.confidence);
+        const label = confLabel(s.confidence);
+        const catClass = categoryBadgeClass(s.category);
+        const sources = (s.data_sources || []).join(' + ');
+        const gaps = (s.data_gaps || []).length;
+        const isActive = s.id === selectedSignalId ? ' active' : '';
+
+        return `<div class="signal-card${isActive}" data-id="${s.id}" onclick="selectSignal(${s.id})">
+            <div class="signal-card-top">
+                <span class="conf-dot" style="background:${color}"></span>
+                <span class="conf-text" style="color:${color}">${Math.round(s.confidence * 100)}%</span>
+                <span class="signal-card-title">${s.title}</span>
+            </div>
+            <div class="signal-card-meta">
+                <span class="badge ${catClass}">${s.category}</span>
+                <span>${sources}</span>
+            </div>
+            <div class="signal-card-action">${s.suggested_action || ''}</div>
+            <div class="signal-card-bottom">
+                <span>${timeAgo(s.created_at)}</span>
+                <span class="badge badge-gray">${s.status}</span>
+                ${gaps > 0 ? `<span class="gap-warn">⚠ gaps: ${gaps}</span>` : ''}
+            </div>
+        </div>`;
+    }
+
+    // ─── Select Signal ───
+    async function selectSignal(id) {
+        selectedSignalId = id;
+        // Update active card
+        document.querySelectorAll('.signal-card').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.signal-card[data-id="${id}"]`)?.classList.add('active');
+
+        const panel = document.getElementById('detailPanel');
+        panel.innerHTML = '<div class="loading"><div class="spinner"></div> Loading...</div>';
+
+        try {
+            // Fetch signal detail + gaps in parallel
+            const [sigRes, gapRes] = await Promise.all([
+                fetch(API + '/api/v1/signals/' + id),
+                fetch(API + '/api/v1/signals/' + id + '/gaps'),
+            ]);
+            const signal = await sigRes.json();
+            const gapData = await gapRes.json();
+
+            renderDetailPanel(signal, gapData.gaps || {});
+        } catch (e) {
+            panel.innerHTML = '<div class="loading">Error: ' + e.message + '</div>';
+        }
+    }
+
+    // ─── Render Detail Panel ───
+    function renderDetailPanel(s, gapResult) {
+        const panel = document.getElementById('detailPanel');
+        const color = confColor(s.confidence);
+        const pct = Math.round(s.confidence * 100);
+
+        // Parse AI interpretation
+        let aiData = null;
+        if (s.ai_interpretation) {
+            try { aiData = JSON.parse(s.ai_interpretation); } catch(e) { aiData = { interpretation: s.ai_interpretation }; }
+        }
+
+        const gaps = gapResult.gaps || [];
+        const recs = gapResult.recommendations || [];
+        const enrichments = gapResult.enrichments || [];
+
+        panel.innerHTML = `
+        <div class="detail-content">
+            <!-- Header -->
+            <div class="detail-header">
+                <h2>${s.title}</h2>
+                <p>${s.description || ''}</p>
+                <div class="detail-conf">
+                    <span class="badge ${categoryBadgeClass(s.category)}">${s.category}</span>
+                    <span class="badge badge-gray">${s.signal_type}</span>
+                    <span class="badge badge-gray">${s.status}</span>
+                    <span style="color:${color}; font-weight:700; font-size:0.9rem;">${pct}% ${confLabel(s.confidence)}</span>
+                    <div class="conf-bar-bg">
+                        <div class="conf-bar" style="width:${pct}%; background:${color};"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evidence Section -->
+            <div class="detail-section">
+                <div class="detail-section-header">
+                    <span style="color:#3b82f6;">■</span> Evidence Data
+                </div>
+                <div class="detail-section-body">
+                    ${(s.evidence || []).map(e => `
+                        <div class="evidence-item">
+                            <span class="evidence-module">${e.module}</span>
+                            <span class="evidence-label">${e.label}</span>
+                            <span class="evidence-value">${formatValue(e.value)}</span>
+                        </div>
+                    `).join('') || '<span class="ai-unavailable">No evidence data</span>'}
+                </div>
+            </div>
+
+            <!-- AI Strategist Interpretation -->
+            <div class="detail-section">
+                <div class="detail-section-header">
+                    <span style="color:#a855f7;">■</span> AI Strategist Interpretation
+                    ${!aiData ? `<button class="btn btn-primary" style="margin-left:auto; font-size:0.7rem;" onclick="requestAI(${s.id})">Request AI Analysis</button>` : ''}
+                </div>
+                <div class="detail-section-body">
+                    ${aiData ? renderAISection(aiData) : '<span class="ai-unavailable">AI 해석 미요청. 버튼을 클릭하여 분석을 요청하세요.</span>'}
+                </div>
+            </div>
+
+            <!-- Data Gaps & Recommendations -->
+            <div class="detail-section">
+                <div class="detail-section-header">
+                    <span style="color:#f59e0b;">■</span> Data Gaps & External Source Recommendations
+                    <span class="badge badge-amber" style="margin-left:auto;">${gaps.length} gaps</span>
+                </div>
+                <div class="detail-section-body">
+                    ${gaps.length > 0 ? gaps.map(g => `
+                        <div class="gap-item">
+                            <div class="gap-module">⚠ ${g.module}</div>
+                            <div class="gap-reason">${g.reason}</div>
+                            <div class="gap-impact">${g.impact || ''}</div>
+                        </div>
+                    `).join('') : '<span style="color:#22c55e; font-size:0.85rem;">All data sources available</span>'}
+
+                    ${recs.length > 0 ? `
+                        <div style="margin-top:1rem; font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Recommended External Sources</div>
+                        ${recs.map(r => `
+                            <div class="rec-item">
+                                <div class="rec-name">${r.name}</div>
+                                <div class="rec-synergy">${r.synergy}</div>
+                                <div class="rec-boost">Confidence boost: ${r.confidence_boost}</div>
+                                ${r.url ? `<div class="rec-url"><a href="${r.url}" target="_blank">→ ${r.url}</a></div>` : ''}
+                            </div>
+                        `).join('')}
+                    ` : ''}
+
+                    ${enrichments.length > 0 ? `
+                        <div style="margin-top:1rem; font-size:0.75rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">Enrichment Sources</div>
+                        ${enrichments.map(e => `
+                            <div class="rec-item">
+                                <div class="rec-name">${e.name}</div>
+                                <div class="rec-synergy">${e.synergy}</div>
+                                <div class="rec-boost">${e.benefit}</div>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                ${s.status !== 'accepted' && s.status !== 'rejected' ? `
+                    <button class="btn btn-success" onclick="acceptSignal(${s.id})">✓ Accept → Create Idea</button>
+                    <button class="btn" onclick="updateStatus(${s.id}, 'reviewed')">Mark Reviewed</button>
+                    <button class="btn btn-danger" onclick="updateStatus(${s.id}, 'rejected')">✕ Reject</button>
+                ` : `
+                    <span class="badge ${s.status === 'accepted' ? 'badge-green' : 'badge-red'}" style="font-size:0.85rem; padding:6px 14px;">
+                        ${s.status === 'accepted' ? '✓ Accepted' : '✕ Rejected'}
+                    </span>
+                    ${s.related_idea_id ? `<span style="font-size:0.8rem; color:#94a3b8;">→ Idea #${s.related_idea_id}</span>` : ''}
+                `}
+                <span style="flex:1;"></span>
+                <span style="font-size:0.7rem; color:#475569;">Signal ID: ${s.signal_id}</span>
+            </div>
+        </div>`;
+    }
+
+    function formatValue(v) {
+        if (v === null || v === undefined) return 'N/A';
+        if (typeof v === 'number') return v.toFixed ? v.toFixed(2) : v;
+        if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+        return String(v);
+    }
+
+    function renderAISection(ai) {
+        let html = '';
+        if (ai.interpretation) {
+            html += `<div class="ai-text">${ai.interpretation}</div>`;
+        }
+        if (ai.hypothesis) {
+            html += `<div class="ai-hypothesis">${ai.hypothesis}</div>`;
+        }
+        if (ai.actions && ai.actions.length > 0) {
+            html += '<ul class="ai-actions">';
+            ai.actions.forEach(a => { html += `<li>${a}</li>`; });
+            html += '</ul>';
+        }
+        if (ai.risk_factors && ai.risk_factors.length > 0) {
+            html += '<div style="margin-top:0.5rem; font-size:0.75rem; color:#94a3b8;">Risk Factors:</div><ul class="ai-actions">';
+            ai.risk_factors.forEach(r => { html += `<li style="color:#fbbf24;">${r}</li>`; });
+            html += '</ul>';
+        }
+        if (ai.confidence_adjustment && ai.confidence_adjustment !== 0) {
+            const adj = ai.confidence_adjustment > 0 ? '+' : '';
+            html += `<div style="margin-top:0.5rem; font-size:0.75rem; color:#94a3b8;">AI Confidence Adjustment: <span style="color:${ai.confidence_adjustment > 0 ? '#22c55e' : '#ef4444'}">${adj}${(ai.confidence_adjustment * 100).toFixed(0)}%</span></div>`;
+        }
+        if (ai.reason) {
+            html += `<div class="ai-unavailable">${ai.reason}</div>`;
+        }
+        return html || '<span class="ai-unavailable">No interpretation available</span>';
+    }
+
+    // ─── Actions ───
+    async function requestAI(id) {
+        const btn = event.target;
+        btn.textContent = 'Analyzing...';
+        btn.disabled = true;
+        try {
+            await fetch(API + '/api/v1/signals/' + id + '/interpret', { method: 'POST' });
+            selectSignal(id);
+        } catch (e) {
+            alert('AI analysis error: ' + e.message);
+            btn.textContent = 'Request AI Analysis';
+            btn.disabled = false;
+        }
+    }
+
+    async function acceptSignal(id) {
+        try {
+            const res = await fetch(API + '/api/v1/signals/' + id + '/accept', { method: 'POST' });
+            const data = await res.json();
+            if (data.idea) {
+                alert(`Idea created: #${data.idea.id} — ${data.idea.title}`);
+            }
+            loadSignals();
+            selectSignal(id);
+        } catch (e) {
+            alert('Accept error: ' + e.message);
+        }
+    }
+
+    async function updateStatus(id, status) {
+        try {
+            await fetch(API + '/api/v1/signals/' + id + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status }),
+            });
+            loadSignals();
+            selectSignal(id);
+        } catch (e) {
+            alert('Status update error: ' + e.message);
+        }
+    }
+
+    // ─── Init ───
+    loadSignals();
+    </script>
+</body>
+</html>
