@@ -113,6 +113,44 @@
             color: #f8fafc;
         }
 
+        .btn-collect {
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: white;
+            border: none;
+        }
+        .btn-collect:hover {
+            background: linear-gradient(135deg, #16a34a, #059669);
+            transform: translateY(-1px);
+        }
+        .btn-collecting {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            cursor: wait;
+        }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .collect-toast {
+            max-width: 1400px;
+            margin: 0.5rem auto 0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-align: center;
+            cursor: pointer;
+        }
+        .toast-success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+        .toast-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
         .btn-back {
             background: transparent;
             color: #94a3b8;
@@ -545,7 +583,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useCallback } = React;
+        const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
         const API_BASE = 'http://localhost:8000';
 
@@ -794,6 +832,8 @@
             const [error, setError] = useState(null);
             const [filter, setFilter] = useState('all');
             const [clusterAlert, setClusterAlert] = useState(null);
+            const [collecting, setCollecting] = useState(false);
+            const [collectResult, setCollectResult] = useState(null);
 
             // 클러스터 알림 텍스트 → event_class 매핑
             const CLUSTER_LABEL_TO_CLASSES = {
@@ -901,6 +941,81 @@
                 }
             }, [clusterAlert]);
 
+            const STEP_LABELS = { starting: '시작 중...', collecting: 'KIND 공시 수집 중...', analyzing: '분석 중...', done: '완료' };
+            const [collectStep, setCollectStep] = useState('');
+            const [collectElapsed, setCollectElapsed] = useState(0);
+            const pollRef = useRef(null);
+
+            const stopPolling = useCallback(() => {
+                if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+            }, []);
+
+            const startPolling = useCallback(() => {
+                stopPolling();
+                pollRef.current = setInterval(async () => {
+                    try {
+                        const res = await fetch(`${API_BASE}/api/v1/collector/disclosure/progress`);
+                        if (!res.ok) return;
+                        const prog = await res.json();
+                        if (prog.status === 'running') {
+                            setCollectStep(STEP_LABELS[prog.step] || prog.step);
+                            setCollectElapsed(prog.elapsed || 0);
+                        } else if (prog.status === 'completed') {
+                            stopPolling();
+                            setCollecting(false);
+                            setCollectResult(prog.result);
+                            setCollectStep('');
+                            // 성공 시 데이터 리로드
+                            if (prog.result && prog.result.status !== 'failed') {
+                                try {
+                                    const dataRes = await fetch('data/latest_disclosures.json?t=' + Date.now());
+                                    if (dataRes.ok) { const json = await dataRes.json(); setData(json); }
+                                } catch(_) {}
+                                setTimeout(() => setCollectResult(null), 8000);
+                            }
+                            setTimeout(() => { lucide.createIcons(); }, 100);
+                        } else if (prog.status === 'idle') {
+                            stopPolling();
+                            setCollecting(false);
+                            setCollectStep('');
+                            setTimeout(() => { lucide.createIcons(); }, 100);
+                        }
+                    } catch(_) {}
+                }, 3000);
+            }, [stopPolling]);
+
+            useEffect(() => { return () => stopPolling(); }, [stopPolling]);
+
+            const handleCollect = useCallback(async () => {
+                if (collecting) return;
+                setCollecting(true);
+                setCollectResult(null);
+                setCollectStep('시작 중...');
+                setCollectElapsed(0);
+                try {
+                    const res = await fetch(`${API_BASE}/api/v1/collector/disclosure`, { method: 'POST' });
+                    if (!res.ok) {
+                        const errBody = await res.text();
+                        let detail = '서버 오류 (' + res.status + ')';
+                        try { detail = JSON.parse(errBody).detail || detail; } catch(_) {}
+                        setCollectResult({ status: 'failed', error: detail });
+                        setCollecting(false);
+                        return;
+                    }
+                    const result = await res.json();
+                    if (result.status === 'accepted' || result.status === 'already_running') {
+                        startPolling();
+                    } else if (result.status === 'failed') {
+                        setCollectResult({ status: 'failed', error: result.error || '수집 실패' });
+                        setCollecting(false);
+                    }
+                } catch (err) {
+                    setCollectResult({ status: 'failed', error: err.message || '서버에 연결할 수 없습니다' });
+                    setCollecting(false);
+                    setTimeout(() => { lucide.createIcons(); }, 100);
+                }
+            }, [collecting, startPolling]);
+
             if (loading) {
                 return (
                     <div className="monitor-container">
@@ -931,7 +1046,7 @@
 
             return (
                 <div className="monitor-container">
-                    <Header date={data?.date} />
+                    <Header date={data?.date} onCollect={handleCollect} collecting={collecting} collectStep={collectStep} collectElapsed={collectElapsed} collectResult={collectResult} onDismissToast={() => setCollectResult(null)} />
                     <div className="monitor-main">
                         <SentimentBanner summary={data?.summary} />
                         <KPICards summary={data?.summary} onClusterClick={handleClusterClick} activeCluster={clusterAlert} />
@@ -996,7 +1111,7 @@
 
         // ─── Header ──────────────────────────────────────────
 
-        const Header = React.memo(({ date }) => (
+        const Header = React.memo(({ date, onCollect, collecting, collectStep, collectElapsed, collectResult, onDismissToast }) => (
             <div className="monitor-header">
                 <div className="header-content">
                     <div className="header-left">
@@ -1013,12 +1128,38 @@
                             <i data-lucide="arrow-left" style={{ width: 16, height: 16 }}></i>
                             메인 대시보드
                         </a>
+                        <button
+                            className={`btn ${collecting ? 'btn-collecting' : 'btn-collect'}`}
+                            onClick={onCollect}
+                            disabled={collecting}
+                        >
+                            <i data-lucide={collecting ? "loader" : "download"}
+                               style={{ width: 16, height: 16 }}
+                               className={collecting ? "spin" : ""}></i>
+                            {collecting ? (collectStep || '수집 중...') : '데이터 수집'}
+                        </button>
+                        {collecting && collectElapsed > 0 && (
+                            <span style={{fontSize:'0.72rem',color:'#94a3b8',marginLeft:'-0.25rem'}}>
+                                {Math.floor(collectElapsed)}초
+                            </span>
+                        )}
                         <button className="btn btn-secondary" onClick={() => window.location.reload()}>
                             <i data-lucide="refresh-cw" style={{ width: 16, height: 16 }}></i>
                             새로고침
                         </button>
                     </div>
                 </div>
+                {collectResult && (
+                    <div className={`collect-toast ${collectResult.status === 'failed' ? 'toast-error' : 'toast-success'}`}
+                         onClick={onDismissToast}>
+                        {collectResult.status === 'failed'
+                            ? `수집 실패: ${collectResult.error || '서버 오류'}`
+                            : `${collectResult.status === 'partial' ? '수집 부분 완료' : '수집 완료'} (${collectResult.duration ?? '?'}초) — ${collectResult.steps?.collect || '완료'}`}
+                        <span style={{fontSize:'0.72rem',color:'#94a3b8',marginLeft:'0.75rem'}}>
+                            15:30 이후 수집 권장
+                        </span>
+                    </div>
+                )}
             </div>
         ));
 

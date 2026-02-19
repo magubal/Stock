@@ -1,0 +1,20 @@
+{
+  "_comment": "PDCA feature -> fixed ID mapping. Never reuse deleted IDs.",
+  "_nextId": 15,
+  "map": {
+    "stock-moat-estimator": 1,
+    "evidence-based-moat": 2,
+    "stock-research-dashboard": 3,
+    "disclosure-monitoring": 4,
+    "idea-ai-collaboration": 5,
+    "oracle-earnings-integration": 6,
+    "investment-intelligence-engine": 7,
+    "news-intelligence-monitor": 8,
+    "data-source-footer": 9,
+    "pdca-status-sync": 10,
+    "disclosure-auto-collect": 11,
+    "zombie-process-cleanup": 12,
+    "pdca-auto-register": 13,
+    "project-status-detail-enhance": 14
+  }
+}

@@ -236,6 +236,37 @@
             border-color: rgba(96, 165, 250, 0.35);
         }
 
+        .badge-check {
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.12);
+            border-color: rgba(250, 204, 21, 0.35);
+        }
+
+        .badge-design {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .source-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.06rem 0.3rem;
+            border-radius: 4px;
+            margin-right: 0.3rem;
+            vertical-align: middle;
+        }
+        .source-badge-req {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.15);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        .source-badge-pdca {
+            color: #a78bfa;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
         .detail-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -268,6 +299,13 @@
 
         .list-plain code {
             color: #93c5fd;
+        }
+
+        .list-plain li:hover {
+            background: rgba(96, 165, 250, 0.08);
+            border-radius: 4px;
+            padding: 0.15rem 0.3rem;
+            margin: -0.15rem -0.3rem;
         }
 
         .check-row {
@@ -304,6 +342,128 @@
         .check-label-done {
             text-decoration: line-through;
             color: var(--muted);
+        }
+
+        .check-doc-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 0.72rem;
+            opacity: 0.7;
+            transition: opacity 0.15s;
+        }
+
+        .check-doc-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .check-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-desc {
+            color: var(--muted);
+            font-size: 0.78rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            border-left: 2px solid #334155;
+            padding-left: 0.5rem;
+        }
+
+        .doc-badges {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .doc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+        .doc-badge:hover { transform: translateY(-1px); }
+        .doc-badge-plan { background: rgba(96,165,250,0.15); color: #60a5fa; border-color: rgba(96,165,250,0.3); }
+        .doc-badge-design { background: rgba(168,85,247,0.15); color: #a855f7; border-color: rgba(168,85,247,0.3); }
+        .doc-badge-analysis { background: rgba(34,197,94,0.15); color: #22c55e; border-color: rgba(34,197,94,0.3); }
+        .doc-badge-report { background: rgba(249,115,22,0.15); color: #f97316; border-color: rgba(249,115,22,0.3); }
+
+        /* Document modal */
+        .doc-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .doc-modal-overlay.open { display: flex; }
+        .doc-modal {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 860px;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .doc-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #1e293b;
+            flex-shrink: 0;
+        }
+        .doc-modal-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .doc-modal-path {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-left: 0.75rem;
+        }
+        .doc-modal-close {
+            background: none;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.8rem;
+        }
+        .doc-modal-close:hover { background: #1e293b; color: #f8fafc; }
+        .doc-modal-body {
+            padding: 1rem 1.25rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .doc-modal-body pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+        .doc-modal-loading {
+            text-align: center;
+            color: #64748b;
+            padding: 3rem;
         }
 
         .next-action {
@@ -371,19 +531,37 @@
                     <h2 id="detail-title" data-testid="project-status-program-title">상세 개발 프로그램</h2>
                     <div class="meta-line"><span class="meta-label">요청 ID:</span> <span
                             data-testid="project-status-selected-id">-</span></div>
-                    <div class="meta-line"><span class="meta-label">담당:</span> <span id="detail-owner">-</span></div>
+                    <div class="meta-line" id="doc-links-row" style="display:none"><span class="meta-label">문서:</span> <span class="doc-badges" id="doc-badges"></span></div>
                     <div class="meta-line"><span class="meta-label">진행 단계:</span> <span id="detail-stage">-</span></div>
+                    <div class="meta-line"><span class="meta-label">담당:</span> <span id="detail-owner">-</span></div>
                     <div class="meta-line"><span class="meta-label">기한:</span> <span id="detail-due">-</span></div>
                     <ol class="list-plain" id="program-list" data-testid="project-status-program-list"></ol>
                 </article>
 
                 <article class="card">
                     <h2>체크리스트 요약</h2>
+                    <div class="feature-desc" id="feature-desc" style="display:none"></div>
                     <div id="checklist" data-testid="project-status-checklist-list"></div>
                     <div class="next-action" id="next-action" data-testid="project-status-next-action"></div>
                 </article>
             </div>
         </section>
+    </div>
+
+    <!-- Document viewer modal -->
+    <div class="doc-modal-overlay" id="doc-modal-overlay">
+        <div class="doc-modal">
+            <div class="doc-modal-header">
+                <div>
+                    <span class="doc-modal-title" id="doc-modal-title">Document</span>
+                    <span class="doc-modal-path" id="doc-modal-path"></span>
+                </div>
+                <button class="doc-modal-close" id="doc-modal-close">ESC</button>
+            </div>
+            <div class="doc-modal-body" id="doc-modal-body">
+                <div class="doc-modal-loading">Loading...</div>
+            </div>
+        </div>
     </div>
 
     <script src="js/project_status_data.js"></script>
@@ -399,6 +577,47 @@
             filter: '개발중'
         };
 
+        // --- Document modal ---
+        const docModal = {
+            overlay: document.getElementById('doc-modal-overlay'),
+            title: document.getElementById('doc-modal-title'),
+            path: document.getElementById('doc-modal-path'),
+            body: document.getElementById('doc-modal-body'),
+            close: document.getElementById('doc-modal-close'),
+        };
+
+        async function openDocModal(label, path) {
+            docModal.title.textContent = label;
+            docModal.path.textContent = path;
+            docModal.body.innerHTML = '<div class="doc-modal-loading">Loading...</div>';
+            docModal.overlay.classList.add('open');
+
+            try {
+                const resp = await fetch(`http://localhost:8000/api/v1/project-status/document?path=${encodeURIComponent(path)}`);
+                if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+                const data = await resp.json();
+                docModal.body.innerHTML = `<pre>${escapeHtml(data.content)}</pre>`;
+            } catch (err) {
+                docModal.body.innerHTML = `<div class="doc-modal-loading" style="color:#ef4444">Failed: ${escapeHtml(err.message)}</div>`;
+            }
+        }
+
+        function closeDocModal() {
+            docModal.overlay.classList.remove('open');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        docModal.close.addEventListener('click', closeDocModal);
+        docModal.overlay.addEventListener('click', (e) => {
+            if (e.target === docModal.overlay) closeDocModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDocModal();
+        });
+
         const els = {
             list: document.getElementById('dev-list'),
             detailTitle: document.getElementById('detail-title'),
@@ -408,6 +627,9 @@
             due: document.getElementById('detail-due'),
             programList: document.getElementById('program-list'),
             checklist: document.getElementById('checklist'),
+            featureDesc: document.getElementById('feature-desc'),
+            docLinksRow: document.getElementById('doc-links-row'),
+            docBadges: document.getElementById('doc-badges'),
             nextAction: document.getElementById('next-action'),
             countTotal: document.querySelector('[data-testid="project-status-count-total"]'),
             countCompleted: document.querySelector('[data-testid="project-status-count-completed"]'),
@@ -421,7 +643,14 @@
         const getStatusBadgeClass = (status) => {
             if (status === '완료') return 'badge badge-complete';
             if (status === '개발중') return 'badge badge-progress';
+            if (status === '검증') return 'badge badge-check';
+            if (status === '설계') return 'badge badge-design';
             return 'badge badge-pending';
+        };
+
+        const getSourceBadge = (source) => {
+            if (source === 'pdca') return '<span class="source-badge source-badge-pdca">PDCA</span>';
+            return '<span class="source-badge source-badge-req">REQ</span>';
         };
 
         const findItemById = (id) => items.find((item) => item.id === id);
@@ -440,13 +669,21 @@
             els.progressFill.style.width = pct + '%';
             els.progressText.textContent = pct + '% (' + completed + '/' + items.length + ' 완료)';
 
+            const checking = items.filter((item) => item.status === '검증' || item.status === '설계').length;
             const filters = [
                 { key: 'all', label: '전체 ' + items.length },
                 { key: '개발중', label: '개발중 ' + inProgress },
+                { key: '검증', label: '검증 ' + checking },
                 { key: '기획', label: '기획 ' + planned },
                 { key: '완료', label: '완료 ' + completed }
             ];
             if (pending > 0) filters.push({ key: '미착수', label: '미착수 ' + pending });
+            const reqCount = items.filter(i => (i.source || 'req') === 'req').length;
+            const pdcaCount = items.filter(i => i.source === 'pdca').length;
+            if (pdcaCount > 0) {
+                filters.push({ key: 'req-only', label: 'REQ ' + reqCount });
+                filters.push({ key: 'pdca-only', label: 'PDCA ' + pdcaCount });
+            }
 
             els.filterTabs.innerHTML = '';
             filters.forEach((f) => {
@@ -464,9 +701,18 @@
 
         const renderList = () => {
             els.list.innerHTML = '';
-            const filtered = state.filter === 'all'
-                ? items
-                : items.filter((item) => item.status === state.filter);
+            let filtered;
+            if (state.filter === 'all') {
+                filtered = items;
+            } else if (state.filter === 'req-only') {
+                filtered = items.filter((item) => (item.source || 'req') === 'req');
+            } else if (state.filter === 'pdca-only') {
+                filtered = items.filter((item) => item.source === 'pdca');
+            } else if (state.filter === '검증') {
+                filtered = items.filter((item) => item.status === '검증' || item.status === '설계');
+            } else {
+                filtered = items.filter((item) => item.status === state.filter);
+            }
 
             filtered.forEach((item) => {
                 const button = document.createElement('button');
@@ -480,7 +726,7 @@
 
                 button.innerHTML = `
                     <div class="dev-head">
-                        <span class="dev-title">${item.title}</span>
+                        <span class="dev-title">${getSourceBadge(item.source || 'req')}${item.title}</span>
                         <span class="${getStatusBadgeClass(item.status)}">${item.status}</span>
                     </div>
                     <div class="dev-meta">${item.stage}${ownerText}</div>
@@ -516,6 +762,7 @@
                 els.owner.closest('.meta-line').style.display = 'none';
                 els.stage.textContent = '-';
                 els.due.closest('.meta-line').style.display = 'none';
+                els.docLinksRow.style.display = 'none';
                 els.programList.innerHTML = '';
                 els.checklist.innerHTML = '';
                 els.nextAction.style.display = 'none';
@@ -542,12 +789,59 @@
                 dueLine.style.display = 'none';
             }
 
+            // Document badges
+            const docs = selected.documents || {};
+            const programs = selected.programs || [];
+            const isReq = (selected.id || '').startsWith('REQ-');
+            const badgeClass = { Plan: 'doc-badge-plan', Design: 'doc-badge-design', Analysis: 'doc-badge-analysis', Report: 'doc-badge-report' };
+
+            // Build badge list in order: Plan → Design → Analysis → Report → Spec → sources
+            const badges = [];
+            // 1) PDCA-style docs (Plan/Design/Analysis/Report)
+            ['Plan', 'Design', 'Analysis', 'Report'].forEach(label => {
+                if (docs[label]) badges.push({ label, path: docs[label], cls: badgeClass[label] });
+            });
+            // 2) REQ items: add Spec badge + source file badges
+            if (isReq) {
+                badges.push({ label: 'Spec', path: 'REQUESTS.md', cls: 'doc-badge-plan' });
+                programs.forEach(p => {
+                    const ext = p.name.split('.').pop();
+                    const cls = { py: 'doc-badge-analysis', js: 'doc-badge-design', jsx: 'doc-badge-design', ts: 'doc-badge-design', tsx: 'doc-badge-design', html: 'doc-badge-report', css: 'doc-badge-report' }[ext] || 'doc-badge-plan';
+                    badges.push({ label: p.name, path: p.path, cls });
+                });
+            }
+
+            if (badges.length > 0) {
+                els.docLinksRow.style.display = '';
+                els.docBadges.innerHTML = '';
+                badges.forEach(({ label, path, cls }) => {
+                    const span = document.createElement('span');
+                    span.className = `doc-badge ${cls}`;
+                    span.textContent = label;
+                    span.title = path;
+                    span.onclick = () => openDocModal(label, path);
+                    els.docBadges.appendChild(span);
+                });
+            } else {
+                els.docLinksRow.style.display = 'none';
+            }
+
             els.programList.innerHTML = '';
-            (selected.programs || []).forEach((program) => {
+            programs.forEach((program) => {
                 const li = document.createElement('li');
+                li.style.cursor = 'pointer';
                 li.innerHTML = `<strong>${program.name}</strong><br /><code>${program.path}</code><br />${autoLabel(program)}`;
+                li.onclick = () => openDocModal(program.name, program.path);
                 els.programList.appendChild(li);
             });
+
+            // Feature description
+            if (selected.description) {
+                els.featureDesc.textContent = selected.description;
+                els.featureDesc.style.display = '';
+            } else {
+                els.featureDesc.style.display = 'none';
+            }
 
             els.checklist.innerHTML = '';
             const checklist = selected.checklist || [];
@@ -561,7 +855,10 @@
                     const row = document.createElement('div');
                     row.className = 'check-row';
                     const labelClass = step.done ? 'check-label-done' : '';
-                    row.innerHTML = `<span class="${labelClass}">${step.label}</span><span class="${step.done ? 'check-mark-ok' : 'check-mark-pending'}">${step.done ? '완료' : '대기'}</span>`;
+                    const linkHtml = step.link
+                        ? `<span class="check-doc-link" style="cursor:pointer" onclick="openDocModal('${step.label}', '${step.link}')" title="${step.link}">doc</span>`
+                        : '';
+                    row.innerHTML = `<span class="${labelClass}">${step.label}</span><span class="check-right">${linkHtml}<span class="${step.done ? 'check-mark-ok' : 'check-mark-pending'}">${step.done ? '완료' : '대기'}</span></span>`;
                     els.checklist.appendChild(row);
                 });
             }
@@ -580,11 +877,36 @@
             renderDetail();
         };
 
-        const initialize = () => {
+        const initialize = async () => {
+            // Fetch PDCA items (graceful: ignore failures)
+            try {
+                const resp = await fetch('http://localhost:8000/api/v1/project-status/pdca');
+                const data = await resp.json();
+                (data.items || []).forEach(item => {
+                    items.push({
+                        ...item,
+                        status: item.status === '진행' ? '개발중' : item.status
+                    });
+                });
+            } catch (e) { /* graceful: REQ만 표시 */ }
+
+            // Fetch REQ document links from REQUESTS.md (graceful)
+            try {
+                const reqResp = await fetch('http://localhost:8000/api/v1/project-status/req-docs');
+                const reqDocs = await reqResp.json();
+                // Merge doc links into REQ items
+                items.forEach(item => {
+                    if ((item.id || '').startsWith('REQ-') && reqDocs[item.id]) {
+                        item.documents = { ...(item.documents || {}), ...reqDocs[item.id] };
+                    }
+                });
+            } catch (e) { /* graceful */ }
+
             const params = new URLSearchParams(window.location.search);
             const reqId = params.get('req');
             const filterParam = params.get('filter');
-            if (filterParam && ['all', '개발중', '기획', '완료', '미착수'].includes(filterParam)) {
+            const validFilters = ['all', '개발중', '기획', '완료', '미착수', '검증', 'req-only', 'pdca-only'];
+            if (filterParam && validFilters.includes(filterParam)) {
                 state.filter = filterParam;
             }
             if (reqId && findItemById(reqId)) {

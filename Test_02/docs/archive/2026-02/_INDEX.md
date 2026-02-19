@@ -2,6 +2,42 @@
 
 ## Archived Features
 
+### disclosure-auto-collect
+- **Archived**: 2026-02-19
+- **Match Rate**: 97.9%
+- **Iterations**: 0
+- **Duration**: 1 session (2026-02-19)
+- **Documents**:
+  - `disclosure-auto-collect/disclosure-auto-collect.plan.md`
+  - `disclosure-auto-collect/disclosure-auto-collect.design.md`
+  - `disclosure-auto-collect/disclosure-auto-collect.analysis.md`
+  - `disclosure-auto-collect/disclosure-auto-collect.report.md`
+- **Summary**: 공시 모니터 대시보드 수동 수집 버튼 + 일일 자동 수집 통합. 비동기 백그라운드 스레드 + 3초 폴링 패턴 (30-60초 KIND 스크래핑 대응). POST /disclosure (accepted 즉시응답) + GET /progress (폴링). run-all 통합, Windows Task Scheduler 배치파일. ~244 lines added.
+
+### disclosure-monitoring
+- **Archived**: 2026-02-19
+- **Match Rate**: 96.4%
+- **Iterations**: 0
+- **Duration**: ~5 days (2026-02-14 ~ 2026-02-19)
+- **Documents**:
+  - `disclosure-monitoring/disclosure-monitoring.plan.md`
+  - `disclosure-monitoring/disclosure-monitoring.design.md`
+  - `disclosure-monitoring/disclosure-monitoring.analysis.md`
+  - `disclosure-monitoring/disclosure-monitoring.report.md`
+- **Summary**: KIND 공시 모니터링 시스템. Collector(POST+페이지네이션) → Analyzer(19개 이벤트 분류+감성점수+클러스터) → React CDN Dashboard. 1,007건 실제 데이터, 44건 enriched detail. ~2,050 lines.
+
+### pdca-status-sync
+- **Archived**: 2026-02-19
+- **Match Rate**: 97.2%
+- **Iterations**: 0
+- **Duration**: 1 session (2026-02-19)
+- **Documents**:
+  - `pdca-status-sync/pdca-status-sync.plan.md`
+  - `pdca-status-sync/pdca-status-sync.design.md`
+  - `pdca-status-sync/pdca-status-sync.analysis.md`
+  - `pdca-status-sync/pdca-status-sync.report.md`
+- **Summary**: REQ/PDCA 프로젝트 현황 통합 표시. 하이브리드 아키텍처(정적 REQ JS + 동적 PDCA API merge). ID 네임스페이스 분리(REQ-/PDCA-), config/pdca_id_map.json 고정 매핑, planPath 기반 노이즈 필터링. 2 new files + 3 modified, ~300 lines added.
+
 ### data-source-footer
 - **Archived**: 2026-02-19
 - **Match Rate**: 98.8%

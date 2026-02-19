@@ -32,14 +32,16 @@
    - Error handling improved 55.6% -> 77.8%
    - Ready for: `/pdca report stock-research-dashboard`
 
-4. **disclosure-monitoring** (2026-02-14)
-   - Match Rate: 96.4% (PASS)
+4. **disclosure-monitoring** (2026-02-14, RE-RUN v2.0 on 2026-02-19)
+   - Match Rate: 96.4% (PASS) -- same score, deeper analysis
    - Design doc: `docs/02-design/features/disclosure-monitoring.design.md`
    - Analysis: `docs/03-analysis/features/disclosure-monitoring.analysis.md`
-   - 86 items checked: 81 matched, 3 changed, 1 missing, 10 added
-   - Pipeline: KIND collector -> analyzer -> JSON -> React CDN frontend
-   - Key gaps: EUC-KR vs UTF-8 encoding (Medium), dilution_total->dilution_count (Low), Excel fallback missing (Low)
-   - Added: sample data generator, 5 extra taxonomy keywords, archive output, file logging
+   - 103 items checked: 97 matched, 5 changed, 0 missing, 1 partial, 27 added
+   - Pipeline: KIND collector -> analyzer (722 lines, deep enrichment) -> JSON -> React CDN frontend
+   - v1->v2 corrections: dashboard link is monitoring-link card (not header-actions button), detail field IS populated for 44/1007 records (not empty), Excel fallback reclassified CHANGED not MISSING
+   - Key gaps: EUC-KR vs UTF-8 (Medium), dilution_total->dilution_count (Low), detail field not rendered in frontend (Low)
+   - 27 added features: 6 taxonomy keywords, earnings YoY enrichment, contract amount enrichment, correction diff analysis, filter bar, cluster click, DataSourceFooter, etc.
+   - Error handling: 8/8 (100%), Cross-consistency: 95%, Success criteria: 4/4
    - Ready for: `/pdca report disclosure-monitoring`
 
 5. **liquidity-stress-monitor** (2026-02-14)
@@ -92,6 +94,70 @@
    - Error handling: 9/9 (100%) -- best in project history
    - Ready for: `/pdca report investment-intelligence-engine`
 
+9. **dashboard-project-panel-v2** (2026-02-19)
+   - Match Rate: 100% (PASS) -- 12/12 V-XX criteria all PASS
+   - Design doc: `docs/02-design/features/dashboard-project-panel-v2.design.md`
+   - Analysis: `docs/03-analysis/features/dashboard-project-panel-v2.analysis.md`
+   - Scope: 3 files (dashboard/index.html, dashboard/project_status.html, tests/playwright/tests/dashboard-core.spec.ts)
+   - UI overhaul: 4-column KPI + full list -> progress bar + badge row + active-card grid + view-all link
+   - Detail page: owner/due/nextAction hidden when empty, empty checklist shows message, autoLabel() for extensions
+   - All 18+ old CSS classes confirmed removed, no new external libraries added
+   - Responsive breakpoint 640px->768px (intentional, consistent with rest of dashboard)
+   - Ready for: `/pdca report dashboard-project-panel-v2`
+
+10. **news-intelligence-monitor** (2026-02-19)
+   - Match Rate: 98.4% (PASS) -- 19/19 V-XX criteria all PASS
+   - Design doc: `docs/02-design/features/news-intelligence-monitor.design.md`
+   - Analysis: `docs/03-analysis/features/news-intelligence-monitor.analysis.md`
+   - 95 items checked: 92 matched, 2 changed, 0 missing, 6 added
+   - Full pipeline: Finviz HTML parser -> SQLite DB -> Claude AI analyzer -> FastAPI 2 endpoints -> React CDN dashboard
+   - 14 files: 2 DB models, 4 scripts (config+fetch+analyzer+batch), service+router+main, dashboard+index, seed, playwright
+   - Key gaps: 404 response double-nesting (Low), UniqueConstraint name cosmetic (Negligible)
+   - 6 positive additions: .env key loader, ensure_tables(), 3-level HTML fallback, DI pattern, 500 error wrapper, Korean sentiment labels
+   - Cross-consistency: 15/15 model-schema-API fields, 7/7 config constants, 5/5 sentiment levels, 6/6 categories
+   - Error handling: 8/9 (88.9%) -- only 404 nesting format differs
+   - Ready for: `/pdca report news-intelligence-monitor`
+
+11. **data-source-footer** (2026-02-19)
+   - Match Rate: 98.8% (PASS)
+   - Design doc: `docs/02-design/features/data-source-footer.design.md`
+   - Analysis: `docs/03-analysis/data-source-footer.analysis.md`
+   - 246 items checked: 239 matched, 1 partial, 6 missing (cosmetic CSS class)
+   - Cross-cutting feature: 1 backend API extension + 6 dashboard pages (5 React + 1 Vanilla JS)
+   - Backend: collector/status API extended with table_counts (15 tables) + 3 new collector keys
+   - Frontend: DataSourceFooter React.memo component replicated across 5 pages; renderDSFooter() Vanilla JS in idea_board
+   - Key gaps: .ds-badge-demo CSS missing (Low, no current usage), 5s fetch timeout absent (Low), .ds-footer padding omitted (Negligible)
+   - 2 positive additions: extra table_counts tables for news_intelligence
+   - Cross-consistency verified: All 6 pages resolve to same API URL, all 15 db_table refs match backend, all 22 DATA_SOURCES items match design
+   - Ready for: `/pdca report data-source-footer`
+
+12. **pdca-status-sync** (2026-02-19)
+   - Match Rate: 97.2% (PASS)
+   - Design doc: `docs/02-design/features/pdca-status-sync.design.md`
+   - Analysis: `docs/03-analysis/features/pdca-status-sync.analysis.md`
+   - 69 items checked: 65 matched, 1 partial, 2 changed (Negligible), 1 missing (Low)
+   - Hybrid merge: Static REQ (project_status_data.js) + Dynamic PDCA (API) in both index.html and project_status.html
+   - 5 files: config/pdca_id_map.json, backend/app/api/project_status.py, backend/app/main.py, dashboard/index.html, dashboard/project_status.html
+   - Key: ID namespace separation (PDCA- vs REQ-) with pdca_id_map.json for immutable ID assignment
+   - Noise filtering: 30 features in .pdca-status.json but only 5 have planPath (correctly filtered)
+   - Error handling: 7/7 (100%) -- graceful degradation in both frontend pages
+   - Missing: 2 CSS classes (.project-badge.badge-pdca, .badge-design in index.html) -- Low impact, source badges serve same purpose
+   - 3 positive additions: _REQ_ITEMS module-level extraction, URL filter params, checklist counting
+   - Ready for: `/pdca report pdca-status-sync`
+
+13. **disclosure-auto-collect** (2026-02-19, RE-RUN v2.0)
+   - Match Rate: 97.9% (PASS) -- was 75.0% in v1.0
+   - Design doc: `docs/02-design/features/disclosure-auto-collect.design.md`
+   - Analysis: `docs/03-analysis/features/disclosure-auto-collect.analysis.md`
+   - 12 items checked: 11 matched, 1 changed (Low), 0 missing
+   - 3 files: collector.py (backend), monitor_disclosures.html (frontend), run_daily_collect.bat (batch)
+   - v1->v2 fixes: Design updated to async+polling pattern, toast partial distinction added, timer aligned to 8s
+   - All 6 previously-PARTIAL items resolved by design update + UI fix
+   - Remaining: run_all uses `_bg()` variant (intentional optimization, Low impact)
+   - 8 positive additions: step labels, elapsed timer, already_running guard, cache-bust reload, etc.
+   - Cross-consistency: 7/7 (100%), Error handling: 4/4 (100%)
+   - Ready for: `/pdca report disclosure-auto-collect`
+
 ### Key Patterns
 
 - Design doc covers dashboard (React/API) but moat estimator is a sub-feature (data pipeline)
@@ -102,40 +168,14 @@
 
 ### Analysis Methodology Notes
 
-- Weight functional requirements (30%) higher than convention compliance (5%)
+See detailed notes in `methodology-notes.md`. Key principles:
+- Weight functional requirements (30-40%) higher than convention compliance (5%)
 - "Added features" beyond design are positive indicators, not gaps
-- Data quality verification via reanalysis reports is critical for data pipeline features
-- Security issues (hardcoded keys) reduce convention score but not match rate
-- Stub methods (return None) count as PARTIAL, not MISSING -- interface exists
-- print() vs logging is a convention gap but low impact for data pipeline scripts
-- Test plan items without formal pytest files score 50% if __main__ blocks exist
+- Error handling is often the weakest category -- track separately
+- Encoding mismatches (EUC-KR vs UTF-8) are Medium impact for Korean web scraping
 - Full-stack features: check 7 categories (endpoints, models, schemas, service logic, frontend, error handling, router registration)
-- Phase 3 (future) items should be excluded from match rate -- only count current phase scope
-- DI patterns (FastAPI Depends) and default fallback values count as positive additions
-- response_model missing from FastAPI endpoints is Low severity but should be noted
-- Error handling is often the weakest category -- track error_code, timestamp, HTTP status codes separately
-- Static-file pipeline features (scraper->analyzer->JSON->HTML): check pipeline paths, field schemas, and output data files as concrete evidence
-- React CDN + Babel features: verify React.memo, useMemo, useCallback, null safety, stable keys for quality
-- Encoding mismatches (EUC-KR vs UTF-8) are Medium impact for Korean web scraping -- always flag
-- Cross-consistency check: when models are duplicated across standalone scripts, verify all copies match canonical source
-- Config-driven features (weights, ranges, symbols): verify config.py constants match design AND are used by all consumers
-- Multi-file level/status mappings (backend LEVEL_MAP + frontend LEVEL_CONFIG + calculator score_to_level): verify all match
-- News "Top N" designs: check if API supports N items or only returns single top -- frontend can only show what API provides
-- External API features: when design specifies statistical thresholds (p80, p90) but no historical data store exists, fixed thresholds are acceptable MVP substitutes -- flag as CHANGED not MISSING
-- Trigger engine verification: check threshold values, comparison operators, scoring logic (count->level mapping), and special cases (e.g., MVRV regime change = always HIGH)
-- Gauge count mismatches: conditional gauges (render only when data available) are positive additions if the data source was already in the plan
-- Modal/popup features not in design but enhancing UX should be counted as positive additions, not gaps
-- MCP tool parameter verification: check that tool parameters map to actual SQLAlchemy model fields -- wrong field names cause runtime TypeError
-- Multi-phase features (Phase 1/2/3): score each phase separately, exclude future-phase "Should" items from match rate
-- Context Packet schema: design may specify comprehensive schema but implementation can use simplified version -- check PROTOCOL.md for alignment
-- Vanilla JS vs CDN React: when design says React CDN but implementation uses vanilla JS, count as CHANGED (Medium) not MISSING -- functionally equivalent
-- MCP registration: .mcp.json is correct MCP standard, .claude/settings.json is older convention -- flag as CHANGED (Low, intentional)
-- Extension/Intelligence Layer scope: when separately approved extensions exist beyond original design, analyze them as bonus items (100% bonus score) but include in overall count
-- Cross-module aggregation services: verify each data source (DB queries, file reads, cache reads) individually -- 7+ modules need per-module verification
-- Custom data source plugins (auto-load *.json from directory): verify both the example file AND the service auto-load logic
-- Dashboard rewrites: when implementation significantly exceeds design (e.g., Kanban -> Intelligence Dashboard), score as CHANGED+EXCEEDED, not MISSING
-- MCP tool bug verification on RE-RUN: always re-read the exact lines and verify SQLAlchemy model field names match tool keyword arguments
-- Rule engine features: verify rules JSON -> engine extractor -> condition evaluator -> signal creator full chain, plus dashboard color/label mapping
-- When design and implementation are developed together (same session), expect near-100% match -- focus analysis on cross-consistency and error handling quality
-- Signal->Idea conversion: verify both the service method AND the API endpoint that exposes it, plus MCP tool wrapper
-- Multi-service features (3+ services): verify service independence (no circular deps) and that API layer properly orchestrates them
+- Cross-cutting features: verify each page independently, use matrix tables for 6+ page comparisons
+- Dashboard integration evolves: card-based monitoring sections replace header-actions buttons
+- KIND enrichment: check BOTH backend data production AND frontend rendering of enriched fields
+- Sync-to-async refactoring: When impl changes sync design to async (background thread + polling), count each affected layer as PARTIAL, not MISSING. Root cause is single architectural decision, not multiple independent gaps.
+- Long-running scraping endpoints: async pattern with progress polling is architecturally superior; recommend design update rather than implementation revert

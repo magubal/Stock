@@ -1,9 +1,10 @@
 """
 Data Collector API - 데이터 수집 트리거 엔드포인트
-POST /api/v1/collector/liquidity  - 유동성 데이터 수집
-POST /api/v1/collector/crypto     - 크립토 데이터 수집
-POST /api/v1/collector/run-all    - 전체 순차 수집
-GET  /api/v1/collector/status     - 수집 상태 조회
+POST /api/v1/collector/liquidity    - 유동성 데이터 수집
+POST /api/v1/collector/crypto       - 크립토 데이터 수집
+POST /api/v1/collector/disclosure   - 공시 데이터 수집
+POST /api/v1/collector/run-all      - 전체 순차 수집
+GET  /api/v1/collector/status       - 수집 상태 조회
 """
 import sys
 import os
@@ -176,8 +177,101 @@ def _run_crypto_collector() -> dict:
     return result
 
 
+# 공시 수집 백그라운드 상태 관리
+_disclosure_task = {"running": False, "result": None, "step": "", "started_at": None}
+_disclosure_lock = __import__('threading').Lock()
+
+
+def _run_disclosure_collector_bg():
+    """공시 데이터 수집 + 분석 (백그라운드 실행)."""
+    global _disclosure_task
+    start = time.time()
+    steps = {}
+
+    utc_now = datetime.now(timezone.utc)
+    kst_now = utc_now + timedelta(hours=9)
+    today = kst_now.strftime("%Y-%m-%d")
+
+    with _disclosure_lock:
+        _disclosure_task["step"] = "collecting"
+
+    # Step 1: KIND 공시 수집
+    try:
+        collect_mod = _load_module_from_file(
+            'collect_disclosures',
+            os.path.join(_scripts_root, 'scripts', 'collect_disclosures.py')
+        )
+        disclosures = collect_mod.collect_all_pages(today)
+        if not disclosures:
+            disclosures = collect_mod.generate_sample_data(today)
+            steps["collect"] = f"sample_fallback: {len(disclosures)} items"
+        else:
+            steps["collect"] = f"success: {len(disclosures)} items"
+        collect_mod.save_disclosures(disclosures, today)
+    except Exception as e:
+        steps["collect"] = f"failed: {e}"
+
+    with _disclosure_lock:
+        _disclosure_task["step"] = "analyzing"
+
+    # Step 2: 분석
+    try:
+        analyze_mod = _load_module_from_file(
+            'analyze_disclosures',
+            os.path.join(_scripts_root, 'scripts', 'analyze_disclosures.py')
+        )
+        result = analyze_mod.analyze(today)
+        if result:
+            analyze_mod.save_result(result, today)
+            steps["analyze"] = f"success: {result['summary']['total']} analyzed"
+        else:
+            steps["analyze"] = "failed: no result"
+    except Exception as e:
+        steps["analyze"] = f"failed: {e}"
+
+    elapsed = time.time() - start
+    ok_count = sum(1 for v in steps.values() if v.startswith("success"))
+    status = "success" if ok_count == 2 else ("partial" if ok_count > 0 else "failed")
+
+    _log_collection("disclosure", status, elapsed, steps, "api")
+
+    final_result = {
+        "collector": "disclosure",
+        "status": status,
+        "duration": round(elapsed, 1),
+        "date": today,
+        "steps": steps,
+    }
+
+    with _disclosure_lock:
+        _disclosure_task["running"] = False
+        _disclosure_task["result"] = final_result
+        _disclosure_task["step"] = "done"
+
+    return final_result
+
+
+def _run_disclosure_collector() -> dict:
+    """공시 수집을 백그라운드로 시작하고 즉시 accepted 반환."""
+    global _disclosure_task
+    import threading
+
+    with _disclosure_lock:
+        if _disclosure_task["running"]:
+            return {"status": "already_running", "step": _disclosure_task["step"]}
+        _disclosure_task["running"] = True
+        _disclosure_task["result"] = None
+        _disclosure_task["step"] = "starting"
+        _disclosure_task["started_at"] = time.time()
+
+    t = threading.Thread(target=_run_disclosure_collector_bg, daemon=True)
+    t.start()
+
+    return {"status": "accepted", "message": "수집이 시작되었습니다"}
+
+
 def _run_all_collectors() -> dict:
-    """순차 수집: 유동성 → 크립토."""
+    """순차 수집: 유동성 → 크립토 → 공시."""
     start = time.time()
     results = []
 
@@ -186,6 +280,9 @@ def _run_all_collectors() -> dict:
 
     result_crypto = _run_crypto_collector()
     results.append(result_crypto)
+
+    result_disclosure = _run_disclosure_collector_bg()  # run-all은 동기 실행
+    results.append(result_disclosure)
 
     total = time.time() - start
     all_ok = all(r["status"] == "success" for r in results)
@@ -218,9 +315,38 @@ async def collect_crypto():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/disclosure")
+async def collect_disclosure():
+    """공시 데이터 수집 트리거 (백그라운드 실행, 즉시 응답)."""
+    try:
+        result = _run_disclosure_collector()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/disclosure/progress")
+async def get_disclosure_progress():
+    """공시 수집 진행 상태 폴링."""
+    with _disclosure_lock:
+        if not _disclosure_task["running"] and _disclosure_task["result"]:
+            result = _disclosure_task["result"]
+            _disclosure_task["result"] = None  # 1회 소비
+            return {"status": "completed", "result": result}
+        elif _disclosure_task["running"]:
+            elapsed = time.time() - (_disclosure_task["started_at"] or time.time())
+            return {
+                "status": "running",
+                "step": _disclosure_task["step"],
+                "elapsed": round(elapsed, 1),
+            }
+        else:
+            return {"status": "idle"}
+
+
 @router.post("/run-all")
 async def collect_all():
-    """전체 순차 수집: 유동성 → 크립토."""
+    """전체 순차 수집: 유동성 → 크립토 → 공시."""
     try:
         result = await asyncio.to_thread(_run_all_collectors)
         return result

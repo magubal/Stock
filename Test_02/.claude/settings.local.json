@@ -55,7 +55,19 @@
       "Bash(bash /f/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/run_batch500.sh)",
       "Bash(bash /f/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/run_samsung.sh)",
       "mcp__idea-collab__export_packet",
-      "Bash(bash /f/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/run_batch_remaining.sh)"
+      "Bash(bash /f/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/run_batch_remaining.sh)",
+      "WebFetch(domain:mcpmarket.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git status:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:finviz.com)",
+      "Bash(for pid in 16820 46688 34896 71536 37820 42100)",
+      "Bash(do)",
+      "Bash(wmic process where \"processid=$pid\" get commandline)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(../backend/venv/Scripts/python.exe:*)",
+      "Bash(pkill:*)"
     ]
   }
 }

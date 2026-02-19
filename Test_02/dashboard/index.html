@@ -257,6 +257,31 @@
             border-color: rgba(148, 163, 184, 0.3);
         }
 
+        .project-badge.badge-check {
+            color: #facc15;
+            background: rgba(250, 204, 21, 0.12);
+            border-color: rgba(250, 204, 21, 0.35);
+        }
+
+        .source-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.06rem 0.3rem;
+            border-radius: 4px;
+            margin-right: 0.3rem;
+            vertical-align: middle;
+        }
+        .source-badge-req {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.15);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        .source-badge-pdca {
+            color: #a78bfa;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
         .project-active-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -887,24 +912,49 @@
             );
         };
 
-        const PROJECT_STATUS_ITEMS = Array.isArray(window.PROJECT_STATUS_ITEMS)
+        const _REQ_ITEMS = Array.isArray(window.PROJECT_STATUS_ITEMS)
             ? window.PROJECT_STATUS_ITEMS.map((item) => ({
                 ...item,
+                source: item.source || 'req',
                 status: item.status === '진행' ? '개발중' : item.status
             }))
             : [];
 
         const ProjectStatusPanel = () => {
-            const total = PROJECT_STATUS_ITEMS.length;
-            const completed = PROJECT_STATUS_ITEMS.filter((i) => i.status === '완료').length;
-            const inProgress = PROJECT_STATUS_ITEMS.filter((i) => i.status === '개발중' || i.status === '진행').length;
-            const planned = PROJECT_STATUS_ITEMS.filter((i) => i.status === '기획').length;
-            const pending = PROJECT_STATUS_ITEMS.filter((i) => i.status === '미착수').length;
+            const [allItems, setAllItems] = React.useState(_REQ_ITEMS);
+
+            React.useEffect(() => {
+                fetch('http://localhost:8000/api/v1/project-status/pdca')
+                    .then(r => r.json())
+                    .then(data => {
+                        const pdcaItems = (data.items || []).map(item => ({
+                            ...item,
+                            status: item.status === '진행' ? '개발중' : item.status
+                        }));
+                        setAllItems(prev => {
+                            const reqOnly = prev.filter(i => (i.source || 'req') === 'req');
+                            return [...reqOnly, ...pdcaItems];
+                        });
+                    })
+                    .catch(() => { /* graceful: REQ만 유지 */ });
+            }, []);
+
+            const total = allItems.length;
+            const completed = allItems.filter((i) => i.status === '완료').length;
+            const inProgress = allItems.filter((i) => i.status === '개발중' || i.status === '진행').length;
+            const checking = allItems.filter((i) => i.status === '검증' || i.status === '설계').length;
+            const planned = allItems.filter((i) => i.status === '기획').length;
+            const pending = allItems.filter((i) => i.status === '미착수').length;
             const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-            const activeItems = PROJECT_STATUS_ITEMS
-                .filter((i) => i.status === '개발중' || i.status === '진행')
-                .slice(0, 5);
+            const activeItems = allItems
+                .filter((i) => i.status === '개발중' || i.status === '진행' || i.status === '검증' || i.status === '설계')
+                .slice(0, 8);
+
+            const SourceBadge = ({ source }) => {
+                if (source === 'pdca') return <span className="source-badge source-badge-pdca">PDCA</span>;
+                return <span className="source-badge source-badge-req">REQ</span>;
+            };
 
             return (
                 <div className="project-status-panel" data-testid="project-status-panel">
@@ -920,6 +970,7 @@
                     <div className="project-status-badges">
                         <span className="project-badge badge-complete">완료 {completed}</span>
                         <span className="project-badge badge-progress">진행 {inProgress}</span>
+                        {checking > 0 && <span className="project-badge badge-check">검증 {checking}</span>}
                         {planned > 0 && <span className="project-badge badge-planned">기획 {planned}</span>}
                         {pending > 0 && <span className="project-badge badge-pending">미착수 {pending}</span>}
                     </div>
@@ -936,7 +987,9 @@
                                         className="project-active-card"
                                         data-testid={`project-checklist-${item.id}`}
                                     >
-                                        <div className="project-active-title">{item.title}</div>
+                                        <div className="project-active-title">
+                                            <SourceBadge source={item.source || 'req'} />{item.title}
+                                        </div>
                                         <div className="project-active-meta">
                                             <span>{totalCheck > 0 ? `☑ ${doneCount}/${totalCheck}` : '체크리스트 미등록'}</span>
                                             <span className="project-status-badge status-in-progress">

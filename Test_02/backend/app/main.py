@@ -12,8 +12,9 @@ async def lifespan(app: FastAPI):
     # Create database tables
     Base.metadata.create_all(bind=engine)
     yield
-    # Shutdown
+    # Shutdown - release DB connections so port is freed cleanly
     print("Stock Research ONE API shutting down...")
+    engine.dispose()
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -50,9 +51,10 @@ app.include_router(monitoring.router)
 app.include_router(moat_dashboard.router)
 app.include_router(news_intelligence.router)
 app.include_router(news_analysis.router)
-from .api import collector, crypto_data
+from .api import collector, crypto_data, project_status
 app.include_router(collector.router)
 app.include_router(crypto_data.router)
+app.include_router(project_status.router)
 
 # Root endpoint
 @app.get("/")

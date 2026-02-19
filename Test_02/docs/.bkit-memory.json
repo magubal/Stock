@@ -1,11 +1,11 @@
 {
-  "sessionCount": 118,
+  "sessionCount": 129,
   "lastSession": {
-    "startedAt": "2026-02-19T07:00:58.974Z",
+    "startedAt": "2026-02-19T13:31:22.507Z",
     "platform": "claude",
     "level": "Enterprise"
   },
-  "currentFeature": null,
-  "currentPhase": null,
-  "matchRate": null
+  "currentFeature": "disclosure-auto-collect",
+  "currentPhase": "completed",
+  "matchRate": 97.9
 }
