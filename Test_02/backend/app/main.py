@@ -25,18 +25,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://127.0.0.1:3002",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:8080",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,9 +45,14 @@ app.include_router(insights.router)
 app.include_router(collab.router)
 app.include_router(cross_module.router)
 app.include_router(signals.router)
-from .api import monitoring, moat_dashboard
+from .api import monitoring, moat_dashboard, news_intelligence, news_analysis
 app.include_router(monitoring.router)
 app.include_router(moat_dashboard.router)
+app.include_router(news_intelligence.router)
+app.include_router(news_analysis.router)
+from .api import collector, crypto_data
+app.include_router(collector.router)
+app.include_router(crypto_data.router)
 
 # Root endpoint
 @app.get("/")

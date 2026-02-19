@@ -11,6 +11,7 @@ const REQUIRED_TEXTS = [
 
 const REQUIRED_LINKS = [
   'monitor_disclosures.html',
+  'news_intelligence.html',
   'liquidity_stress.html',
   'crypto_trends.html',
   'moat_analysis.html',

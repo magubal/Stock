@@ -219,3 +219,5 @@ from .collab import CollabPacket, CollabSession, CollabPacketHistory
 from .signal import Signal
 from .monitoring import MonitoringIncident, MonitoringDecision, MonitoringEvent
 from .moat_data import MoatStockSnapshot, MoatStockSyncRun, MoatStockHistory
+from .news_article import NewsArticle, MarketNarrative, SectorPerformance, IndustryPerformance, IndustryStock
+from .crypto import CryptoPrice, CryptoMetric, CollectorLog

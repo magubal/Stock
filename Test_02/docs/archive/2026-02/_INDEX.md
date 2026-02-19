@@ -2,6 +2,30 @@
 
 ## Archived Features
 
+### data-source-footer
+- **Archived**: 2026-02-19
+- **Match Rate**: 98.8%
+- **Iterations**: 0
+- **Duration**: 1 session (2026-02-19)
+- **Documents**:
+  - `data-source-footer/data-source-footer.plan.md`
+  - `data-source-footer/data-source-footer.design.md`
+  - `data-source-footer/data-source-footer.analysis.md`
+  - `data-source-footer/data-source-footer.report.md`
+- **Summary**: 6개 모니터링 대시보드 하단에 접이식 DataSourceFooter 추가. 하이브리드 방식(정적 JS 메타 + 동적 collector/status API). 22개 데이터 소스 매핑, 15개 DB 테이블 건수 조회. 5 React pages + 1 Vanilla JS page. ~820 lines added.
+
+### news-intelligence-monitor
+- **Archived**: 2026-02-19
+- **Match Rate**: 98.4%
+- **Iterations**: 0
+- **Duration**: 1 day (2026-02-19)
+- **Documents**:
+  - `news-intelligence-monitor/news-intelligence-monitor.plan.md`
+  - `news-intelligence-monitor/news-intelligence-monitor.design.md`
+  - `news-intelligence-monitor/news-intelligence-monitor.analysis.md`
+  - `news-intelligence-monitor/news-intelligence-monitor.report.md`
+- **Summary**: Finviz 뉴스 5 카테고리 파싱 + Claude AI 분석 + Sector→Industry→Stock 3단계 drill-down. 5 DB models, 6 API endpoints, ~3,350 lines. Unified 4-step pipeline (News→Stock→Sector→AI) with coverage badge. v1.0→v1.2 in single day.
+
 ### evidence-based-moat
 - **Archived**: 2026-02-09
 - **Match Rate**: 95.2%

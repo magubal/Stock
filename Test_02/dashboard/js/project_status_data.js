@@ -2,9 +2,9 @@
     window.PROJECT_STATUS_ITEMS = [
         {
             "id": "REQ-001",
-            "title": "REQ-001 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-001 네이버 블로그 데이터 자동 수집",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -27,24 +27,24 @@
             "checklist": [
                         {
                                     "label": "블로거 RSS 목록 기반으로 최신 글 자동 수집.",
-                                    "done": false
+                                    "done": true
                         },
                         {
                                     "label": "본문 이미지 캡처 및 일자별 저장.",
-                                    "done": false
+                                    "done": true
                         },
                         {
                                     "label": "스케줄러 기반 자동 실행.",
-                                    "done": false
+                                    "done": true
                         }
             ],
             "nextAction": "-"
 },
         {
             "id": "REQ-002",
-            "title": "REQ-002 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-002 아이디어 관리 시스템 (Idea Management)",
+            "status": "진행",
+            "stage": "진행",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -82,9 +82,9 @@
 },
         {
             "id": "REQ-003",
-            "title": "REQ-003 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-003 Pending Packets Inbox 우선 전환 + 즉시처리 연동",
+            "status": "진행",
+            "stage": "진행",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -122,9 +122,9 @@
 },
         {
             "id": "REQ-004",
-            "title": "REQ-004 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-004 업황/컨센서스 연동 분석 파이프라인",
+            "status": "진행",
+            "stage": "진행",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -162,33 +162,33 @@
 },
         {
             "id": "REQ-005",
-            "title": "REQ-005 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-005 국내상장종목 해자 투자가치 엑셀 데이터 정리",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [],
             "checklist": [
                         {
                                     "label": "기준 엑셀 포맷 정리.",
-                                    "done": false
+                                    "done": true
                         },
                         {
                                     "label": "종목코드/종목명 등 핵심 필드 정합화.",
-                                    "done": false
+                                    "done": true
                         },
                         {
                                     "label": "분석 파이프라인 입력 데이터 품질 확보.",
-                                    "done": false
+                                    "done": true
                         }
             ],
             "nextAction": "-"
 },
         {
             "id": "REQ-006",
-            "title": "REQ-006 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-006 Collab-Stock Moat Pipeline + Idea Gate",
+            "status": "진행",
+            "stage": "진행",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -226,9 +226,9 @@
 },
         {
             "id": "REQ-007",
-            "title": "REQ-007 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-007 일관성 모니터링 핵심 경로 Hard-Block",
+            "status": "기획",
+            "stage": "기획",
             "owner": "TBD",
             "due": "-",
             "programs": [],
@@ -237,9 +237,9 @@
 },
         {
             "id": "REQ-008",
-            "title": "REQ-008 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-008 요구사항 계약(REQ Contract) 모니터링 강제",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -264,9 +264,9 @@
 },
         {
             "id": "REQ-009",
-            "title": "REQ-009 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-009 일관성 모니터링 명칭 고정 + 누락 강제",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [],
@@ -275,9 +275,9 @@
 },
         {
             "id": "REQ-010",
-            "title": "REQ-010 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-010 3중 강제 게이트 (브랜치/CI/런타임)",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -302,9 +302,9 @@
 },
         {
             "id": "REQ-011",
-            "title": "REQ-011 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-011 Mini Consistency Batch 데모 검증",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -324,9 +324,9 @@
 },
         {
             "id": "REQ-012",
-            "title": "REQ-012 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-012 Windows 서버 start/stop 단축 스크립트",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -351,9 +351,9 @@
 },
         {
             "id": "REQ-013",
-            "title": "REQ-013 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-013 제조업 BM 하위분류 개선(대시보드)",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [],
@@ -362,9 +362,9 @@
 },
         {
             "id": "REQ-014",
-            "title": "REQ-014 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-014 WICS 기반 BM 재분류",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [],
@@ -373,9 +373,9 @@
 },
         {
             "id": "REQ-015",
-            "title": "REQ-015 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-015 Excel 기준소스 + Moat DB 이력관리",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -400,9 +400,9 @@
 },
         {
             "id": "REQ-016",
-            "title": "REQ-016 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-016 매일 19:00 변경감지 갱신 스케줄러",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -432,9 +432,9 @@
 },
         {
             "id": "REQ-017",
-            "title": "REQ-017 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-017 대시보드 프로젝트 현황/체크리스트 패널",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -451,25 +451,25 @@
             ],
             "checklist": [
                         {
-                                    "label": "`dashboard/index.html`에 프로젝트 현황 카드 추가.",
-                                    "done": false
+                                    "label": "[x] `dashboard/index.html`에 프로젝트 현황 카드 추가.",
+                                    "done": true
                         },
                         {
-                                    "label": "하위 체크리스트 항목 클릭 시 진행상태/체크/다음조치 표시.",
-                                    "done": false
+                                    "label": "[x] 하위 체크리스트 항목 클릭 시 진행상태/체크/다음조치 표시.",
+                                    "done": true
                         },
                         {
-                                    "label": "REQ-015/016/017 연결 근거를 카드에서 확인 가능하게 구성.",
-                                    "done": false
+                                    "label": "[x] REQ-015/016/017 연결 근거를 카드에서 확인 가능하게 구성.",
+                                    "done": true
                         }
             ],
             "nextAction": "-"
 },
         {
             "id": "REQ-018",
-            "title": "REQ-018 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-018 Dashboard black screen 복구",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [],
@@ -478,9 +478,9 @@
 },
         {
             "id": "REQ-019",
-            "title": "REQ-019 ",
-            "status": "상태",
-            "stage": "상태",
+            "title": "REQ-019 전역 변경 가드(Global Change Guard) 강제",
+            "status": "완료",
+            "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
@@ -506,6 +506,131 @@
                         }
             ],
             "checklist": [],
+            "nextAction": "-"
+},
+        {
+            "id": "REQ-020",
+            "title": "REQ-020 bkit 브레인→PDCA 워크플로우 도입",
+            "status": "완료",
+            "stage": "완료",
+            "owner": "TBD",
+            "due": "-",
+            "programs": [
+                        {
+                                    "name": "SKILL.md",
+                                    "path": ".agent/skills/brainstorm-bkit/SKILL.md",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "brain.md",
+                                    "path": ".agent/workflows/brain.md",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "settings.local.json",
+                                    "path": ".claude/settings.local.json",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": ".bkit-memory.json",
+                                    "path": ".bkit-memory.json",
+                                    "description": "Related file"
+                        }
+            ],
+            "checklist": [
+                        {
+                                    "label": "bkit 도입 수준을 워크플로우 중심(`/brain` → `/pdca`)으로 확정.",
+                                    "done": true
+                        },
+                        {
+                                    "label": "기존 저장소 설정에서 즉시 사용 가능한 경로 확인.",
+                                    "done": true
+                        },
+                        {
+                                    "label": "MCP 연동은 보류(필요 시 차후 확장).",
+                                    "done": true
+                        }
+            ],
+            "nextAction": "-"
+},
+        {
+            "id": "REQ-021",
+            "title": "REQ-021 Intelligence Board Triage v2 체험 개선",
+            "status": "완료",
+            "stage": "완료",
+            "owner": "TBD",
+            "due": "-",
+            "programs": [
+                        {
+                                    "name": "idea_board.html",
+                                    "path": "dashboard/idea_board.html",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "idea-board.spec.ts",
+                                    "path": "tests/playwright/tests/idea-board.spec.ts",
+                                    "description": "Related file"
+                        }
+            ],
+            "checklist": [
+                        {
+                                    "label": "Intelligence Board의 목적(의도/목적) 문구를 화면에 명시.",
+                                    "done": true
+                        },
+                        {
+                                    "label": "실제 사용 체감이 가능한 수준으로 triage UX를 선구현.",
+                                    "done": true
+                        },
+                        {
+                                    "label": "회귀 확인 가능한 최소 테스트 시나리오 추가.",
+                                    "done": true
+                        }
+            ],
+            "nextAction": "-"
+},
+        {
+            "id": "REQ-022",
+            "title": "REQ-022 Crypto Trends 데이터파싱 버튼 연동",
+            "status": "완료",
+            "stage": "완료",
+            "owner": "TBD",
+            "due": "-",
+            "programs": [
+                        {
+                                    "name": "crypto_trends.html",
+                                    "path": "dashboard/crypto_trends.html",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "crypto_parse.py",
+                                    "path": "backend/app/api/crypto_parse.py",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "main.py",
+                                    "path": "backend/app/main.py",
+                                    "description": "Related file"
+                        },
+                        {
+                                    "name": "crypto-trends-parse.spec.ts",
+                                    "path": "tests/playwright/tests/crypto-trends-parse.spec.ts",
+                                    "description": "Related file"
+                        }
+            ],
+            "checklist": [
+                        {
+                                    "label": "`crypto_trends.html` 상단 우측에 `데이터파싱` 버튼 추가.",
+                                    "done": true
+                        },
+                        {
+                                    "label": "버튼 클릭 시 파싱 실행(백엔드 API 우선, 미연결 시 프론트 폴백).",
+                                    "done": true
+                        },
+                        {
+                                    "label": "파싱 상태를 사용자에게 표시하고 중복 클릭을 방지.",
+                                    "done": true
+                        }
+            ],
             "nextAction": "-"
 }
     ];

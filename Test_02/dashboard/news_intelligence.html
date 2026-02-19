@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Intelligence - Stock Research ONE</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f97316;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .page-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 20px;
+            color: #f97316;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .back-link:hover { color: #f97316; }
+
+        /* Main */
+        .main { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem; }
+
+        /* DEMO Banner */
+        .demo-banner {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ef4444;
+            font-size: 0.875rem;
+        }
+
+        .demo-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-left: 0.25rem;
+        }
+
+        /* Index Bar */
+        .index-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .index-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+
+        .index-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .index-name { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        .index-price { font-size: 1.125rem; font-weight: 700; }
+        .index-change { font-size: 0.8125rem; font-weight: 600; }
+        .index-range { font-size: 0.6875rem; color: #64748b; margin-top: 0.25rem; }
+
+        /* Sentiment Timeline */
+        .timeline-panel {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .timeline-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.75rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        .timeline-item:last-child { border-bottom: none; }
+
+        .timeline-time {
+            min-width: 140px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .timeline-move {
+            min-width: 160px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .timeline-driver {
+            flex: 1;
+            font-size: 0.8125rem;
+            color: #cbd5e1;
+        }
+
+        .timeline-sentiment-tag {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .timeline-sentiment-tag.risk-on { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .timeline-sentiment-tag.risk-off { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .timeline-sentiment-tag.mixed { background: rgba(234,179,8,0.15); color: #eab308; }
+
+        /* Model Selector */
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .model-select {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            color: #e2e8f0;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .model-select:focus { outline: none; border-color: #f97316; }
+
+        .analyze-btn {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 6px;
+            padding: 0.25rem 0.75rem;
+            color: #f97316;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .analyze-btn:hover { background: rgba(249, 115, 22, 0.25); }
+        .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .manual-btn {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            padding: 0.25rem 0.75rem;
+            color: #3b82f6;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .manual-btn:hover { background: rgba(59, 130, 246, 0.25); }
+        .manual-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Manual Editor Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-container {
+            background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+            width: 90vw; max-width: 900px; max-height: 90vh; overflow-y: auto;
+            padding: 1.5rem;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid #334155;
+        }
+        .modal-title { font-size: 1.125rem; font-weight: 600; color: #3b82f6; }
+        .modal-close {
+            background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer;
+        }
+        .modal-close:hover { color: #e2e8f0; }
+
+        .form-section { margin-bottom: 1.25rem; }
+        .form-label {
+            font-size: 0.8125rem; font-weight: 600; color: #e2e8f0;
+            margin-bottom: 0.375rem; display: block;
+        }
+        .form-sublabel { font-size: 0.6875rem; color: #64748b; margin-left: 0.5rem; font-weight: 400; }
+        .form-textarea {
+            width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px;
+            color: #e2e8f0; padding: 0.625rem; font-size: 0.8125rem; line-height: 1.6;
+            resize: vertical; font-family: inherit;
+        }
+        .form-textarea:focus { outline: none; border-color: #3b82f6; }
+        .form-input {
+            width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px;
+            color: #e2e8f0; padding: 0.375rem 0.625rem; font-size: 0.8125rem; font-family: inherit;
+        }
+        .form-input:focus { outline: none; border-color: #3b82f6; }
+        .form-select {
+            background: #1e293b; border: 1px solid #334155; border-radius: 6px;
+            color: #e2e8f0; padding: 0.375rem 0.5rem; font-size: 0.8125rem; cursor: pointer;
+        }
+
+        .issue-editor-card {
+            background: rgba(30,41,59,0.5); border: 1px solid #334155; border-radius: 8px;
+            padding: 0.75rem; margin-bottom: 0.5rem;
+        }
+        .issue-editor-row {
+            display: grid; grid-template-columns: 1fr 80px 100px 28px; gap: 0.5rem;
+            margin-bottom: 0.375rem; align-items: center;
+        }
+        .issue-editor-row:last-child { margin-bottom: 0; }
+
+        .timeline-card {
+            background: rgba(30,41,59,0.5); border: 1px solid #334155; border-radius: 8px;
+            padding: 0.75rem; margin-bottom: 0.5rem;
+        }
+        .timeline-row {
+            display: grid; grid-template-columns: 160px 1fr 80px 28px; gap: 0.5rem;
+            align-items: center;
+        }
+
+        .add-btn {
+            background: rgba(59,130,246,0.1); border: 1px dashed rgba(59,130,246,0.3);
+            border-radius: 6px; padding: 0.375rem; color: #3b82f6; cursor: pointer;
+            font-size: 0.75rem; width: 100%; text-align: center;
+        }
+        .add-btn:hover { background: rgba(59,130,246,0.2); }
+
+        .remove-btn {
+            background: none; border: none; color: #ef4444; cursor: pointer;
+            font-size: 1rem; padding: 0; line-height: 1;
+        }
+        .remove-btn:hover { color: #f87171; }
+
+        .modal-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 1rem; border-top: 1px solid #334155; margin-top: 1rem; gap: 0.75rem;
+        }
+        .save-btn {
+            background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; border-radius: 8px;
+            padding: 0.5rem 1.25rem; color: #3b82f6; font-size: 0.875rem; font-weight: 600;
+            cursor: pointer;
+        }
+        .save-btn:hover { background: rgba(59,130,246,0.3); }
+        .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .autofill-btn {
+            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px;
+            padding: 0.5rem 1rem; color: #22c55e; font-size: 0.8125rem; font-weight: 600;
+            cursor: pointer;
+        }
+        .autofill-btn:hover { background: rgba(34,197,94,0.2); }
+        .autofill-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .cancel-btn {
+            background: none; border: 1px solid #475569; border-radius: 8px;
+            padding: 0.5rem 1rem; color: #94a3b8; font-size: 0.8125rem; cursor: pointer;
+        }
+        .cancel-btn:hover { border-color: #94a3b8; color: #e2e8f0; }
+
+        .sentiment-controls {
+            display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+        }
+        .sentiment-controls input[type="range"] {
+            flex: 1; min-width: 200px; accent-color: #3b82f6;
+        }
+
+        /* Briefing Panel */
+        .briefing-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .briefing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .briefing-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f97316;
+        }
+
+        .briefing-meta {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .briefing-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Key Issues */
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .issue-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 3px solid #64748b;
+        }
+        .issue-card.high { border-left-color: #ef4444; }
+        .issue-card.medium { border-left-color: #eab308; }
+        .issue-card.low { border-left-color: #22c55e; }
+
+        .issue-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-summary {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .issue-tag {
+            font-size: 0.6875rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            background: rgba(249, 115, 22, 0.15);
+            color: #f97316;
+        }
+
+        .impact-high { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .impact-medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .impact-low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        /* Narrative */
+        .narrative-block {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        /* Sentiment Gauge */
+        .sentiment-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sentiment-label-text {
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .sentiment-bar-container {
+            flex: 1;
+            height: 8px;
+            background: #1e293b;
+            border-radius: 4px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .sentiment-bar-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #ef4444, #eab308, #22c55e);
+            opacity: 0.4;
+        }
+
+        .sentiment-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #f97316;
+            border: 2px solid white;
+            z-index: 1;
+        }
+
+        .sentiment-score-text {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        /* Sector Impact */
+        .sector-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sector-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .sector-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+        }
+
+        .sector-direction {
+            font-size: 1.25rem;
+            width: 32px;
+            text-align: center;
+        }
+
+        .sector-info { flex: 1; }
+
+        .sector-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .sector-reason {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.125rem;
+        }
+
+        .sector-confidence {
+            width: 60px;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .sector-confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .sector-item { cursor: pointer; transition: border-color 0.15s; }
+        .sector-item:hover { border-color: #475569; }
+        .sector-item.expanded { border-color: #f97316; background: rgba(30, 41, 59, 0.7); }
+
+        .industry-drilldown {
+            grid-column: 1 / -1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .industry-drilldown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .industry-drilldown-header h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f97316;
+            margin: 0;
+        }
+        .industry-drilldown-close {
+            background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1rem;
+        }
+        .industry-drilldown-close:hover { color: #e2e8f0; }
+
+        .industry-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.4rem;
+        }
+        .industry-row {
+            display: flex;
+            align-items: center;
+            padding: 0.35rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: rgba(30, 41, 59, 0.5);
+            gap: 0.5rem;
+        }
+        .industry-row:hover { background: rgba(51, 65, 85, 0.5); }
+        .industry-name { color: #cbd5e1; flex: 1; }
+        .industry-meta { color: #64748b; font-size: 0.65rem; min-width: 80px; text-align: right; }
+        .industry-change {
+            font-weight: 600;
+            min-width: 55px;
+            text-align: right;
+        }
+
+        .industry-row { cursor: pointer; }
+        .industry-row.ind-expanded { background: rgba(51, 65, 85, 0.6); border-left: 2px solid #f97316; }
+
+        .stock-drilldown {
+            grid-column: 1 / -1;
+            background: rgba(10, 15, 30, 0.9);
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-top: 0.25rem;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .stock-drilldown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .stock-drilldown-header h5 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f97316;
+            margin: 0;
+        }
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.72rem;
+        }
+        .stock-table th {
+            color: #64748b;
+            font-weight: 500;
+            text-align: right;
+            padding: 0.3rem 0.4rem;
+            border-bottom: 1px solid #1e293b;
+            white-space: nowrap;
+        }
+        .stock-table th:first-child, .stock-table td:first-child { text-align: left; }
+        .stock-table td {
+            padding: 0.35rem 0.4rem;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.4);
+            text-align: right;
+            color: #cbd5e1;
+        }
+        .stock-table tr:hover td { background: rgba(30, 41, 59, 0.5); }
+        .stock-ticker { font-weight: 600; color: #e2e8f0; text-decoration: none; }
+        .stock-ticker:hover { color: #f97316; text-decoration: underline; }
+        .stock-company { color: #94a3b8; font-size: 0.65rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .trend-bar-cell { width: 100px; }
+        .trend-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: flex-end;
+        }
+        .trend-bar {
+            height: 6px;
+            border-radius: 3px;
+            min-width: 2px;
+        }
+        .trend-bar.positive { background: linear-gradient(90deg, #065f46, #22c55e); }
+        .trend-bar.negative { background: linear-gradient(90deg, #ef4444, #7f1d1d); }
+
+        .stock-loading {
+            text-align: center;
+            padding: 1rem;
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+        .stock-empty {
+            text-align: center;
+            padding: 0.75rem;
+            color: #475569;
+            font-size: 0.72rem;
+        }
+
+        .bullish { color: #22c55e; }
+        .bearish { color: #ef4444; }
+        .neutral-dir { color: #94a3b8; }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cat-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cat-tab:hover { border-color: #f97316; color: #f97316; }
+        .cat-tab.active {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: #f97316;
+            color: #f97316;
+            font-weight: 600;
+        }
+
+        /* News List */
+        .news-list-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .news-list-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-list-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .news-count {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .news-row {
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 1.5rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+            transition: background 0.15s;
+        }
+        .news-row:hover { background: rgba(249, 115, 22, 0.05); }
+        .news-row:last-child { border-bottom: none; }
+
+        .news-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            min-width: 55px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .news-publisher {
+            font-size: 0.6875rem;
+            color: #94a3b8;
+            min-width: 90px;
+            max-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .news-title-link {
+            font-size: 0.8125rem;
+            color: #e2e8f0;
+            text-decoration: none;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .news-title-link:hover { color: #f97316; }
+
+        .news-cat-badge {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            background: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+        }
+
+        /* Loading & Empty */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        /* Fetch Button */
+        .fetch-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            white-space: nowrap;
+        }
+        .fetch-btn:hover { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; }
+        .fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .fetch-btn.fetching {
+            border-color: rgba(234, 179, 8, 0.4);
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+        }
+
+        .fetch-result {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .fetch-result.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .tabs-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Reference Info Panel */
+        .ref-panel {
+            margin-top: 1.5rem;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .ref-toggle {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            background: rgba(15, 23, 42, 0.4);
+            border: none;
+            color: #64748b;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s;
+        }
+        .ref-toggle:hover { color: #94a3b8; }
+
+        .ref-body {
+            padding: 1rem 1.25rem;
+            background: rgba(15, 23, 42, 0.2);
+            border-top: 1px solid #1e293b;
+        }
+
+        .ref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .ref-item h4 {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 0.375rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .ref-item p, .ref-item a {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            margin: 0.125rem 0;
+        }
+
+        .ref-item a {
+            color: #f97316;
+            text-decoration: none;
+        }
+        .ref-item a:hover { text-decoration: underline; }
+
+        .ref-table {
+            font-size: 0.75rem;
+            color: #64748b;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .ref-table td {
+            padding: 0.25rem 0.5rem;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+        }
+        .ref-table td:first-child {
+            color: #94a3b8;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 0.75rem 1rem; }
+            .main { padding: 1rem; }
+            .issues-grid { grid-template-columns: 1fr; }
+            .sector-grid { grid-template-columns: 1fr; }
+            .news-publisher { display: none; }
+            .ref-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── Data Source Footer ─── */
+        .ds-footer { margin: 2rem auto 1rem; max-width: 1400px; }
+        .ds-footer-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(30,41,59,0.6); border: 1px solid #334155; border-radius: 8px;
+            padding: 0.6rem 1rem; cursor: pointer; width: 100%; color: #94a3b8; font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .ds-footer-toggle:hover { background: rgba(30,41,59,0.9); }
+        .ds-footer-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.78rem; }
+        .ds-footer-table th { text-align: left; color: #64748b; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1e293b; font-weight: 500; }
+        .ds-footer-table td { padding: 0.4rem 0.6rem; color: #cbd5e1; border-bottom: 1px solid rgba(30,41,59,0.5); }
+        .ds-footer-table tr:hover td { background: rgba(51,65,85,0.3); }
+        .ds-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+        .ds-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; }
+        .ds-badge-auto { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .ds-badge-manual { background: rgba(100,116,139,0.2); color: #94a3b8; }
+        .ds-badge-static { background: rgba(100,116,139,0.2); color: #64748b; }
+        .ds-badge-ondemand { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .ds-detail-row td { padding: 0.3rem 0.6rem 0.5rem; color: #64748b; font-size: 0.72rem; border-bottom: 1px solid rgba(30,41,59,0.3); }
+        .ds-detail-row a { color: #60a5fa; text-decoration: none; }
+        .ds-detail-row a:hover { text-decoration: underline; }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // API port: override via ?port=XXXX, default 8000
+        const _qPort = new URLSearchParams(window.location.search).get('port');
+        let API_PORT = _qPort || '8000';
+        let API_BASE = `http://localhost:${API_PORT}/api/v1/news-intel`;
+
+        const CATEGORY_LABELS = {
+            all: '전체',
+            market: 'Market',
+            market_pulse: 'Pulse',
+            stock: 'Stock',
+            etf: 'ETF',
+            crypto: 'Crypto',
+        };
+
+        const SENTIMENT_COLORS = {
+            fear: '#ef4444',
+            cautious: '#f97316',
+            neutral: '#eab308',
+            optimistic: '#22c55e',
+            greed: '#10b981',
+        };
+
+        const SENTIMENT_LABELS_KO = {
+            fear: '극도의 공포',
+            cautious: '주의',
+            neutral: '중립',
+            optimistic: '낙관',
+            greed: '탐욕',
+        };
+
+        const isDemo = (source) => source === 'DEMO';
+
+        // ── 데이터 Fetcher ──
+        const fetchArticles = async (date) => {
+            try {
+                const res = await fetch(`${API_BASE}/articles?date=${date}&limit=500`);
+                if (!res.ok) return { date, total: 0, articles: [] };
+                return await res.json();
+            } catch {
+                return { date, total: 0, articles: [] };
+            }
+        };
+
+        const fetchNarrative = async (date) => {
+            try {
+                const res = await fetch(`${API_BASE}/narrative?date=${date}`);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch {
+                return null;
+            }
+        };
+
+        const fetchStocks = async (industry, date) => {
+            try {
+                const res = await fetch(`${API_BASE}/stocks?industry=${encodeURIComponent(industry)}&date=${date}`);
+                if (!res.ok) return [];
+                const data = await res.json();
+                return data.stocks || [];
+            } catch {
+                return [];
+            }
+        };
+
+        const fetchStockCoverage = async (date) => {
+            try {
+                const res = await fetch(`${API_BASE}/stocks/coverage?date=${date}`);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch {
+                return null;
+            }
+        };
+
+        const AI_API = API_BASE + '-ai';  // /api/v1/news-intel-ai
+
+        const fetchModels = async () => {
+            try {
+                const res = await fetch(`${AI_API}/models`);
+                if (!res.ok) return { models: [], default: '' };
+                return await res.json();
+            } catch {
+                return { models: [], default: '' };
+            }
+        };
+
+        const runAnalysis = async (date, model) => {
+            const params = new URLSearchParams({ date });
+            if (model) params.set('model', model);
+            const res = await fetch(`${AI_API}/analyze?${params}`, { method: 'POST' });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail?.detail || `HTTP ${res.status}`);
+            }
+            return await res.json();
+        };
+
+        const runManualBriefing = async (date) => {
+            const params = new URLSearchParams({ date });
+            const res = await fetch(`${AI_API}/manual?${params}`, { method: 'POST' });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail?.detail || `HTTP ${res.status}`);
+            }
+            return await res.json();
+        };
+
+        const fetchPrefill = async (date) => {
+            const res = await fetch(`${AI_API}/prefill?date=${date}`);
+            if (!res.ok) throw new Error('prefill failed');
+            return await res.json();
+        };
+
+        const saveManualResearch = async (date, payload) => {
+            const res = await fetch(`${AI_API}/manual-save?date=${date}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail?.detail || `HTTP ${res.status}`);
+            }
+            return await res.json();
+        };
+
+        // ── Data Sources ───────────────────────────────
+        const DATA_SOURCES = [
+            { name: "Naver Blog 수집", db_table: "naver_blog_data", collector_key: "news", type: "auto", api_url: "https://blog.naver.com/", script: "scripts/naver_blog_collector.py" },
+            { name: "뉴스 분석 결과", db_table: "news_analysis", collector_key: "news", type: "auto", script: "scripts/naver_blog_scheduler.py" },
+        ];
+
+        // ─── DataSourceFooter ─────────────────────────────────
+        const DataSourceFooter = React.memo(() => {
+            const [expanded, setExpanded] = useState(false);
+            const [status, setStatus] = useState(null);
+            const [detailIdx, setDetailIdx] = useState(null);
+
+            useEffect(() => {
+                fetch(`http://localhost:${API_PORT}/api/v1/collector/status`)
+                    .then(r => r.json()).then(setStatus).catch(() => {});
+            }, []);
+
+            const getStatusColor = (src) => {
+                if (!src.collector_key || !status?.collectors?.[src.collector_key]) {
+                    const m = { manual: '#64748b', static: '#64748b', 'on-demand': '#8b5cf6' };
+                    return m[src.type] || '#475569';
+                }
+                const c = status.collectors[src.collector_key];
+                if (!c || c.status !== 'success') return '#ef4444';
+                const hours = (Date.now() - new Date(c.created_at).getTime()) / 3600000;
+                return hours < 1 ? '#22c55e' : hours < 24 ? '#eab308' : '#ef4444';
+            };
+
+            const getLastTime = (src) => {
+                if (!src.collector_key || !status?.collectors?.[src.collector_key]) return '-';
+                const c = status.collectors[src.collector_key];
+                if (!c?.created_at) return '-';
+                return new Date(c.created_at).toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+            };
+
+            const getCount = (src) => {
+                if (!src.db_table || !status?.table_counts) return '-';
+                const count = status.table_counts[src.db_table];
+                return count != null ? count.toLocaleString() : '-';
+            };
+
+            const latestTime = DATA_SOURCES
+                .map(s => s.collector_key && status?.collectors?.[s.collector_key]?.created_at)
+                .filter(Boolean).sort().pop();
+
+            const typeBadge = (type) => {
+                const labels = { auto: '자동', manual: '수동', static: '정적', 'on-demand': '요청시' };
+                const cls = type === 'on-demand' ? 'ondemand' : type;
+                return React.createElement('span', { className: `ds-badge ds-badge-${cls}` }, labels[type] || type);
+            };
+
+            return (
+                <div className="ds-footer">
+                    <button className="ds-footer-toggle" onClick={() => setExpanded(!expanded)}>
+                        <span>
+                            {expanded ? '\u25BE' : '\u25B8'} 데이터 소스 ({DATA_SOURCES.length}개
+                            {latestTime ? ` \u00b7 마지막 수집 ${new Date(latestTime).toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })}` : ''})
+                        </span>
+                        <span style={{fontSize:'0.72rem'}}>{expanded ? '접기' : '펼치기'}</span>
+                    </button>
+                    {expanded && (
+                        <table className="ds-footer-table">
+                            <thead><tr>
+                                <th>소스</th><th>DB 테이블</th><th>건수</th><th>마지막 수집</th><th>유형</th><th>상태</th>
+                            </tr></thead>
+                            <tbody>
+                                {DATA_SOURCES.map((src, i) => (
+                                    <React.Fragment key={i}>
+                                        <tr onClick={() => setDetailIdx(detailIdx === i ? null : i)} style={{cursor:'pointer'}}>
+                                            <td>{src.name}</td>
+                                            <td><code style={{fontSize:'0.72rem',color:'#94a3b8'}}>{src.db_table || '-'}</code></td>
+                                            <td>{getCount(src)}</td>
+                                            <td>{getLastTime(src)}</td>
+                                            <td>{typeBadge(src.type)}</td>
+                                            <td><span className="ds-status-dot" style={{backgroundColor: getStatusColor(src)}}></span></td>
+                                        </tr>
+                                        {detailIdx === i && (
+                                            <tr className="ds-detail-row">
+                                                <td colSpan={6}>
+                                                    {src.api_url && <div>API: <a href={src.api_url} target="_blank" rel="noopener noreferrer">{src.api_url}</a></div>}
+                                                    {src.script && <div>Script: <code>{src.script}</code></div>}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            );
+        });
+
+        // ── Index Display ──
+        const IndexBar = ({ indices }) => {
+            if (!indices || indices.length === 0) return null;
+            return (
+                <div className="index-bar">
+                    {indices.map((idx, i) => {
+                        const isUp = idx.change >= 0;
+                        const color = isUp ? '#22c55e' : '#ef4444';
+                        const sign = isUp ? '+' : '';
+                        return (
+                            <div className="index-card" key={i}>
+                                <div className="index-card-header">
+                                    <span className="index-name">{idx.name}</span>
+                                    <span className="index-change" style={{color}}>
+                                        {sign}{idx.change_pct}%
+                                    </span>
+                                </div>
+                                <div className="index-price" style={{color}}>
+                                    {idx.current?.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+                                </div>
+                                <div className="index-range">
+                                    {sign}{idx.change?.toLocaleString(undefined, {minimumFractionDigits:2})} | L {idx.day_low?.toLocaleString()} — H {idx.day_high?.toLocaleString()}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        };
+
+        // ── Sentiment Timeline ──
+        const SentimentTimeline = ({ timeline }) => {
+            if (!timeline || timeline.length === 0) return null;
+            return (
+                <div className="timeline-panel">
+                    <div className="timeline-title">Intraday Sentiment Timeline</div>
+                    {timeline.map((t, i) => (
+                        <div className="timeline-item" key={i}>
+                            <span className="timeline-time">{t.time_period}</span>
+                            <span className="timeline-move">{t.market_move}</span>
+                            <span className="timeline-driver">{t.sentiment_driver}</span>
+                            <span className={`timeline-sentiment-tag ${t.sentiment || 'mixed'}`}>
+                                {t.sentiment === 'risk-on' ? 'Risk-On' : t.sentiment === 'risk-off' ? 'Risk-Off' : 'Mixed'}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // ── Market Summary ──
+        const MarketSummary = ({ text }) => {
+            if (!text) return null;
+            return (
+                <div className="narrative-block" style={{borderLeft:'3px solid #3b82f6', marginBottom:'1rem'}}>
+                    <div style={{fontSize:'0.8125rem',fontWeight:600,color:'#3b82f6',marginBottom:'0.5rem'}}>
+                        US Market Summary
+                    </div>
+                    {text}
+                </div>
+            );
+        };
+
+        // ── Sentiment Gauge ──
+        const SentimentGauge = ({ score, label }) => {
+            const pct = ((score + 1) / 2) * 100; // -1~1 → 0~100%
+            const color = SENTIMENT_COLORS[label] || '#eab308';
+            const labelKo = SENTIMENT_LABELS_KO[label] || label;
+
+            return (
+                <div className="sentiment-row">
+                    <span className="sentiment-label-text" style={{ color }}>{labelKo}</span>
+                    <div className="sentiment-bar-container">
+                        <div className="sentiment-bar-gradient" />
+                        <div className="sentiment-marker" style={{ left: `${pct}%`, background: color }} />
+                    </div>
+                    <span className="sentiment-score-text">{score > 0 ? '+' : ''}{score.toFixed(2)}</span>
+                </div>
+            );
+        };
+
+        // ── Key Issue Card ──
+        const IssueCard = ({ issue }) => (
+            <div className={`issue-card ${issue.impact || ''}`}>
+                <div className="issue-title">{issue.title}</div>
+                <div className="issue-summary">{issue.summary}</div>
+                <div className="issue-meta">
+                    <span className={`issue-tag impact-${issue.impact || 'low'}`}>
+                        {issue.impact === 'high' ? 'HIGH' : issue.impact === 'medium' ? 'MED' : 'LOW'}
+                    </span>
+                    {issue.category && <span className="issue-tag">{issue.category}</span>}
+                </div>
+            </div>
+        );
+
+        // ── Sector Impact Item (클릭 → 인더스트리 drill-down) ──
+        const SectorItem = ({ sector, isExpanded, onToggle }) => {
+            const dirClass = sector.direction === 'bullish' ? 'bullish'
+                : sector.direction === 'bearish' ? 'bearish' : 'neutral-dir';
+            const icon = sector.direction === 'bullish' ? '▲'
+                : sector.direction === 'bearish' ? '▼' : '─';
+            const barColor = sector.direction === 'bullish' ? '#22c55e'
+                : sector.direction === 'bearish' ? '#ef4444' : '#64748b';
+            const changePct = sector.change_pct != null ? sector.change_pct : null;
+            const changeStr = changePct != null
+                ? `${changePct > 0 ? '+' : ''}${changePct.toFixed(2)}%`
+                : '';
+
+            return (
+                <div className={`sector-item ${isExpanded ? 'expanded' : ''}`} onClick={onToggle}>
+                    <span className={`sector-direction ${dirClass}`}>{icon}</span>
+                    <div className="sector-info">
+                        <div className="sector-name">
+                            {sector.sector}
+                            {changeStr && (
+                                <span style={{
+                                    marginLeft: '0.5rem',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    color: changePct > 0 ? '#22c55e' : changePct < 0 ? '#ef4444' : '#94a3b8'
+                                }}>
+                                    {changeStr}
+                                </span>
+                            )}
+                        </div>
+                        <div className="sector-reason">{sector.reason}</div>
+                    </div>
+                    <div className="sector-confidence" title={`${Math.round((sector.confidence || 0) * 100)}%`}>
+                        <div
+                            className="sector-confidence-fill"
+                            style={{ width: `${(sector.confidence || 0) * 100}%`, background: barColor }}
+                        />
+                    </div>
+                </div>
+            );
+        };
+
+        // ── Trend Bar (1Y performance visual) ──
+        const TrendBar = ({ value }) => {
+            if (value == null) return <span style={{color:'#475569'}}>—</span>;
+            const maxW = 60;
+            const clamped = Math.max(-200, Math.min(200, value));
+            const w = Math.max(2, Math.abs(clamped) / 200 * maxW);
+            const cls = value >= 0 ? 'positive' : 'negative';
+            const label = `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+            const color = value >= 0 ? '#22c55e' : '#ef4444';
+            return (
+                <div className="trend-bar-wrap">
+                    <span style={{color, fontSize:'0.65rem', minWidth:42, textAlign:'right'}}>{label}</span>
+                    <div className={`trend-bar ${cls}`} style={{width: w}} title={label}></div>
+                </div>
+            );
+        };
+
+        // ── Stock Drill-down Table ──
+        const StockDrilldown = ({ industryName, stocks, loading, onClose }) => {
+            if (loading) return <div className="stock-drilldown"><div className="stock-loading">Loading stocks...</div></div>;
+            if (!stocks || stocks.length === 0) return <div className="stock-drilldown"><div className="stock-empty">No stock data collected yet for this industry.</div></div>;
+            return (
+                <div className="stock-drilldown">
+                    <div className="stock-drilldown-header">
+                        <h5>{industryName} Stocks ({stocks.length})</h5>
+                        <button className="industry-drilldown-close" onClick={onClose}>✕</button>
+                    </div>
+                    <table className="stock-table">
+                        <thead>
+                            <tr>
+                                <th style={{textAlign:'left'}}>Ticker</th>
+                                <th style={{textAlign:'left'}}>Company</th>
+                                <th>Price</th>
+                                <th>Day %</th>
+                                <th>Week</th>
+                                <th>Month</th>
+                                <th>YTD</th>
+                                <th className="trend-bar-cell">1Y Trend</th>
+                                <th>Mkt Cap</th>
+                                <th>P/E</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {stocks.map((s, i) => {
+                                const dayPct = s.change_pct;
+                                const dayStr = dayPct != null ? `${dayPct > 0 ? '+' : ''}${dayPct.toFixed(2)}%` : '—';
+                                const dayColor = dayPct > 0 ? '#22c55e' : dayPct < 0 ? '#ef4444' : '#94a3b8';
+                                const fmtPct = (v) => v != null ? `${v > 0 ? '+' : ''}${v.toFixed(1)}%` : '—';
+                                const pctColor = (v) => v > 0 ? '#22c55e' : v < 0 ? '#ef4444' : '#94a3b8';
+                                return (
+                                    <tr key={s.ticker || i}>
+                                        <td><a className="stock-ticker" href={`https://finviz.com/quote.ashx?t=${s.ticker}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>{s.ticker}</a></td>
+                                        <td><span className="stock-company" title={s.company}>{s.company}</span></td>
+                                        <td>{s.price != null ? `$${s.price.toLocaleString()}` : '—'}</td>
+                                        <td style={{color: dayColor, fontWeight: 600}}>{dayStr}</td>
+                                        <td style={{color: pctColor(s.perf_week)}}>{fmtPct(s.perf_week)}</td>
+                                        <td style={{color: pctColor(s.perf_month)}}>{fmtPct(s.perf_month)}</td>
+                                        <td style={{color: pctColor(s.perf_ytd)}}>{fmtPct(s.perf_ytd)}</td>
+                                        <td className="trend-bar-cell"><TrendBar value={s.perf_year} /></td>
+                                        <td style={{color:'#94a3b8'}}>{s.market_cap || '—'}</td>
+                                        <td style={{color:'#94a3b8'}}>{s.pe_ratio != null ? s.pe_ratio.toFixed(1) : '—'}</td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        };
+
+        // ── Industry Drill-down Panel ──
+        const IndustryDrilldown = ({ sectorName, industries, date, onClose }) => {
+            const [expandedInd, setExpandedInd] = useState(null);
+            const [stockData, setStockData] = useState([]);
+            const [stockLoading, setStockLoading] = useState(false);
+
+            const handleIndClick = async (indName) => {
+                if (expandedInd === indName) {
+                    setExpandedInd(null);
+                    setStockData([]);
+                    return;
+                }
+                setExpandedInd(indName);
+                setStockLoading(true);
+                const stocks = await fetchStocks(indName, date);
+                setStockData(stocks);
+                setStockLoading(false);
+            };
+
+            return (
+                <div className="industry-drilldown">
+                    <div className="industry-drilldown-header">
+                        <h4>{sectorName} Industries ({industries.length}) <span style={{fontSize:'0.7rem',color:'#64748b',fontWeight:400}}>— click industry for stocks</span></h4>
+                        <button className="industry-drilldown-close" onClick={onClose}>✕</button>
+                    </div>
+                    <div className="industry-list">
+                        {industries.map((ind, i) => {
+                            const pct = ind.change_pct;
+                            const pctStr = pct != null ? `${pct > 0 ? '+' : ''}${pct.toFixed(2)}%` : '—';
+                            const pctColor = pct > 0 ? '#22c55e' : pct < 0 ? '#ef4444' : '#94a3b8';
+                            const meta = [ind.market_cap, ind.pe_ratio ? `PE ${ind.pe_ratio}` : null].filter(Boolean).join(' · ');
+                            const isExp = expandedInd === ind.industry;
+                            return (
+                                <React.Fragment key={i}>
+                                    <div
+                                        className={`industry-row ${isExp ? 'ind-expanded' : ''}`}
+                                        onClick={() => handleIndClick(ind.industry)}
+                                        title="Click to see stocks"
+                                    >
+                                        <span className="industry-name">{ind.industry}</span>
+                                        {meta && <span className="industry-meta">{meta}</span>}
+                                        <span className="industry-change" style={{color: pctColor}}>{pctStr}</span>
+                                    </div>
+                                    {isExp && (
+                                        <StockDrilldown
+                                            industryName={ind.industry}
+                                            stocks={stockData}
+                                            loading={stockLoading}
+                                            onClose={() => { setExpandedInd(null); setStockData([]); }}
+                                        />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        // ── News Row ──
+        const NewsRow = ({ article }) => {
+            const time = article.published_at
+                ? new Date(article.published_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+                : '--:--';
+
+            return (
+                <div className="news-row">
+                    <span className="news-time">{time}</span>
+                    <span className="news-publisher">{article.publisher || article.source}</span>
+                    <a className="news-title-link" href={article.url} target="_blank" rel="noopener noreferrer">
+                        {article.title}
+                    </a>
+                    {isDemo(article.source) && <span className="demo-badge">DEMO</span>}
+                    <span className="news-cat-badge">{article.category}</span>
+                </div>
+            );
+        };
+
+        // ── Reference Info Panel ──
+        const ReferencePanel = () => {
+            const [open, setOpen] = useState(false);
+            return (
+                <div className="ref-panel">
+                    <button className="ref-toggle" onClick={() => setOpen(!open)}>
+                        <span>Data Source & Table Reference</span>
+                        <span>{open ? '▲' : '▼'}</span>
+                    </button>
+                    {open && (
+                        <div className="ref-body">
+                            <div className="ref-grid">
+                                <div className="ref-item">
+                                    <h4>Data Source</h4>
+                                    <p><a href="https://finviz.com/news.ashx" target="_blank" rel="noopener noreferrer">Finviz News</a></p>
+                                    <p style={{fontSize:'0.75rem',color:'#64748b'}}>5 categories: Market, Market Pulse, Stock, ETF, Crypto</p>
+                                    <p style={{fontSize:'0.75rem',color:'#64748b',marginTop:'0.25rem'}}>HTML parsing via BeautifulSoup + requests</p>
+                                </div>
+                                <div className="ref-item">
+                                    <h4>DB Tables</h4>
+                                    <table className="ref-table">
+                                        <tbody>
+                                            <tr><td>news_articles</td><td>뉴스 기사 저장 (source, category, title, url, publisher, published_at)</td></tr>
+                                            <tr><td>market_narratives</td><td>AI 분석 결과 (key_issues, narrative, sector_impact, sentiment)</td></tr>
+                                            <tr><td>sector_performances</td><td>섹터별 일간 퍼포먼스 (change_pct, market_cap, P/E, volume)</td></tr>
+                                            <tr><td>industry_performances</td><td>인더스트리별 일간 퍼포먼스 (섹터 매핑, 144 industries)</td></tr>
+                                            <tr><td>industry_stocks</td><td>인더스트리별 개별 종목 (price, day%, week/month/YTD/1Y perf, PE, mkt cap)</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="ref-item">
+                                    <h4>API Endpoints</h4>
+                                    <table className="ref-table">
+                                        <tbody>
+                                            <tr><td>GET /news-intel/articles</td><td>기사 목록 (category, date, limit)</td></tr>
+                                            <tr><td>GET /news-intel/narrative</td><td>AI 내러티브 (date)</td></tr>
+                                            <tr><td>POST /news-intel/fetch</td><td>실시간 Finviz 파싱</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="ref-item">
+                                    <h4>Scripts</h4>
+                                    <table className="ref-table">
+                                        <tbody>
+                                            <tr><td>run_news.py</td><td>배치 실행 (파싱 + AI 분석)</td></tr>
+                                            <tr><td>finviz_fetch.py</td><td>Finviz HTML 파서</td></tr>
+                                            <tr><td>narrative_analyzer.py</td><td>Claude Sonnet AI 분석</td></tr>
+                                            <tr><td>seed_data.py</td><td>DEMO 시드 데이터</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ── Manual Briefing Editor Modal ──
+        const SENTIMENT_OPTIONS = [
+            { value: '공포', label: '공포 (Fear)' },
+            { value: '경계', label: '경계 (Cautious)' },
+            { value: 'cautious-optimistic', label: 'Cautious-Optimistic' },
+            { value: '중립', label: '중립 (Neutral)' },
+            { value: '낙관', label: '낙관 (Optimistic)' },
+        ];
+        const IMPACT_OPTIONS = ['high', 'medium', 'low'];
+        const TIMELINE_SENTIMENTS = ['risk-on', 'mixed', 'risk-off'];
+
+        const ManualBriefingModal = ({ date, onClose, onSaved }) => {
+            const [saving, setSaving] = useState(false);
+            const [loading, setLoading] = useState(true);
+            const [autoFilling, setAutoFilling] = useState(false);
+            const [narrative, setNarrative] = useState('');
+            const [marketSummary, setMarketSummary] = useState('');
+            const [sentimentScore, setSentimentScore] = useState(0);
+            const [sentimentLabel, setSentimentLabel] = useState('중립');
+            const [keyIssues, setKeyIssues] = useState([]);
+            const [timeline, setTimeline] = useState([]);
+            const [sourceInfo, setSourceInfo] = useState('');
+
+            // 초기 로드: DB에서 기존 데이터 가져오기
+            useEffect(() => {
+                (async () => {
+                    try {
+                        const data = await fetchPrefill(date);
+                        setNarrative(data.narrative || '');
+                        setMarketSummary(data.market_summary || '');
+                        setSentimentScore(data.sentiment_score || 0);
+                        setSentimentLabel(data.sentiment_label || '중립');
+                        setKeyIssues(data.key_issues || []);
+                        setTimeline(data.sentiment_timeline || []);
+                        setSourceInfo(data.source === 'db' ? `기존 데이터 (${data.generated_by})` : '새 브리핑');
+                    } catch { setSourceInfo('로드 실패'); }
+                    setLoading(false);
+                })();
+            }, [date]);
+
+            // 자동 채우기: GET /autofill (DB 저장 없이 데이터만 생성)
+            const handleAutoFill = async () => {
+                setAutoFilling(true);
+                try {
+                    const res = await fetch(`${AI_API}/autofill?date=${date}`);
+                    if (!res.ok) throw new Error('autofill failed');
+                    const data = await res.json();
+                    setNarrative(data.narrative || '');
+                    setMarketSummary(data.market_summary || '');
+                    setSentimentScore(data.sentiment_score || 0);
+                    setSentimentLabel(data.sentiment_label || '중립');
+                    setKeyIssues(data.key_issues || []);
+                    setTimeline(data.sentiment_timeline || []);
+                    setSourceInfo('자동 채우기 완료 (편집 후 저장하세요)');
+                } catch (e) {
+                    setSourceInfo(`자동 채우기 실패: ${e.message}`);
+                }
+                setAutoFilling(false);
+            };
+
+            // 저장
+            const handleSave = async () => {
+                setSaving(true);
+                try {
+                    const payload = {
+                        key_issues: keyIssues,
+                        narrative,
+                        market_summary: marketSummary,
+                        sentiment_timeline: timeline,
+                        sentiment_score: sentimentScore,
+                        sentiment_label: sentimentLabel,
+                    };
+                    await saveManualResearch(date, payload);
+                    onSaved();
+                } catch (e) {
+                    alert(`저장 실패: ${e.message}`);
+                }
+                setSaving(false);
+            };
+
+            // Issue helpers
+            const addIssue = () => setKeyIssues([...keyIssues, { title: '', summary: '', impact: 'medium', category: '' }]);
+            const removeIssue = (i) => setKeyIssues(keyIssues.filter((_, idx) => idx !== i));
+            const updateIssue = (i, field, val) => {
+                const copy = [...keyIssues];
+                copy[i] = { ...copy[i], [field]: val };
+                setKeyIssues(copy);
+            };
+
+            // Timeline helpers
+            const addTimeline = () => setTimeline([...timeline, { time_period: '', market_move: '', sentiment_driver: '', sentiment: 'mixed' }]);
+            const removeTimeline = (i) => setTimeline(timeline.filter((_, idx) => idx !== i));
+            const updateTimeline = (i, field, val) => {
+                const copy = [...timeline];
+                copy[i] = { ...copy[i], [field]: val };
+                setTimeline(copy);
+            };
+
+            if (loading) {
+                return (
+                    <div className="modal-overlay" onClick={onClose}>
+                        <div className="modal-container" onClick={e => e.stopPropagation()}>
+                            <div className="loading">데이터를 불러오는 중...</div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-container" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div>
+                                <span className="modal-title">수동 리서치 브리핑 편집</span>
+                                <span style={{fontSize:'0.75rem',color:'#64748b',marginLeft:'0.75rem'}}>{date} | {sourceInfo}</span>
+                            </div>
+                            <button className="modal-close" onClick={onClose}>✕</button>
+                        </div>
+
+                        {/* 핵심 이슈 */}
+                        <div className="form-section">
+                            <label className="form-label">
+                                핵심 이슈 ({keyIssues.length}건)
+                                <span className="form-sublabel">제목, 요약, 영향도, 카테고리</span>
+                            </label>
+                            {keyIssues.map((issue, i) => (
+                                <div className="issue-editor-card" key={i}>
+                                    <div className="issue-editor-row">
+                                        <input className="form-input" placeholder="제목" value={issue.title}
+                                            onChange={e => updateIssue(i, 'title', e.target.value)} />
+                                        <select className="form-select" value={issue.impact}
+                                            onChange={e => updateIssue(i, 'impact', e.target.value)}>
+                                            {IMPACT_OPTIONS.map(v => <option key={v} value={v}>{v.toUpperCase()}</option>)}
+                                        </select>
+                                        <input className="form-input" placeholder="카테고리" value={issue.category || ''}
+                                            onChange={e => updateIssue(i, 'category', e.target.value)} />
+                                        <button className="remove-btn" onClick={() => removeIssue(i)}>✕</button>
+                                    </div>
+                                    <textarea className="form-textarea" rows={2} placeholder="요약 내용..."
+                                        value={issue.summary} onChange={e => updateIssue(i, 'summary', e.target.value)} />
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={addIssue}>+ 이슈 추가</button>
+                        </div>
+
+                        {/* 내러티브 */}
+                        <div className="form-section">
+                            <label className="form-label">내러티브 <span className="form-sublabel">시장 전체 흐름 서술</span></label>
+                            <textarea className="form-textarea" rows={6} placeholder="오늘 시장 전체 흐름을 서술하세요..."
+                                value={narrative} onChange={e => setNarrative(e.target.value)} />
+                        </div>
+
+                        {/* 시장 요약 */}
+                        <div className="form-section">
+                            <label className="form-label">시장 요약 <span className="form-sublabel">지수, 주요 종목, 장중 흐름</span></label>
+                            <textarea className="form-textarea" rows={5} placeholder="S&P 500, NASDAQ, DOW 종가 및 장중 흐름..."
+                                value={marketSummary} onChange={e => setMarketSummary(e.target.value)} />
+                        </div>
+
+                        {/* 센티먼트 */}
+                        <div className="form-section">
+                            <label className="form-label">투자 심리</label>
+                            <div className="sentiment-controls">
+                                <select className="form-select" value={sentimentLabel}
+                                    onChange={e => setSentimentLabel(e.target.value)}>
+                                    {SENTIMENT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                </select>
+                                <span style={{fontSize:'0.75rem',color:'#64748b'}}>점수:</span>
+                                <input type="range" min="-1" max="1" step="0.01" value={sentimentScore}
+                                    onChange={e => setSentimentScore(parseFloat(e.target.value))} />
+                                <span style={{fontSize:'0.8125rem',color:'#e2e8f0',fontWeight:600,minWidth:40}}>
+                                    {sentimentScore > 0 ? '+' : ''}{sentimentScore.toFixed(2)}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* 센티먼트 타임라인 */}
+                        <div className="form-section">
+                            <label className="form-label">
+                                센티먼트 타임라인 ({timeline.length}구간)
+                                <span className="form-sublabel">장중 시간대별 심리 변화</span>
+                            </label>
+                            {timeline.map((t, i) => (
+                                <div className="timeline-card" key={i}>
+                                    <div className="timeline-row" style={{marginBottom:'0.375rem'}}>
+                                        <input className="form-input" placeholder="시간대 (09:30-11:00 ET)"
+                                            value={t.time_period} onChange={e => updateTimeline(i, 'time_period', e.target.value)} />
+                                        <input className="form-input" placeholder="S&P +0.4%, NASDAQ +0.6%"
+                                            value={t.market_move} onChange={e => updateTimeline(i, 'market_move', e.target.value)} />
+                                        <select className="form-select" value={t.sentiment}
+                                            onChange={e => updateTimeline(i, 'sentiment', e.target.value)}>
+                                            {TIMELINE_SENTIMENTS.map(v => <option key={v} value={v}>{v}</option>)}
+                                        </select>
+                                        <button className="remove-btn" onClick={() => removeTimeline(i)}>✕</button>
+                                    </div>
+                                    <textarea className="form-textarea" rows={2} placeholder="해당 시간대 심리 드라이버..."
+                                        value={t.sentiment_driver} onChange={e => updateTimeline(i, 'sentiment_driver', e.target.value)} />
+                                </div>
+                            ))}
+                            <button className="add-btn" onClick={addTimeline}>+ 타임라인 구간 추가</button>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="modal-footer">
+                            <div style={{display:'flex',gap:'0.5rem'}}>
+                                <button className="autofill-btn" onClick={handleAutoFill} disabled={autoFilling}>
+                                    {autoFilling ? '수집 중...' : '자동 채우기'}
+                                </button>
+                                <button className="cancel-btn" onClick={onClose}>취소</button>
+                            </div>
+                            <button className="save-btn" onClick={handleSave} disabled={saving}>
+                                {saving ? '저장 중...' : 'manual-research 저장'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ── Main App ──
+        const NewsIntelligence = () => {
+            // KST 기준 날짜 (UTC+9) — 한국 사용자를 위해 로컬 타임존 사용
+            const now = new Date();
+            const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const [date, setDate] = useState(today);
+            const [articles, setArticles] = useState([]);
+            const [narrative, setNarrative] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [activeTab, setActiveTab] = useState('all');
+            const [fetching, setFetching] = useState(false);
+            const [fetchResult, setFetchResult] = useState(null);
+            const [expandedSector, setExpandedSector] = useState(null);
+            const [industryData, setIndustryData] = useState([]);
+            const [stockCoverage, setStockCoverage] = useState(null);
+            const [models, setModels] = useState([]);
+            const [selectedModel, setSelectedModel] = useState('');
+            const [analyzing, setAnalyzing] = useState(false);
+            const [analyzeResult, setAnalyzeResult] = useState(null);
+            const [manualResult, setManualResult] = useState(null);
+            const [showManualModal, setShowManualModal] = useState(false);
+
+            const loadData = useCallback(async () => {
+                setLoading(true);
+                const [artData, narData, covData, mdlData] = await Promise.all([
+                    fetchArticles(date),
+                    fetchNarrative(date),
+                    fetchStockCoverage(date),
+                    fetchModels(),
+                ]);
+                setArticles(artData.articles || []);
+                setNarrative(narData);
+                setStockCoverage(covData);
+                if (mdlData.models?.length > 0) {
+                    setModels(mdlData.models);
+                    if (!selectedModel) setSelectedModel(mdlData.default || mdlData.models[0]?.id || '');
+                }
+                setLoading(false);
+            }, [date]);
+
+            useEffect(() => { loadData(); }, [loadData]);
+            useEffect(() => { if (window.lucide) lucide.createIcons(); });
+
+            const filteredArticles = useMemo(() => {
+                if (activeTab === 'all') return articles;
+                return articles.filter(a => a.category === activeTab);
+            }, [articles, activeTab]);
+
+            const categoryCounts = useMemo(() => {
+                const counts = { all: articles.length };
+                articles.forEach(a => {
+                    counts[a.category] = (counts[a.category] || 0) + 1;
+                });
+                return counts;
+            }, [articles]);
+
+            const demoCount = useMemo(() => articles.filter(a => isDemo(a.source)).length, [articles]);
+
+            const handleFetch = useCallback(async () => {
+                setFetching(true);
+                setFetchResult(null);
+                try {
+                    const res = await fetch(`${API_BASE}/fetch`, { method: 'POST' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    setFetchResult({ ok: true, msg: `${data.total_fetched}건 수집, ${data.total_saved}건 저장, ${data.total_skipped}건 중복` });
+                    await loadData();
+                } catch (e) {
+                    setFetchResult({ ok: false, msg: `파싱 실패: ${e.message}` });
+                } finally {
+                    setFetching(false);
+                }
+            }, [loadData]);
+
+            const handleAnalyze = useCallback(async () => {
+                setAnalyzing(true);
+                setAnalyzeResult(null);
+                try {
+                    const result = await runAnalysis(date, selectedModel);
+                    setAnalyzeResult({ ok: true, msg: `분석 완료: ${result.sentiment} (${result.key_issues} issues)` });
+                    await loadData();
+                } catch (e) {
+                    setAnalyzeResult({ ok: false, msg: `분석 실패: ${e.message}` });
+                } finally {
+                    setAnalyzing(false);
+                }
+            }, [date, selectedModel, loadData]);
+
+            // handleManualBriefing는 모달 방식으로 대체됨
+
+            return (
+                <div className="container">
+                    <header className="header">
+                        <div className="header-content">
+                            <div className="header-left">
+                                <div className="logo">
+                                    <div className="logo-icon"><i data-lucide="newspaper" style={{width:20,height:20}}></i></div>
+                                    News Intelligence
+                                </div>
+                                <span className="page-badge">Stock Research ONE</span>
+                            </div>
+                            <div style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+                                <input
+                                    type="date"
+                                    value={date}
+                                    onChange={e => setDate(e.target.value)}
+                                    style={{background:'#1e293b',border:'1px solid #334155',borderRadius:6,padding:'0.375rem 0.5rem',color:'#e2e8f0',fontSize:'0.8125rem'}}
+                                />
+                                <button
+                                    onClick={loadData}
+                                    style={{background:'rgba(249,115,22,0.15)',border:'1px solid rgba(249,115,22,0.3)',borderRadius:6,padding:'0.375rem 0.75rem',color:'#f97316',fontSize:'0.8125rem',cursor:'pointer'}}
+                                >
+                                    새로고침
+                                </button>
+                                <a href="index.html" className="back-link">← 대시보드</a>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="main">
+                        {demoCount > 0 && (
+                            <div className="demo-banner">
+                                ⚠ DEMO 데이터 {demoCount}건이 포함되어 있습니다. 실제 데이터 수집 후 자동 교체됩니다.
+                            </div>
+                        )}
+
+                        {loading ? (
+                            <div className="loading">데이터를 불러오는 중...</div>
+                        ) : (
+                            <>
+                                {/* AI Briefing Panel */}
+                                <div className="briefing-panel">
+                                    <div className="briefing-header">
+                                        <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}>
+                                            <span className="briefing-title">AI Market Briefing</span>
+                                            <span className="briefing-meta">
+                                                {narrative ? `${narrative.article_count}건 분석` : '분석 결과 없음'}
+                                                {narrative && narrative.generated_by === 'DEMO' && <span className="demo-badge">DEMO</span>}
+                                            </span>
+                                        </div>
+                                        <div className="briefing-controls">
+                                            {narrative && narrative.model_used && (
+                                                <span style={{fontSize:'0.6875rem',color:'#64748b',padding:'0.125rem 0.5rem',background:'rgba(51,65,85,0.3)',borderRadius:4}}>
+                                                    {models.find(m => m.id === narrative.model_used)?.label || narrative.model_used}
+                                                </span>
+                                            )}
+                                            <div className="model-selector">
+                                                <select
+                                                    className="model-select"
+                                                    value={selectedModel}
+                                                    onChange={e => setSelectedModel(e.target.value)}
+                                                >
+                                                    {models.map(m => (
+                                                        <option key={m.id} value={m.id}>
+                                                            {m.label} ({m.tier})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    className="analyze-btn"
+                                                    onClick={handleAnalyze}
+                                                    disabled={analyzing}
+                                                >
+                                                    {analyzing ? 'Analyzing...' : 'AI Analyze'}
+                                                </button>
+                                                <button
+                                                    className="manual-btn"
+                                                    onClick={() => setShowManualModal(true)}
+                                                    disabled={analyzing}
+                                                    title="수동 리서치 브리핑 편집/저장 (manual-research)"
+                                                >
+                                                    수동 브리핑
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {analyzeResult && (
+                                        <div style={{
+                                            fontSize:'0.75rem',
+                                            padding:'0.5rem 0.75rem',
+                                            marginBottom:'0.75rem',
+                                            borderRadius:6,
+                                            background: analyzeResult.ok ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                                            border: `1px solid ${analyzeResult.ok ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                                            color: analyzeResult.ok ? '#22c55e' : '#ef4444',
+                                        }}>
+                                            {analyzeResult.msg}
+                                        </div>
+                                    )}
+
+                                    {manualResult && (
+                                        <div style={{
+                                            fontSize:'0.75rem',
+                                            padding:'0.5rem 0.75rem',
+                                            marginBottom:'0.75rem',
+                                            borderRadius:6,
+                                            background: manualResult.ok ? 'rgba(59,130,246,0.1)' : 'rgba(239,68,68,0.1)',
+                                            border: `1px solid ${manualResult.ok ? 'rgba(59,130,246,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                                            color: manualResult.ok ? '#3b82f6' : '#ef4444',
+                                        }}>
+                                            {manualResult.msg}
+                                        </div>
+                                    )}
+
+                                    {/* US Index Bar */}
+                                    {narrative && narrative.index_data && narrative.index_data.indices && (
+                                        <IndexBar indices={narrative.index_data.indices} />
+                                    )}
+
+                                    {narrative ? (
+                                        <>
+                                            {/* Market Summary (NEW) */}
+                                            {narrative.index_data && narrative.index_data.market_summary && (
+                                                <MarketSummary text={narrative.index_data.market_summary} />
+                                            )}
+
+                                            {/* Sentiment Timeline (NEW) */}
+                                            {narrative.index_data && narrative.index_data.sentiment_timeline && (
+                                                <SentimentTimeline timeline={narrative.index_data.sentiment_timeline} />
+                                            )}
+
+                                            {/* Key Issues */}
+                                            {narrative.key_issues && narrative.key_issues.length > 0 && (
+                                                <div className="issues-grid">
+                                                    {narrative.key_issues.map((issue, i) => (
+                                                        <IssueCard key={i} issue={issue} />
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Narrative */}
+                                            {narrative.narrative && (
+                                                <div className="narrative-block">{narrative.narrative}</div>
+                                            )}
+
+                                            {/* Sentiment */}
+                                            {narrative.sentiment && (
+                                                <SentimentGauge
+                                                    score={narrative.sentiment.score || 0}
+                                                    label={narrative.sentiment.label || 'neutral'}
+                                                />
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="empty-state">
+                                            해당 날짜의 분석 결과가 없습니다.<br/>
+                                            <span style={{fontSize:'0.75rem',color:'#64748b'}}>
+                                                'AI Analyze' (AI 분석) 또는 '수동 브리핑' (규칙 기반) 버튼을 클릭하세요.
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Sector Impact */}
+                                {narrative && narrative.sector_impact && narrative.sector_impact.length > 0 && (
+                                    <div className="sector-panel">
+                                        <div className="sector-title" style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                                            <div style={{display:'flex',alignItems:'center',gap:'0.6rem'}}>
+                                                <span>Sector Impact Matrix</span>
+                                                <a href="https://finviz.com/groups.ashx?g=sector&v=210&o=name&st=d1"
+                                                   target="_blank" rel="noopener noreferrer"
+                                                   style={{fontSize:'0.7rem',color:'#94a3b8',textDecoration:'none',display:'inline-flex',alignItems:'center',gap:'0.2rem'}}
+                                                   onMouseOver={(e)=>e.currentTarget.style.color='#f97316'}
+                                                   onMouseOut={(e)=>e.currentTarget.style.color='#94a3b8'}>
+                                                    <i data-lucide="external-link" style={{width:12,height:12}}></i>
+                                                    Finviz
+                                                </a>
+                                            </div>
+                                            {stockCoverage && (
+                                                <span style={{
+                                                    fontSize:'0.7rem',
+                                                    padding:'0.2rem 0.6rem',
+                                                    borderRadius:12,
+                                                    background: stockCoverage.coverage_pct >= 100
+                                                        ? 'rgba(34,197,94,0.15)'
+                                                        : stockCoverage.coverage_pct > 0
+                                                        ? 'rgba(249,115,22,0.15)'
+                                                        : 'rgba(100,116,139,0.15)',
+                                                    border: `1px solid ${
+                                                        stockCoverage.coverage_pct >= 100
+                                                        ? 'rgba(34,197,94,0.4)'
+                                                        : stockCoverage.coverage_pct > 0
+                                                        ? 'rgba(249,115,22,0.4)'
+                                                        : 'rgba(100,116,139,0.3)'
+                                                    }`,
+                                                    color: stockCoverage.coverage_pct >= 100
+                                                        ? '#22c55e'
+                                                        : stockCoverage.coverage_pct > 0
+                                                        ? '#f97316'
+                                                        : '#64748b',
+                                                    fontWeight:600,
+                                                    whiteSpace:'nowrap',
+                                                }}>
+                                                    {stockCoverage.coverage_pct >= 100 ? '\u2714 ' : ''}
+                                                    종목정보 {stockCoverage.coverage_pct}%
+                                                    <span style={{fontWeight:400,opacity:0.7,marginLeft:4}}>
+                                                        ({stockCoverage.collected_industries}/{stockCoverage.total_industries})
+                                                    </span>
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="sector-grid">
+                                            {[...narrative.sector_impact].sort((a, b) => (b.change_pct || 0) - (a.change_pct || 0)).map((s, i) => (
+                                                <React.Fragment key={i}>
+                                                    <SectorItem
+                                                        sector={s}
+                                                        isExpanded={expandedSector === s.sector}
+                                                        onToggle={async () => {
+                                                            if (expandedSector === s.sector) {
+                                                                setExpandedSector(null);
+                                                                setIndustryData([]);
+                                                            } else {
+                                                                setExpandedSector(s.sector);
+                                                                try {
+                                                                    const res = await fetch(`${API_BASE}/industries?sector=${encodeURIComponent(s.sector)}&date=${date}`);
+                                                                    const data = await res.json();
+                                                                    setIndustryData(data.industries || []);
+                                                                } catch { setIndustryData([]); }
+                                                            }
+                                                        }}
+                                                    />
+                                                    {expandedSector === s.sector && industryData.length > 0 && (
+                                                        <IndustryDrilldown
+                                                            sectorName={s.sector}
+                                                            industries={industryData}
+                                                            date={date}
+                                                            onClose={() => { setExpandedSector(null); setIndustryData([]); }}
+                                                        />
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Category Tabs + Fetch Button */}
+                                <div className="tabs-row">
+                                    <div className="category-tabs" style={{marginBottom:0}}>
+                                        {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
+                                            <button
+                                                key={key}
+                                                className={`cat-tab ${activeTab === key ? 'active' : ''}`}
+                                                onClick={() => setActiveTab(key)}
+                                            >
+                                                {label} {categoryCounts[key] !== undefined ? categoryCounts[key] : 0}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div style={{display:'flex',alignItems:'center',gap:'0.75rem'}}>
+                                        {fetchResult && (
+                                            <span className={`fetch-result ${fetchResult.ok ? '' : 'error'}`}>
+                                                {fetchResult.msg}
+                                            </span>
+                                        )}
+                                        <button
+                                            className={`fetch-btn ${fetching ? 'fetching' : ''}`}
+                                            onClick={handleFetch}
+                                            disabled={fetching}
+                                        >
+                                            {fetching ? '수집 중...' : 'Finviz 파싱'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* News List */}
+                                <div className="news-list-panel">
+                                    <div className="news-list-header">
+                                        <span className="news-list-title">News Feed</span>
+                                        <span className="news-count">{filteredArticles.length}건</span>
+                                    </div>
+                                    {filteredArticles.length > 0 ? (
+                                        filteredArticles.map(a => <NewsRow key={a.id} article={a} />)
+                                    ) : (
+                                        <div className="empty-state">해당 카테고리의 뉴스가 없습니다.</div>
+                                    )}
+                                </div>
+
+                                {/* Reference Info */}
+                                <ReferencePanel />
+                            </>
+                        )}
+                    </main>
+
+                    <DataSourceFooter />
+
+                    {/* Manual Briefing Editor Modal */}
+                    {showManualModal && (
+                        <ManualBriefingModal
+                            date={date}
+                            onClose={() => setShowManualModal(false)}
+                            onSaved={async () => {
+                                setShowManualModal(false);
+                                setManualResult({ ok: true, msg: 'manual-research 브리핑 저장 완료' });
+                                await loadData();
+                            }}
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<NewsIntelligence />, document.getElementById('root'));
+    </script>
+</body>
+</html>

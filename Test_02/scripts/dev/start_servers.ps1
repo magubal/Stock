@@ -88,6 +88,14 @@ $apiErr = Join-Path $logsDir "api_stderr.log"
 $dashOut = Join-Path $logsDir "dashboard_stdout.log"
 $dashErr = Join-Path $logsDir "dashboard_stderr.log"
 
+# --- REQ-017: Auto-Sync REQUESTS.md to Dashboard Data ---
+Write-Host "Syncing REQUESTS.md to dashboard..."
+& $pythonExe "scripts/sync_requests_to_dashboard.py"
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Failed to sync REQUESTS.md. Dashboard data might be stale."
+}
+# --------------------------------------------------------
+
 $api = Start-ServerProcess `
     -Name "API" `
     -ExePath $pythonExe `

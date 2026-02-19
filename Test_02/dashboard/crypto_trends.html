@@ -125,6 +125,54 @@
             color: #64748b;
         }
 
+        .btn-collect {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            border: none;
+        }
+        .btn-collect:hover { filter: brightness(1.15); }
+        .btn-collect:disabled { opacity: 0.6; cursor: not-allowed; filter: none; }
+
+        .collect-status {
+            font-size: 0.75rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .collect-status .status-dot {
+            width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+        }
+        .collect-status .status-dot.success { background: #22c55e; }
+        .collect-status .status-dot.error { background: #ef4444; }
+        .collect-status .status-dot.unknown { background: #64748b; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+
+        /* ─── Data Source Footer ─── */
+        .ds-footer { margin: 2rem auto 1rem; max-width: 1400px; }
+        .ds-footer-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(30,41,59,0.6); border: 1px solid #334155; border-radius: 8px;
+            padding: 0.6rem 1rem; cursor: pointer; width: 100%; color: #94a3b8; font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .ds-footer-toggle:hover { background: rgba(30,41,59,0.9); }
+        .ds-footer-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.78rem; }
+        .ds-footer-table th { text-align: left; color: #64748b; padding: 0.4rem 0.6rem; border-bottom: 1px solid #1e293b; font-weight: 500; }
+        .ds-footer-table td { padding: 0.4rem 0.6rem; color: #cbd5e1; border-bottom: 1px solid rgba(30,41,59,0.5); }
+        .ds-footer-table tr:hover td { background: rgba(51,65,85,0.3); }
+        .ds-status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+        .ds-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; }
+        .ds-badge-auto { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .ds-badge-manual { background: rgba(100,116,139,0.2); color: #94a3b8; }
+        .ds-badge-static { background: rgba(100,116,139,0.2); color: #64748b; }
+        .ds-badge-ondemand { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .ds-detail-row td { padding: 0.3rem 0.6rem 0.5rem; color: #64748b; font-size: 0.72rem; border-bottom: 1px solid rgba(30,41,59,0.3); }
+        .ds-detail-row a { color: #60a5fa; text-decoration: none; }
+        .ds-detail-row a:hover { text-decoration: underline; }
+
         /* Main */
         .main {
             max-width: 1400px;
@@ -712,6 +760,17 @@
             }
         };
 
+        const API_BASE = 'http://localhost:8000';
+
+        // ─── Data Source Footer 메타데이터 ───
+        const DATA_SOURCES = [
+            { name: "CoinGecko (Top 20)", db_table: "crypto_price", collector_key: "crypto", type: "auto", api_url: "https://www.coingecko.com/", script: "scripts/crypto_monitor/coingecko_fetch.py" },
+            { name: "DefiLlama (TVL)", db_table: "crypto_defi", collector_key: "crypto", type: "auto", api_url: "https://defillama.com/", script: "scripts/crypto_monitor/defi_fetch.py" },
+            { name: "Fear & Greed Index", db_table: "crypto_sentiment", collector_key: "crypto", type: "auto", api_url: "https://alternative.me/crypto/fear-and-greed-index/", script: "scripts/crypto_monitor/fear_greed_fetch.py" },
+            { name: "ETH ETF Flow", db_table: null, collector_key: null, type: "manual", api_url: "https://coinmarketcap.com/etf/ethereum/" },
+            { name: "MVRV Z-Score", db_table: null, collector_key: null, type: "manual", api_url: "https://bitcoinmagazinepro.com/" },
+        ];
+
         // ============================================
         // Utility Functions
         // ============================================
@@ -1194,6 +1253,93 @@
             return 'Extreme Greed';
         }
 
+        // ─── DataSourceFooter ─────────────────────────────────
+        const DataSourceFooter = React.memo(() => {
+            const [expanded, setExpanded] = useState(false);
+            const [status, setStatus] = useState(null);
+            const [detailIdx, setDetailIdx] = useState(null);
+
+            useEffect(() => {
+                fetch(`${API_BASE}/api/v1/collector/status`)
+                    .then(r => r.json()).then(setStatus).catch(() => {});
+            }, []);
+
+            const getStatusColor = (src) => {
+                if (!src.collector_key || !status?.collectors?.[src.collector_key]) {
+                    const m = { manual: '#64748b', static: '#64748b', 'on-demand': '#8b5cf6' };
+                    return m[src.type] || '#475569';
+                }
+                const c = status.collectors[src.collector_key];
+                if (!c || c.status !== 'success') return '#ef4444';
+                const hours = (Date.now() - new Date(c.created_at).getTime()) / 3600000;
+                return hours < 1 ? '#22c55e' : hours < 24 ? '#eab308' : '#ef4444';
+            };
+
+            const getLastTime = (src) => {
+                if (!src.collector_key || !status?.collectors?.[src.collector_key]) return '-';
+                const c = status.collectors[src.collector_key];
+                if (!c?.created_at) return '-';
+                return new Date(c.created_at).toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+            };
+
+            const getCount = (src) => {
+                if (!src.db_table || !status?.table_counts) return '-';
+                const count = status.table_counts[src.db_table];
+                return count != null ? count.toLocaleString() : '-';
+            };
+
+            const latestTime = DATA_SOURCES
+                .map(s => s.collector_key && status?.collectors?.[s.collector_key]?.created_at)
+                .filter(Boolean).sort().pop();
+
+            const typeBadge = (type) => {
+                const labels = { auto: '자동', manual: '수동', static: '정적', 'on-demand': '요청시' };
+                const cls = type === 'on-demand' ? 'ondemand' : type;
+                return React.createElement('span', { className: `ds-badge ds-badge-${cls}` }, labels[type] || type);
+            };
+
+            return (
+                <div className="ds-footer">
+                    <button className="ds-footer-toggle" onClick={() => setExpanded(!expanded)}>
+                        <span>
+                            {expanded ? '\u25BE' : '\u25B8'} 데이터 소스 ({DATA_SOURCES.length}개
+                            {latestTime ? ` \u00b7 마지막 수집 ${new Date(latestTime).toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })}` : ''})
+                        </span>
+                        <span style={{fontSize:'0.72rem'}}>{expanded ? '접기' : '펼치기'}</span>
+                    </button>
+                    {expanded && (
+                        <table className="ds-footer-table">
+                            <thead><tr>
+                                <th>소스</th><th>DB 테이블</th><th>건수</th><th>마지막 수집</th><th>유형</th><th>상태</th>
+                            </tr></thead>
+                            <tbody>
+                                {DATA_SOURCES.map((src, i) => (
+                                    <React.Fragment key={i}>
+                                        <tr onClick={() => setDetailIdx(detailIdx === i ? null : i)} style={{cursor:'pointer'}}>
+                                            <td>{src.name}</td>
+                                            <td><code style={{fontSize:'0.72rem',color:'#94a3b8'}}>{src.db_table || '-'}</code></td>
+                                            <td>{getCount(src)}</td>
+                                            <td>{getLastTime(src)}</td>
+                                            <td>{typeBadge(src.type)}</td>
+                                            <td><span className="ds-status-dot" style={{backgroundColor: getStatusColor(src)}}></span></td>
+                                        </tr>
+                                        {detailIdx === i && (
+                                            <tr className="ds-detail-row">
+                                                <td colSpan={6}>
+                                                    {src.api_url && <div>API: <a href={src.api_url} target="_blank" rel="noopener noreferrer">{src.api_url}</a></div>}
+                                                    {src.script && <div>Script: <code>{src.script}</code></div>}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            );
+        });
+
         // ============================================
         // Main App Component
         // ============================================
@@ -1210,6 +1356,31 @@
             const [lastUpdate, setLastUpdate] = useState(null);
             const [transferCheck, setTransferCheck] = useState(false);
             const [selectedGauge, setSelectedGauge] = useState(null);
+            const [collecting, setCollecting] = useState(false);
+            const [collectorStatus, setCollectorStatus] = useState(null);
+
+            const loadCollectorStatus = useCallback(async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/v1/collector/status`);
+                    if (res.ok) {
+                        const st = await res.json();
+                        setCollectorStatus(st.collectors?.crypto || null);
+                    }
+                } catch (_) { /* silent */ }
+            }, []);
+
+            const handleCollect = useCallback(async () => {
+                setCollecting(true);
+                try {
+                    const res = await fetch(`${API_BASE}/api/v1/collector/crypto`, { method: 'POST' });
+                    if (!res.ok) throw new Error(`수집 실패: ${res.status}`);
+                    await loadCollectorStatus();
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    setCollecting(false);
+                }
+            }, [loadCollectorStatus]);
 
             const loadAll = useCallback(async () => {
                 setLoading(true);
@@ -1240,7 +1411,8 @@
 
             useEffect(() => {
                 loadAll();
-            }, [loadAll]);
+                loadCollectorStatus();
+            }, [loadAll, loadCollectorStatus]);
 
             useEffect(() => {
                 if (typeof lucide !== 'undefined') {
@@ -1344,6 +1516,12 @@
                                     Crypto Pulse
                                 </div>
                                 <span className="page-badge">Market Monitor</span>
+                                {collectorStatus && (
+                                    <span className="collect-status">
+                                        <span className={`status-dot ${collectorStatus.status === 'success' ? 'success' : collectorStatus.status === 'error' ? 'error' : 'unknown'}`}></span>
+                                        DB 수집: {collectorStatus.date || '-'} ({collectorStatus.triggered_by || '-'})
+                                    </span>
+                                )}
                             </div>
                             <div className="header-actions">
                                 {lastUpdate && (
@@ -1351,6 +1529,10 @@
                                         {lastUpdate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} updated
                                     </span>
                                 )}
+                                <button className="btn btn-collect" onClick={handleCollect} disabled={collecting}>
+                                    <i data-lucide={collecting ? "loader" : "database"} style={{ width: 14, height: 14 }} className={collecting ? 'spin' : ''}></i>
+                                    {collecting ? 'DB 수집 중...' : 'DB 수집'}
+                                </button>
                                 <button className="btn btn-refresh" onClick={loadAll}>
                                     <i data-lucide="refresh-cw" style={{ width: 14, height: 14 }}></i>
                                     {'\uC0C8\uB85C\uACE0\uCE68'}
@@ -1541,6 +1723,8 @@
                                 {'\uD06C\uB9BD\uD1A0 \uAC15\uC138\uAC00 \uC8FC\uC2DD\uC73C\uB85C \uBC88\uC9C0\uB294 \uC870\uAC74 \uCDA9\uC871?'}
                             </label>
                         </div>
+
+                        <DataSourceFooter />
                     </main>
                 </div>
             );
