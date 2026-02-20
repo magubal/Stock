@@ -1,4 +1,7 @@
-포트를 점유하고 있는 좀비 프로세스를 정리합니다. 인자: $ARGUMENTS
+description = "포트를 점유하고 있는 좀비 프로세스를 정리합니다 (v2: ghost 감지 + 진단)"
+
+prompt = """
+포트를 점유하고 있는 좀비 프로세스를 정리합니다.
 
 ## 실행 방법
 
@@ -10,7 +13,7 @@
 아래 명령을 실행하세요:
 
 ```bash
-python scripts/kill_port.py $ARGUMENTS
+python scripts/kill_port.py {{args}}
 ```
 
 ## 동작 원리 (v2)
@@ -27,3 +30,4 @@ python scripts/kill_port.py $ARGUMENTS
 - VS Code Run/Debug 전에 이전 세션 잔여 프로세스 정리
 - uvicorn --reload 후 좀비 워커 프로세스 잔존
 - 유령 프로세스(ghost listener) 원인 진단이 필요할 때
+"""
