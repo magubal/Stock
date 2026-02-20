@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magubal Research Platform</title>
+    <meta name="description" content="마구티어 플라이휠 기반 Stock Research 플랫폼">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+
+<body>
+    <!-- Header with Flywheel Navigation -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <span>Magubal Research</span>
+            </div>
+            <nav class="flywheel-nav" id="flywheelNav">
+                <!-- Populated by JS -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Left: Main Dashboard -->
+        <div class="main-content">
+            <div class="card">
+                <!-- Server Status -->
+                <div class="server-status">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">서버 연결 확인 중...</span>
+                </div>
+
+                <!-- Search -->
+                <section class="search-section">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput"
+                            placeholder="종목명 또는 코드 (예: 삼성전자, 005930)" value="삼성전자">
+                        <button class="search-btn" id="searchBtn">검색</button>
+                    </div>
+                    <div class="search-hint">💡 종목명, 코드 또는 미국 티커(AAPL, TSLA) 입력</div>
+                </section>
+
+                <!-- Stock Info -->
+                <section class="stock-header">
+                    <div class="stock-name" id="stockName">-</div>
+                    <div class="stock-price" id="stockPrice">-</div>
+                    <div class="stock-change up" id="stockChange">-</div>
+                </section>
+
+                <!-- Chart Controls -->
+                <div class="chart-controls">
+                    <div class="control-group" id="intervalGroup">
+                        <button class="control-btn active" data-value="1d">일봉</button>
+                        <button class="control-btn" data-value="1wk">주봉</button>
+                    </div>
+                    <div class="control-group" id="rangeGroup">
+                        <button class="control-btn active" data-value="3mo">3개월</button>
+                        <button class="control-btn" data-value="6mo">6개월</button>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>데이터를 불러오는 중...</div>
+                </div>
+
+                <!-- Chart -->
+                <div class="chart-container">
+                    <canvas id="stockChart"></canvas>
+                </div>
+
+                <!-- Saved Stocks -->
+                <section class="saved-stocks">
+                    <h3 class="section-title">📂 최근 조회 종목</h3>
+                    <div class="stock-tags" id="stockTags">
+                        <span class="inline-loading">로딩 중...</span>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Philosophy Quote -->
+            <div class="philosophy-quote">
+                <strong>📍 투자 철학:</strong> 시대의 방향(바람, 파도...WHY...본질)을 체감하고...
+                관련된 자(기업)들을 탐색하고... 준비된 자들 중 <strong>최고의 가능성</strong>을 지닌 자를
+                발굴하면서 검증해나가는 과정
+            </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <aside class="sidebar">
+            <!-- Stock News -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📰 <span id="newsStockName">종목</span> 관련 뉴스</h3>
+                </div>
+                <div class="news-list" id="newsList">
+                    <div class="inline-loading">뉴스를 불러오는 중...</div>
+                </div>
+            </div>
+
+            <!-- Market Issues -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">🔥 시장 이슈</h3>
+                </div>
+                <div class="news-list" id="issuesList">
+                    <div class="inline-loading">이슈를 불러오는 중...</div>
+                </div>
+            </div>
+
+            <!-- Decision Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">🎯 시나리오</h3>
+                </div>
+                <div class="scenario-list" id="scenarioList">
+                    <div class="inline-loading">종목 검색 후 시나리오 생성</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>

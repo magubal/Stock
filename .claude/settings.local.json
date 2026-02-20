@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(pdca)",
+      "Skill(pdca:*)",
+      "Bash(curl:*)",
+      "Bash(python3 -m http.server:*)",
+      "Bash(python -m http.server:*)",
+      "Bash(netstat:*)",
+      "Bash(wmic process:*)",
+      "Bash(tasklist:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

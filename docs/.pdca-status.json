@@ -1,0 +1,213 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-02-20T14:34:34.281Z",
+  "activeFeatures": [
+    "market-daily-digest",
+    "scripts",
+    "Stock",
+    "backend",
+    "liquidity_monitor",
+    "api"
+  ],
+  "primaryFeature": "market-daily-digest",
+  "features": {
+    "market-daily-digest": {
+      "phase": "do",
+      "planPath": "docs/01-plan/features/market-daily-digest.plan.md",
+      "designPath": "docs/02-design/features/market-daily-digest.design.md",
+      "startedAt": "2026-02-20T10:00:00.000Z",
+      "lastActivity": "2026-02-20T11:00:00.000Z"
+    },
+    "scripts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T21:10:43.514Z",
+        "lastUpdated": "2026-02-20T14:34:34.281Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\scripts\\kill_port.py"
+    },
+    "Stock": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T21:53:17.346Z",
+        "lastUpdated": "2026-02-19T22:01:52.628Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\test_console.py"
+    },
+    "backend": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-20T11:50:23.052Z",
+        "lastUpdated": "2026-02-20T11:50:23.052Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\services\\liquidity_stress_service.py"
+    },
+    "liquidity_monitor": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-20T11:51:49.759Z",
+        "lastUpdated": "2026-02-20T11:54:21.980Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\liquidity_monitor\\fred_fetch.py"
+    },
+    "api": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-20T12:03:57.765Z",
+        "lastUpdated": "2026-02-20T12:04:57.956Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\collector.py"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-02-19T19:25:38.504Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-02-20T14:34:34.281Z"
+  },
+  "history": [
+    {
+      "action": "plan_created",
+      "feature": "market-daily-digest",
+      "timestamp": "2026-02-20T10:00:00.000Z",
+      "details": "Plan document created from brain brainstorming session"
+    },
+    {
+      "action": "design_created",
+      "feature": "market-daily-digest",
+      "timestamp": "2026-02-20T10:30:00.000Z",
+      "details": "Design document created with Force-Directed mindmap + Split layout specs"
+    },
+    {
+      "action": "do_completed",
+      "feature": "market-daily-digest",
+      "timestamp": "2026-02-20T11:00:00.000Z",
+      "details": "Implementation complete: Backend (Model+Service+API+Router) + Frontend (D3.js Force-Directed mindmap + Split layout + AI Analyzer + Save) + Dashboard link"
+    },
+    {
+      "timestamp": "2026-02-19T21:10:43.514Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T21:53:17.346Z",
+      "feature": "Stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T21:54:04.043Z",
+      "feature": "Stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T21:55:09.310Z",
+      "feature": "Stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T21:59:18.559Z",
+      "feature": "Stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T22:01:52.628Z",
+      "feature": "Stock",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T11:50:23.052Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T11:51:49.759Z",
+      "feature": "liquidity_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T11:54:02.389Z",
+      "feature": "liquidity_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T11:54:21.980Z",
+      "feature": "liquidity_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T12:03:57.766Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T12:04:42.295Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T12:04:57.956Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T14:20:41.865Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T14:20:48.647Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-20T14:34:34.281Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}
