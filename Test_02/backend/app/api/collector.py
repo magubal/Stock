@@ -182,15 +182,17 @@ _disclosure_task = {"running": False, "result": None, "step": "", "started_at": 
 _disclosure_lock = __import__('threading').Lock()
 
 
-def _run_disclosure_collector_bg():
+def _run_disclosure_collector_bg(target_date=None):
     """공시 데이터 수집 + 분석 (백그라운드 실행)."""
     global _disclosure_task
     start = time.time()
     steps = {}
 
-    utc_now = datetime.now(timezone.utc)
-    kst_now = utc_now + timedelta(hours=9)
-    today = kst_now.strftime("%Y-%m-%d")
+    if not target_date:
+        utc_now = datetime.now(timezone.utc)
+        kst_now = utc_now + timedelta(hours=9)
+        target_date = kst_now.strftime("%Y-%m-%d")
+    today = target_date
 
     with _disclosure_lock:
         _disclosure_task["step"] = "collecting"
@@ -251,7 +253,7 @@ def _run_disclosure_collector_bg():
     return final_result
 
 
-def _run_disclosure_collector() -> dict:
+def _run_disclosure_collector(target_date=None) -> dict:
     """공시 수집을 백그라운드로 시작하고 즉시 accepted 반환."""
     global _disclosure_task
     import threading
@@ -264,10 +266,10 @@ def _run_disclosure_collector() -> dict:
         _disclosure_task["step"] = "starting"
         _disclosure_task["started_at"] = time.time()
 
-    t = threading.Thread(target=_run_disclosure_collector_bg, daemon=True)
+    t = threading.Thread(target=_run_disclosure_collector_bg, args=(target_date,), daemon=True)
     t.start()
 
-    return {"status": "accepted", "message": "수집이 시작되었습니다"}
+    return {"status": "accepted", "message": f"수집이 시작되었습니다 ({target_date or '오늘'})"}
 
 
 def _run_all_collectors() -> dict:
@@ -316,13 +318,47 @@ async def collect_crypto():
 
 
 @router.post("/disclosure")
-async def collect_disclosure():
-    """공시 데이터 수집 트리거 (백그라운드 실행, 즉시 응답)."""
+async def collect_disclosure(date: str = None):
+    """공시 데이터 수집 트리거 (백그라운드 실행, 즉시 응답). date=YYYY-MM-DD (선택)"""
     try:
-        result = _run_disclosure_collector()
+        result = _run_disclosure_collector(target_date=date)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/disclosure/data")
+async def get_disclosure_data(date: str = None):
+    """날짜별 공시 분석 데이터 조회. date=YYYY-MM-DD (미지정시 latest)"""
+    import json as _json
+    data_dir = os.path.join(_scripts_root, 'data', 'disclosures')
+    dashboard_dir = os.path.join(_scripts_root, 'dashboard', 'data')
+
+    if date:
+        # 날짜별 아카이브 파일
+        target_file = os.path.join(data_dir, f'processed_{date}.json')
+        if not os.path.exists(target_file):
+            raise HTTPException(status_code=404, detail=f"{date} 데이터가 없습니다. 수집을 먼저 실행하세요.")
+    else:
+        target_file = os.path.join(dashboard_dir, 'latest_disclosures.json')
+        if not os.path.exists(target_file):
+            raise HTTPException(status_code=404, detail="데이터가 없습니다.")
+
+    with open(target_file, 'r', encoding='utf-8') as f:
+        return _json.load(f)
+
+
+@router.get("/disclosure/dates")
+async def get_disclosure_dates():
+    """수집 가능한 날짜 목록 반환 (processed_ 파일 기준)."""
+    data_dir = os.path.join(_scripts_root, 'data', 'disclosures')
+    dates = []
+    if os.path.isdir(data_dir):
+        for fname in sorted(os.listdir(data_dir), reverse=True):
+            if fname.startswith('processed_') and fname.endswith('.json'):
+                d = fname.replace('processed_', '').replace('.json', '')
+                dates.append(d)
+    return {"dates": dates}
 
 
 @router.get("/disclosure/progress")

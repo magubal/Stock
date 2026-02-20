@@ -37,14 +37,16 @@ class LiquidityStressService:
             return self._empty_response()
 
         macro = self.db.query(LiquidityMacro).filter_by(date=si.date).first()
-        if not macro:
-            # FRED 데이터는 당일 미발행 가능 → 가장 최근 macro로 fallback
-            macro = (
+        # FRED 데이터는 당일 미발행 가능 → 핵심 필드(hy_oas)가 있는 최근 행으로 fallback
+        if not macro or macro.hy_oas is None:
+            better = (
                 self.db.query(LiquidityMacro)
-                .filter(LiquidityMacro.date <= si.date)
+                .filter(LiquidityMacro.date <= si.date, LiquidityMacro.hy_oas.isnot(None))
                 .order_by(desc(LiquidityMacro.date))
                 .first()
             )
+            if better:
+                macro = better
         vix_row = (
             self.db.query(LiquidityPrice)
             .filter_by(date=si.date, symbol="^VIX")

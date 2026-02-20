@@ -85,7 +85,31 @@ def run():
         print("[FRED] 수집된 데이터 없음")
         return
 
+    # Forward-fill: FRED 시리즈별 발표일이 다르므로 빈 필드는 직전 값으로 채움
+    all_fields = list(FRED_SERIES.keys())
+    sorted_dates = sorted(all_data.keys())
+
     session = Session()
+
+    # DB에서 각 필드의 가장 최근 값을 seed로 가져옴
+    prev_values = {}
+    latest_macro = session.query(LiquidityMacro).filter(
+        LiquidityMacro.hy_oas.isnot(None)
+    ).order_by(LiquidityMacro.date.desc()).first()
+    if latest_macro:
+        for field in all_fields:
+            val = getattr(latest_macro, field, None)
+            if val is not None:
+                prev_values[field] = val
+
+    # 날짜순으로 forward-fill
+    for date_str in sorted_dates:
+        for field in all_fields:
+            if field in all_data[date_str]:
+                prev_values[field] = all_data[date_str][field]
+            elif field in prev_values:
+                all_data[date_str][field] = prev_values[field]
+
     count = 0
     for date_str, fields in sorted(all_data.items()):
         existing = session.query(LiquidityMacro).filter_by(date=date_str).first()
@@ -98,7 +122,7 @@ def run():
 
     session.commit()
     session.close()
-    print(f"[FRED] {count}일간 매크로 데이터 저장 완료")
+    print(f"[FRED] {count}일간 매크로 데이터 저장 완료 (forward-fill 적용)")
 
 
 if __name__ == "__main__":

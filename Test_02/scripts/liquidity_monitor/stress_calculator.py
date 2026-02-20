@@ -113,14 +113,15 @@ def calculate(target_date=None):
     vix_lo, vix_hi = NORMALIZE_RANGES["vix"]
     vol_score = normalize(vix, vix_lo, vix_hi)
 
-    # 2. Credit (HY OAS) — exact date first, then fallback to latest available
+    # 2. Credit (HY OAS) — exact date first, then fallback to latest with real data
     macro = session.query(LiquidityMacro).filter_by(date=target_date).first()
-    if not macro:
-        macro = session.query(LiquidityMacro).filter(
-            LiquidityMacro.date <= target_date
+    if not macro or macro.hy_oas is None:
+        better = session.query(LiquidityMacro).filter(
+            LiquidityMacro.date <= target_date, LiquidityMacro.hy_oas.isnot(None)
         ).order_by(desc(LiquidityMacro.date)).first()
-        if macro:
-            print(f"  [INFO] macro fallback: {target_date} → {macro.date}")
+        if better:
+            print(f"  [INFO] macro fallback: {target_date} → {better.date} (hy_oas={better.hy_oas})")
+            macro = better
     hy_oas = macro.hy_oas if macro else None
     hy_lo, hy_hi = NORMALIZE_RANGES["hy_oas"]
     credit_score = normalize(hy_oas, hy_lo, hy_hi)

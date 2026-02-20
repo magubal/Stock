@@ -826,6 +826,11 @@
 
         // ─── Main App ────────────────────────────────────────
 
+        // KST 오늘 날짜
+        const getKSTToday = () => {
+            return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+        };
+
         const DisclosureMonitor = () => {
             const [data, setData] = useState(null);
             const [loading, setLoading] = useState(true);
@@ -834,6 +839,8 @@
             const [clusterAlert, setClusterAlert] = useState(null);
             const [collecting, setCollecting] = useState(false);
             const [collectResult, setCollectResult] = useState(null);
+            const [targetDate, setTargetDate] = useState(getKSTToday());
+            const [availableDates, setAvailableDates] = useState([]);
 
             // 클러스터 알림 텍스트 → event_class 매핑
             const CLUSTER_LABEL_TO_CLASSES = {
@@ -848,23 +855,49 @@
                 '실적공시': ['earnings_surprise', 'earnings_guidance'],
             };
 
-            useEffect(() => {
-                const loadData = async () => {
-                    try {
-                        setLoading(true);
-                        const response = await fetch('data/latest_disclosures.json');
-                        if (!response.ok) throw new Error('데이터를 불러올 수 없습니다.');
+            // 날짜별 데이터 로드 (사용자 선택 날짜를 절대 덮어쓰지 않음)
+            const loadData = useCallback(async (date) => {
+                try {
+                    setLoading(true);
+                    setError(null);
+                    setData(null);
+                    const url = `${API_BASE}/api/v1/collector/disclosure/data?date=${date}`;
+                    const response = await fetch(url);
+                    if (response.status === 404) {
+                        // 해당 날짜 데이터 없음 → 에러 상태 (날짜는 유지)
+                        setError(`${date} 데이터가 없습니다. "데이터 수집" 버튼을 눌러 수집하세요.`);
+                    } else if (!response.ok) {
+                        throw new Error('서버 오류가 발생했습니다.');
+                    } else {
                         const json = await response.json();
                         setData(json);
-                    } catch (err) {
-                        setError(err.message);
-                    } finally {
-                        setLoading(false);
                     }
-                };
-
-                loadData();
+                } catch (err) {
+                    // 백엔드 연결 실패 시 static 파일 fallback (초기 로드만)
+                    try {
+                        const fallback = await fetch('data/latest_disclosures.json');
+                        if (fallback.ok) {
+                            const json = await fallback.json();
+                            setData(json);
+                            // 날짜를 데이터 날짜로 맞춤 (초기 로드이므로 OK)
+                            if (json.date && !window._userDateSelected) setTargetDate(json.date);
+                            return;
+                        }
+                    } catch(_) {}
+                    setError(err.message || '서버에 연결할 수 없습니다.');
+                } finally {
+                    setLoading(false);
+                }
             }, []);
+
+            useEffect(() => { loadData(targetDate); }, [targetDate]);
+
+            // 수집 가능한 날짜 목록
+            useEffect(() => {
+                fetch(`${API_BASE}/api/v1/collector/disclosure/dates`)
+                    .then(r => r.json()).then(d => setAvailableDates(d.dates || []))
+                    .catch(() => {});
+            }, [collectResult]);
 
             // Lucide 아이콘 초기화 (data 로드 후)
             useEffect(() => {
@@ -965,12 +998,9 @@
                             setCollecting(false);
                             setCollectResult(prog.result);
                             setCollectStep('');
-                            // 성공 시 데이터 리로드
+                            // 성공 시 데이터 리로드 (수집한 날짜 기준)
                             if (prog.result && prog.result.status !== 'failed') {
-                                try {
-                                    const dataRes = await fetch('data/latest_disclosures.json?t=' + Date.now());
-                                    if (dataRes.ok) { const json = await dataRes.json(); setData(json); }
-                                } catch(_) {}
+                                loadData(targetDate);
                                 setTimeout(() => setCollectResult(null), 8000);
                             }
                             setTimeout(() => { lucide.createIcons(); }, 100);
@@ -982,9 +1012,16 @@
                         }
                     } catch(_) {}
                 }, 3000);
-            }, [stopPolling]);
+            }, [stopPolling, targetDate, loadData]);
 
             useEffect(() => { return () => stopPolling(); }, [stopPolling]);
+
+            const handleDateChange = useCallback((newDate) => {
+                window._userDateSelected = true;
+                setTargetDate(newDate);
+                setFilter('all');
+                setClusterAlert(null);
+            }, []);
 
             const handleCollect = useCallback(async () => {
                 if (collecting) return;
@@ -993,7 +1030,7 @@
                 setCollectStep('시작 중...');
                 setCollectElapsed(0);
                 try {
-                    const res = await fetch(`${API_BASE}/api/v1/collector/disclosure`, { method: 'POST' });
+                    const res = await fetch(`${API_BASE}/api/v1/collector/disclosure?date=${targetDate}`, { method: 'POST' });
                     if (!res.ok) {
                         const errBody = await res.text();
                         let detail = '서버 오류 (' + res.status + ')';
@@ -1014,12 +1051,12 @@
                     setCollecting(false);
                     setTimeout(() => { lucide.createIcons(); }, 100);
                 }
-            }, [collecting, startPolling]);
+            }, [collecting, targetDate, startPolling]);
 
             if (loading) {
                 return (
                     <div className="monitor-container">
-                        <Header />
+                        <Header targetDate={targetDate} onDateChange={handleDateChange} availableDates={availableDates} onCollect={handleCollect} collecting={collecting} collectStep={collectStep} collectElapsed={collectElapsed} collectResult={collectResult} onDismissToast={() => setCollectResult(null)} />
                         <div className="monitor-main">
                             <div className="loading-spinner"><div className="spinner"></div></div>
                         </div>
@@ -1030,13 +1067,13 @@
             if (error) {
                 return (
                     <div className="monitor-container">
-                        <Header />
+                        <Header targetDate={targetDate} onDateChange={handleDateChange} availableDates={availableDates} onCollect={handleCollect} collecting={collecting} collectStep={collectStep} collectElapsed={collectElapsed} collectResult={collectResult} onDismissToast={() => setCollectResult(null)} />
                         <div className="monitor-main">
                             <div className="empty-state">
-                                <h3>데이터 로딩 실패</h3>
+                                <h3>{targetDate} 데이터 없음</h3>
                                 <p>{error}</p>
                                 <p style={{ marginTop: '1rem', fontSize: '0.875rem' }}>
-                                    collect_disclosures.py → analyze_disclosures.py 를 먼저 실행하세요.
+                                    "데이터 수집" 버튼을 눌러 {targetDate} 공시를 수집하세요.
                                 </p>
                             </div>
                         </div>
@@ -1046,7 +1083,7 @@
 
             return (
                 <div className="monitor-container">
-                    <Header date={data?.date} onCollect={handleCollect} collecting={collecting} collectStep={collectStep} collectElapsed={collectElapsed} collectResult={collectResult} onDismissToast={() => setCollectResult(null)} />
+                    <Header date={data?.date} targetDate={targetDate} onDateChange={handleDateChange} availableDates={availableDates} onCollect={handleCollect} collecting={collecting} collectStep={collectStep} collectElapsed={collectElapsed} collectResult={collectResult} onDismissToast={() => setCollectResult(null)} />
                     <div className="monitor-main">
                         <SentimentBanner summary={data?.summary} />
                         <KPICards summary={data?.summary} onClusterClick={handleClusterClick} activeCluster={clusterAlert} />
@@ -1111,7 +1148,7 @@
 
         // ─── Header ──────────────────────────────────────────
 
-        const Header = React.memo(({ date, onCollect, collecting, collectStep, collectElapsed, collectResult, onDismissToast }) => (
+        const Header = React.memo(({ date, targetDate, onDateChange, availableDates, onCollect, collecting, collectStep, collectElapsed, collectResult, onDismissToast }) => (
             <div className="monitor-header">
                 <div className="header-content">
                     <div className="header-left">
@@ -1121,7 +1158,21 @@
                             </div>
                             <span>Stock Research <span style={{ color: '#22c55e' }}>ONE</span></span>
                         </div>
-                        <span className="page-badge">공시 모니터링{date ? ` · ${date}` : ''}</span>
+                        <span className="page-badge">공시 모니터링</span>
+                        <input
+                            type="date"
+                            value={targetDate || ''}
+                            onChange={(e) => onDateChange && onDateChange(e.target.value)}
+                            max={getKSTToday()}
+                            style={{
+                                background: '#1e293b', color: '#f8fafc', border: '1px solid #334155',
+                                borderRadius: '6px', padding: '0.35rem 0.5rem', fontSize: '0.8rem',
+                                cursor: 'pointer', outline: 'none',
+                            }}
+                        />
+                        {date && date !== targetDate && (
+                            <span style={{ fontSize: '0.7rem', color: '#f59e0b' }}>표시: {date}</span>
+                        )}
                     </div>
                     <div className="header-actions">
                         <a href="index.html" className="btn btn-back">

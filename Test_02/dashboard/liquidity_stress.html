@@ -1353,18 +1353,26 @@
             // News keywords from history or latest
             const newsInfo = modules.news || {};
 
-            // Data source detection: check if FRED modules have seed-like patterns
+            // Data source detection: check actual data presence (not heuristic thresholds)
             const dataSourceInfo = useMemo(() => {
                 if (!modules || !Object.keys(modules).length) return { sources: [], seedCount: 0, mixCount: 0, hasSeed: false };
                 const sources = [];
                 if (modules.volatility?.vix) sources.push({ module: 'VIX/가격', type: modules.volatility.vix > 0 ? 'REAL' : 'SEED', via: 'Yahoo v8 API' });
-                if (modules.credit?.score != null) sources.push({ module: '크레딧', type: modules.credit.hyOas > 5.5 ? 'SEED' : 'MIX', via: 'FRED API (키 필요)' });
-                if (modules.funding?.score != null) sources.push({ module: '자금시장', type: modules.funding.score > 0.8 ? 'SEED' : 'MIX', via: 'FRED API (키 필요)' });
-                if (modules.news?.totalCount != null) sources.push({ module: '뉴스', type: modules.news.totalCount > 100 ? 'REAL' : 'SEED', via: 'Google News' });
-                if (modules.fedTone?.score != null) sources.push({ module: 'Fed톤', type: modules.fedTone.score < 0.1 ? 'REAL' : 'SEED', via: 'Fed 연설문' });
+                // credit: hyOas가 실제 값이면 REAL, null이면 FRED 지연/미수집
+                if (modules.credit?.score != null) {
+                    const hasReal = modules.credit.hyOas != null && modules.credit.hyOas > 0;
+                    sources.push({ module: '크레딧', type: hasReal ? 'REAL' : 'MISSING', via: hasReal ? 'FRED API' : 'FRED 데이터 지연' });
+                }
+                // funding: sofr가 실제 값이면 REAL
+                if (modules.funding?.score != null) {
+                    const hasReal = modules.funding.sofr != null && modules.funding.sofr > 0;
+                    sources.push({ module: '자금시장', type: hasReal ? 'REAL' : 'MISSING', via: hasReal ? 'FRED API' : 'FRED 데이터 지연' });
+                }
+                if (modules.news?.totalCount != null) sources.push({ module: '뉴스', type: modules.news.totalCount > 0 ? 'REAL' : 'SEED', via: 'Google News' });
+                if (modules.fedTone?.score != null) sources.push({ module: 'Fed톤', type: 'REAL', via: 'Fed 연설문' });
                 const seedCount = sources.filter(s => s.type === 'SEED').length;
-                const mixCount = sources.filter(s => s.type === 'MIX').length;
-                return { sources, seedCount, mixCount, hasSeed: seedCount > 0 || mixCount > 0 };
+                const missingCount = sources.filter(s => s.type === 'MISSING').length;
+                return { sources, seedCount, missingCount, hasSeed: seedCount > 0, hasMissing: missingCount > 0 };
             }, [modules]);
 
             if (loading) {
@@ -1417,7 +1425,7 @@
                 <div className="monitor-container">
                     <Header date={data.date} onCollect={handleCollect} collecting={collecting} collectorStatus={collectorStatus} />
                     <div className="monitor-main">
-                        {/* Data Source Banner */}
+                        {/* SEED Data Banner (only for actual SEED/demo data) */}
                         {dataSourceInfo.hasSeed && (
                             <div style={{
                                 background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
@@ -1426,11 +1434,26 @@
                                 fontSize: '0.75rem', color: '#94a3b8'
                             }}>
                                 <span style={{ color: '#f87171', fontWeight: 700, fontSize: '0.65rem', padding: '1px 6px', background: 'rgba(239,68,68,0.15)', borderRadius: '3px', border: '1px solid rgba(239,68,68,0.3)' }}>SEED DATA</span>
-                                <span>일부 모듈 데이터가 시드(데모)입니다:</span>
-                                {dataSourceInfo.sources.filter(s => s.type !== 'REAL').map(s => (
+                                <span>시드(데모) 데이터:</span>
+                                {dataSourceInfo.sources.filter(s => s.type === 'SEED').map(s => (
                                     <span key={s.module} style={{ color: '#f87171' }}>{s.module}({s.via})</span>
                                 ))}
-                                <span style={{ color: '#475569' }}>| FRED API 키 설정 후 실제 데이터로 교체됩니다</span>
+                            </div>
+                        )}
+                        {/* MISSING Data Banner (FRED delay, not seed) */}
+                        {dataSourceInfo.hasMissing && !dataSourceInfo.hasSeed && (
+                            <div style={{
+                                background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)',
+                                borderRadius: '8px', padding: '0.5rem 1rem', marginBottom: '0.75rem',
+                                display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap',
+                                fontSize: '0.75rem', color: '#94a3b8'
+                            }}>
+                                <span style={{ color: '#eab308', fontWeight: 700, fontSize: '0.65rem', padding: '1px 6px', background: 'rgba(234,179,8,0.15)', borderRadius: '3px', border: '1px solid rgba(234,179,8,0.3)' }}>DATA DELAY</span>
+                                <span>일부 모듈 데이터 미수신:</span>
+                                {dataSourceInfo.sources.filter(s => s.type === 'MISSING').map(s => (
+                                    <span key={s.module} style={{ color: '#eab308' }}>{s.module}({s.via})</span>
+                                ))}
+                                <span style={{ color: '#475569' }}>| 데이터 수집 버튼으로 갱신하거나 FRED 발표 시점(보통 1~2일 지연) 이후 재수집하세요</span>
                             </div>
                         )}
                         {/* Stress Banner + Gauge */}
