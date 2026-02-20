@@ -1,10 +1,11 @@
 {
-  "timestamp": "2026-02-19T11:16:50.000Z",
+  "timestamp": "2026-02-19T14:10:13.352Z",
   "reason": "compaction",
   "status": {
     "version": "2.0",
-    "lastUpdated": "2026-02-19T10:10:49.243Z",
+    "lastUpdated": "2026-02-19T14:03:23.102Z",
     "activeFeatures": [
+      "blog-investor-digest",
       "oracle-earnings-integration",
       "investment-intelligence-engine",
       "stock-research-dashboard",
@@ -30,7 +31,8 @@
       "news_monitor",
       "news_intelligence_service.py",
       "crypto_monitor",
-      "dev"
+      "dev",
+      "blog_monitor"
     ],
     "primaryFeature": "oracle-earnings-integration",
     "features": {
@@ -89,14 +91,37 @@
         "iterationCount": 0,
         "checkCompletedAt": "2026-02-19T09:30:00Z"
       },
-      "disclosure-auto-collect": {
-        "phase": "do",
+      "zombie-process-cleanup": {
+        "phase": "archived",
         "startedAt": "2026-02-19T11:00:00Z",
-        "planPath": "docs/01-plan/features/disclosure-auto-collect.plan.md",
-        "designPath": "docs/02-design/features/disclosure-auto-collect.design.md",
-        "matchRate": null,
+        "planPath": "docs/01-plan/features/zombie-process-cleanup.plan.md",
+        "matchRate": 100,
         "iterationCount": 0,
-        "doCompletedAt": "2026-02-19T12:00:00Z"
+        "archivedAt": "2026-02-19T14:00:00Z"
+      },
+      "pdca-auto-register": {
+        "phase": "archived",
+        "startedAt": "2026-02-19T14:30:00Z",
+        "planPath": "docs/01-plan/features/pdca-auto-register.plan.md",
+        "matchRate": 100,
+        "iterationCount": 0,
+        "archivedAt": "2026-02-19T15:00:00Z"
+      },
+      "project-status-detail-enhance": {
+        "phase": "archived",
+        "startedAt": "2026-02-19T16:00:00Z",
+        "planPath": "docs/01-plan/features/project-status-detail-enhance.plan.md",
+        "matchRate": 100,
+        "iterationCount": 0,
+        "archivedAt": "2026-02-19T16:30:00Z"
+      },
+      "disclosure-auto-collect": {
+        "phase": "archived",
+        "matchRate": 97.9,
+        "iterationCount": 0,
+        "startedAt": "2026-02-19T11:00:00Z",
+        "archivedAt": "2026-02-19T16:10:00Z",
+        "archivedTo": "docs/archive/2026-02/disclosure-auto-collect/"
       },
       "stock-research-dashboard": {
         "phase": "do",
@@ -113,7 +138,7 @@
         "documents": {},
         "timestamps": {
           "started": "2026-02-11T11:14:01.275Z",
-          "lastUpdated": "2026-02-19T09:19:59.718Z"
+          "lastUpdated": "2026-02-19T14:02:06.881Z"
         },
         "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\main.py"
       },
@@ -139,9 +164,9 @@
         "documents": {},
         "timestamps": {
           "started": "2026-02-11T11:15:44.499Z",
-          "lastUpdated": "2026-02-19T10:10:49.243Z"
+          "lastUpdated": "2026-02-19T14:01:30.448Z"
         },
-        "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\collector.py"
+        "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\blog_review.py"
       },
       "frontend": {
         "phase": "do",
@@ -178,9 +203,9 @@
         "documents": {},
         "timestamps": {
           "started": "2026-02-11T17:55:48.701Z",
-          "lastUpdated": "2026-02-19T09:02:27.968Z"
+          "lastUpdated": "2026-02-19T11:32:42.553Z"
         },
-        "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\run_daily_collect.bat"
+        "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\kill_port.py"
       },
       "ask": {
         "phase": "do",
@@ -376,6 +401,19 @@
           "lastUpdated": "2026-02-19T06:27:05.175Z"
         },
         "lastFile": "f:/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/dev/unregister_daily_collector.ps1"
+      },
+      "blog_monitor": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-19T14:02:54.668Z",
+          "lastUpdated": "2026-02-19T14:03:23.101Z"
+        },
+        "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\blog_monitor\\migrate_files_to_db.py"
       }
     },
     "pipeline": {
@@ -386,7 +424,7 @@
     "session": {
       "startedAt": "2026-02-09T22:00:00.000Z",
       "onboardingCompleted": true,
-      "lastActivity": "2026-02-19T10:10:49.243Z"
+      "lastActivity": "2026-02-19T14:03:23.102Z"
     },
     "history": [
       {
@@ -2696,6 +2734,156 @@
       {
         "timestamp": "2026-02-19T10:10:49.243Z",
         "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T11:19:18.842Z",
+        "feature": "scripts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T11:23:51.403Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T11:32:33.577Z",
+        "feature": "scripts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T11:32:42.553Z",
+        "feature": "scripts",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:10:06.242Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:10:13.443Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:10:23.948Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:18:47.277Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:43:22.781Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:46:00.005Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:55:02.805Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T12:55:13.664Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:01:16.767Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:08:01.021Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:24:40.861Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:24:55.491Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:28:03.168Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:28:56.078Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T13:59:57.883Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:00:13.453Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:00:58.397Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:01:30.448Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:02:06.881Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:02:54.668Z",
+        "feature": "blog_monitor",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-19T14:03:23.101Z",
+        "feature": "blog_monitor",
         "phase": "do",
         "action": "updated"
       }
