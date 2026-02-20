@@ -7,11 +7,15 @@
 """
 
 import os
+import sys
 import json
 import hashlib
 import requests
+
+sys.stdout.reconfigure(encoding="utf-8")
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
 from pathlib import Path
 import re
@@ -19,6 +23,31 @@ from typing import List, Dict, Set
 
 # 본문 캡처 모듈 import (세션 재사용)
 from final_body_capture import BlogCaptureSession
+
+
+def is_within_days(pub_date_str: str, days: int):
+    """pub_date가 최근 N일 이내인지 확인.
+
+    Returns:
+        (result, reason)
+        - (True, "within") : N일 이내
+        - (True, "no_date") : pub_date 없음 → 수집 허용
+        - (True, "parse_fail") : 파싱 실패 → 수집 허용
+        - (False, "too_old") : N일 초과 → skip
+    """
+    if not pub_date_str or not pub_date_str.strip():
+        return True, "no_date"
+    try:
+        pub_dt = parsedate_to_datetime(pub_date_str.strip())
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(days=days)
+        if pub_dt >= cutoff:
+            return True, "within"
+        else:
+            return False, "too_old"
+    except Exception:
+        return True, "parse_fail"
+
 
 class NaverBlogCollector:
     def __init__(self, base_dir: str = None):
@@ -149,8 +178,14 @@ class NaverBlogCollector:
             print(f"블로그 내용 추출 실패 {blog_url}: {e}")
             return {'title': '', 'description': '', 'content': '', 'images': []}
     
-    def collect_blogger_posts(self, blogger_info: Dict, max_posts: int = 10) -> List[Dict]:
-        """개별 블로거의 최신 게시물 수집"""
+    def collect_blogger_posts(self, blogger_info: Dict, max_posts: int = 10, days: int = 7) -> List[Dict]:
+        """개별 블로거의 최신 게시물 수집
+
+        Args:
+            blogger_info: {'url': rss_url, 'name': blogger_name}
+            max_posts: RSS에서 가져올 최대 아이템 수
+            days: pub_date 기준 최근 N일 이내만 수집 (0=필터 없음)
+        """
         rss_url = blogger_info['url']
         blogger_name = blogger_info['name']
         
@@ -174,7 +209,16 @@ class NaverBlogCollector:
                 
                 if not link:
                     continue
-                
+
+                # pub_date 날짜 필터 (days=0이면 비활성)
+                if days > 0:
+                    within, reason = is_within_days(pub_date, days)
+                    if not within:
+                        print(f"    [SKIP-DATE] {title[:40]} (pub: {pub_date.strip()}, reason: {reason})")
+                        continue
+                    if reason in ("no_date", "parse_fail"):
+                        print(f"    [WARN] pubDate {reason}: {title[:40]}")
+
                 # 게시물 ID 생성 (URL 기준 - Stable Hash)
                 post_id = hashlib.md5(link.encode('utf-8')).hexdigest()
                 
@@ -240,8 +284,13 @@ class NaverBlogCollector:
         else:
             print(f"  → 실패: {capture_result['message']}")
     
-    def collect_all(self, max_posts_per_blogger: int = 10):
-        """모든 블로거의 데이터 수집 (브라우저 재사용)"""
+    def collect_all(self, max_posts_per_blogger: int = 10, days: int = 7):
+        """모든 블로거의 데이터 수집 (브라우저 재사용)
+
+        Args:
+            max_posts_per_blogger: 블로거당 RSS 최대 아이템 수
+            days: pub_date 기준 최근 N일 이내만 수집 (0=필터 없음)
+        """
         rss_list = self._load_rss_list()
         
         if not rss_list:
@@ -254,7 +303,7 @@ class NaverBlogCollector:
         # 1단계: 모든 블로거의 글 목록 수집 (빠름)
         for blogger_info in rss_list:
             print(f"\n[RSS] {blogger_info['name']} 목록 수집 중...")
-            posts = self.collect_blogger_posts(blogger_info, max_posts_per_blogger)
+            posts = self.collect_blogger_posts(blogger_info, max_posts_per_blogger, days=days)
             all_posts.extend(posts)
         
         if not all_posts:
@@ -342,10 +391,16 @@ class NaverBlogCollector:
 
 def main():
     """메인 실행 함수"""
+    import argparse
+    parser = argparse.ArgumentParser(description="네이버 블로그 수집기")
+    parser.add_argument("--days", type=int, default=7,
+                        help="최근 N일 이내 발행 글만 수집 (0=필터없음, 기본=7)")
+    parser.add_argument("--max-posts", type=int, default=10,
+                        help="블로거당 RSS 최대 아이템 수 (기본=10)")
+    args = parser.parse_args()
+
     collector = NaverBlogCollector()
-    
-    # 처음 실행 시 최근 10개만 수집
-    collector.collect_all(max_posts_per_blogger=10)
+    collector.collect_all(max_posts_per_blogger=args.max_posts, days=args.days)
 
 if __name__ == "__main__":
     main()

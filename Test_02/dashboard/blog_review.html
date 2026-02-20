@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자자 블로그 정리 - Stock Research ONE</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0e 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .page-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            color: #22c55e;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #22c55e;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            height: calc(100vh - 68px);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 340px;
+            min-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        .filter-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            width: 40px;
+            flex-shrink: 0;
+        }
+
+        .date-input {
+            flex: 1;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .date-input:focus {
+            border-color: #22c55e;
+        }
+
+        .blogger-select {
+            flex: 1;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .blogger-select:focus {
+            border-color: #22c55e;
+        }
+
+        .date-nav-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #94a3b8;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .date-nav-btn:hover {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+
+        /* Post List */
+        .post-list-section {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            overflow-y: auto;
+            padding: 0.75rem;
+        }
+
+        .blogger-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .blogger-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #22c55e;
+            padding: 0.25rem 0.5rem;
+            background: rgba(34, 197, 94, 0.08);
+            border-radius: 4px;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blogger-count {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        .post-item {
+            padding: 0.5rem 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .post-item:hover {
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .post-item.active {
+            background: rgba(34, 197, 94, 0.1);
+            border-left-color: #22c55e;
+        }
+
+        .post-title-text {
+            flex: 1;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-item.active .post-title-text {
+            color: #ffffff;
+        }
+
+        .post-badges {
+            display: flex;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .badge-ai {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .badge-edited {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .badge-demo {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .list-stats {
+            font-size: 0.7rem;
+            color: #64748b;
+            padding: 0.5rem;
+            text-align: center;
+            border-top: 1px solid #1e293b;
+            margin-top: 0.5rem;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            gap: 1rem;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(34, 197, 94, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Detail Header */
+        .detail-header {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }
+
+        .detail-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            flex: 1;
+        }
+
+        .open-original {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #22c55e;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .open-original:hover {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .detail-meta {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .detail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1.25rem;
+            flex: 1;
+        }
+
+        .summary-block {
+            margin-bottom: 1rem;
+        }
+
+        .summary-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .summary-textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+            min-height: 80px;
+        }
+
+        .summary-textarea:focus {
+            border-color: #22c55e;
+        }
+
+        .summary-textarea.empty {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            padding-top: 0.5rem;
+            border-top: 1px solid #1e293b;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .btn-save {
+            background: #22c55e;
+            color: #000;
+        }
+
+        .btn-save:hover {
+            background: #16a34a;
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-analyze {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-analyze:hover {
+            background: rgba(139, 92, 246, 0.25);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .save-status {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: auto;
+        }
+
+        .save-status.success {
+            color: #22c55e;
+        }
+
+        .save-status.error {
+            color: #ef4444;
+        }
+
+        /* Image Section */
+        .image-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .image-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .image-toggle-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .image-toggle-arrow {
+            color: #64748b;
+            transition: transform 0.2s;
+        }
+
+        .image-toggle-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .image-container {
+            margin-top: 0.75rem;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #0f172a;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+        }
+
+        .image-container iframe.pdf-viewer {
+            width: 100%;
+            height: 80vh;
+            border: 1px solid #334155;
+            border-radius: 4px;
+        }
+
+        .image-placeholder {
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.success {
+            background: rgba(34, 197, 94, 0.9);
+            color: #000;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Demo Banner */
+        .demo-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            color: #ef4444;
+            text-align: center;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #334155;
+            border-top: 2px solid #22c55e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Text Content */
+        .text-content-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .text-content-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .text-content-body {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.7;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        /* Collect Action */
+        .collect-action-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .collect-status-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-collect {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-collect:hover:not(:disabled) {
+            background: rgba(34, 197, 94, 0.25);
+        }
+
+        .btn-collect:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #334155;
+            color: #94a3b8;
+            background: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const API_BASE = 'http://localhost:8000/api/v1/blog-review';
+
+        // ========================================
+        // Utility Functions
+        // ========================================
+        function getLocalDateStr(offsetDays = 0) {
+            const d = new Date();
+            d.setDate(d.getDate() + offsetDays);
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        function isDemo(source) {
+            return source && source.toUpperCase() === 'DEMO';
+        }
+
+        function formatTime(dtStr) {
+            if (!dtStr) return '';
+            const d = new Date(dtStr);
+            return String(d.getHours()).padStart(2, '0') + ':' +
+                String(d.getMinutes()).padStart(2, '0');
+        }
+
+        // ========================================
+        // Toast Component
+        // ========================================
+        function Toast({ message, type, onClose }) {
+            useEffect(() => {
+                const t = setTimeout(onClose, 3000);
+                return () => clearTimeout(t);
+            }, []);
+            return <div className={`toast ${type}`}>{message}</div>;
+        }
+
+        // ========================================
+        // Main App
+        // ========================================
+        function BlogReviewApp() {
+            const [selectedDate, setSelectedDate] = useState(getLocalDateStr());
+            const [availableDates, setAvailableDates] = useState([]);
+            const [bloggers, setBloggers] = useState([]);
+            const [selectedBlogger, setSelectedBlogger] = useState('');
+            const [posts, setPosts] = useState([]);
+            const [selectedPostId, setSelectedPostId] = useState(null);
+            const [postDetail, setPostDetail] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [detailLoading, setDetailLoading] = useState(false);
+            const [toast, setToast] = useState(null);
+
+            // Summary edit state
+            const [editSummary, setEditSummary] = useState('');
+            const [editViewpoint, setEditViewpoint] = useState('');
+            const [editImplications, setEditImplications] = useState('');
+            const [saving, setSaving] = useState(false);
+            const [saveStatus, setSaveStatus] = useState(null);
+            const [analyzing, setAnalyzing] = useState(false);
+
+            // Collapsible sections
+            const [showImage, setShowImage] = useState(false);
+            const [showText, setShowText] = useState(false);
+
+            // Collection status state
+            const [collectState, setCollectState] = useState({ status: 'idle', message: '대기 중' });
+
+            // Demo data count
+            const [demoCount, setDemoCount] = useState(0);
+
+            // ---- Load collect status periodically ----
+            useEffect(() => {
+                const checkStatus = () => {
+                    fetch(`${API_BASE}/collect/status`)
+                        .then(r => r.json())
+                        .then(data => setCollectState(data))
+                        .catch(() => { });
+                };
+
+                // Check immediately on mount
+                checkStatus();
+
+                // If running, poll every 3 seconds to update log message
+                let intervalId;
+                if (collectState.status === 'running') {
+                    intervalId = setInterval(checkStatus, 3000);
+                }
+
+                return () => {
+                    if (intervalId) clearInterval(intervalId);
+                };
+            }, [collectState.status]);
+
+            // ---- Trigger manual collect ----
+            const handleManualCollect = () => {
+                if (collectState.status === 'running') return;
+
+                setCollectState({ status: 'running', message: '요청 전송 중...' });
+                fetch(`${API_BASE}/collect`, { method: 'POST' })
+                    .then(r => {
+                        if (!r.ok) {
+                            if (r.status === 409) throw new Error('이미 수집이 진행 중입니다.');
+                            throw new Error('수집 요청 실패');
+                        }
+                        setToast({ message: '데이터 수집을 시작합니다.', type: 'success' });
+                    })
+                    .catch(e => {
+                        setToast({ message: e.message, type: 'error' });
+                        // Revert status check to correct the UI
+                        fetch(`${API_BASE}/collect/status`)
+                            .then(r => r.json())
+                            .then(data => setCollectState(data))
+                            .catch(() => setCollectState({ status: 'idle', message: '오류 발생' }));
+                    });
+            };
+
+            // ---- Load initial data ----
+            useEffect(() => {
+                fetch(`${API_BASE}/dates`)
+                    .then(r => r.json())
+                    .then(dates => {
+                        setAvailableDates(dates);
+                        if (dates.length > 0 && !dates.includes(selectedDate)) {
+                            setSelectedDate(dates[0]);
+                        }
+                    })
+                    .catch(() => { });
+
+                fetch(`${API_BASE}/bloggers`)
+                    .then(r => r.json())
+                    .then(data => setBloggers(data.map(b => b.name || b)))
+                    .catch(() => { });
+            }, []);
+
+            // ---- Load posts on date/blogger change ----
+            useEffect(() => {
+                if (!selectedDate) return;
+                setLoading(true);
+                setSelectedPostId(null);
+                setPostDetail(null);
+
+                let url = `${API_BASE}/posts?date=${selectedDate}`;
+                if (selectedBlogger) url += `&blogger=${encodeURIComponent(selectedBlogger)}`;
+
+                fetch(url)
+                    .then(r => r.json())
+                    .then(data => {
+                        const postList = data.posts || [];
+                        setPosts(postList);
+                        const dc = postList.filter(p => isDemo(p.source)).length;
+                        setDemoCount(dc);
+                        setLoading(false);
+                    })
+                    .catch(() => {
+                        setPosts([]);
+                        setLoading(false);
+                    });
+            }, [selectedDate, selectedBlogger]);
+
+            // ---- Load post detail ----
+            useEffect(() => {
+                if (!selectedPostId) return;
+                setDetailLoading(true);
+
+                fetch(`${API_BASE}/posts/${selectedPostId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        setPostDetail(data);
+                        const s = data.summary;
+                        setEditSummary(s?.summary || '');
+                        setEditViewpoint(s?.viewpoint || '');
+                        setEditImplications(s?.implications || '');
+                        setSaveStatus(null);
+                        setDetailLoading(false);
+                    })
+                    .catch(() => {
+                        setDetailLoading(false);
+                    });
+            }, [selectedPostId]);
+
+            // ---- Date navigation ----
+            function navigateDate(direction) {
+                const idx = availableDates.indexOf(selectedDate);
+                if (direction === 'prev' && idx < availableDates.length - 1) {
+                    setSelectedDate(availableDates[idx + 1]);
+                } else if (direction === 'next' && idx > 0) {
+                    setSelectedDate(availableDates[idx - 1]);
+                }
+            }
+
+            // ---- Save summary ----
+            async function handleSave() {
+                if (!selectedPostId) return;
+                setSaving(true);
+                setSaveStatus(null);
+
+                try {
+                    const res = await fetch(`${API_BASE}/posts/${selectedPostId}/summary`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            summary: editSummary,
+                            viewpoint: editViewpoint,
+                            implications: editImplications,
+                        }),
+                    });
+
+                    if (res.ok) {
+                        setSaveStatus('success');
+                        setToast({ message: '저장 완료', type: 'success' });
+                        // Update post list badge
+                        setPosts(prev => prev.map(p =>
+                            p.id === selectedPostId ? { ...p, has_summary: true, is_edited: true } : p
+                        ));
+                    } else {
+                        setSaveStatus('error');
+                        setToast({ message: '저장 실패', type: 'error' });
+                    }
+                } catch (e) {
+                    setSaveStatus('error');
+                    setToast({ message: '저장 실패: ' + e.message, type: 'error' });
+                }
+                setSaving(false);
+            }
+
+            // ---- AI re-analyze ----
+            async function handleAnalyze() {
+                if (!selectedPostId) return;
+                setAnalyzing(true);
+
+                try {
+                    const res = await fetch(`${API_BASE}/posts/${selectedPostId}/analyze`, {
+                        method: 'POST',
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.summary) {
+                            setEditSummary(data.summary.summary || '');
+                            setEditViewpoint(data.summary.viewpoint || '');
+                            setEditImplications(data.summary.implications || '');
+                        }
+                        setToast({ message: 'AI 분석 완료', type: 'success' });
+                        setPosts(prev => prev.map(p =>
+                            p.id === selectedPostId ? { ...p, has_summary: true } : p
+                        ));
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        setToast({ message: err.detail || 'AI 분석 실패', type: 'error' });
+                    }
+                } catch (e) {
+                    setToast({ message: 'AI 분석 실패: ' + e.message, type: 'error' });
+                }
+                setAnalyzing(false);
+            }
+
+            // ---- Group posts by blogger ----
+            function groupPostsByBlogger(postList) {
+                const groups = {};
+                postList.forEach(p => {
+                    if (!groups[p.blogger]) groups[p.blogger] = [];
+                    groups[p.blogger].push(p);
+                });
+                return groups;
+            }
+
+            const grouped = groupPostsByBlogger(posts);
+
+            return (
+                <div className="container">
+                    {/* Header */}
+                    <header className="header">
+                        <div className="header-content">
+                            <div className="header-left">
+                                <a href="index.html" className="back-link">{'\u2190'} Dashboard</a>
+                                <div className="logo">
+                                    <div className="logo-icon">{'\uD83D\uDCD6'}</div>
+                                    투자자 블로그 정리
+                                </div>
+                                <span className="page-badge">Blog Review</span>
+                            </div>
+                            <div className="collect-action-container">
+                                {collectState.message && (
+                                    <span className="collect-status-text" title={collectState.message}>
+                                        {collectState.message}
+                                    </span>
+                                )}
+                                <button
+                                    className="btn-collect"
+                                    onClick={handleManualCollect}
+                                    disabled={collectState.status === 'running'}
+                                >
+                                    {collectState.status === 'running' ? (
+                                        <><div className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px', marginRight: '4px' }}></div>수집 중...</>
+                                    ) : (
+                                        <>{'\u2B07'} 데이터 입수</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Demo Banner */}
+                    {demoCount > 0 && (
+                        <div style={{ maxWidth: 1600, margin: '0.5rem auto 0', padding: '0 2rem' }}>
+                            <div className="demo-banner">
+                                DEMO 데이터 {demoCount}건이 포함되어 있습니다. 실제 수집 데이터와 구분됩니다.
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Layout */}
+                    <div className="main-layout">
+                        {/* Left Panel */}
+                        <div className="left-panel">
+                            <div className="filter-section">
+                                <div className="filter-row">
+                                    <span className="filter-label">날짜</span>
+                                    <button className="date-nav-btn" onClick={() => navigateDate('prev')}>{'\u25C0'}</button>
+                                    <input
+                                        type="date"
+                                        className="date-input"
+                                        value={selectedDate}
+                                        onChange={e => setSelectedDate(e.target.value)}
+                                    />
+                                    <button className="date-nav-btn" onClick={() => navigateDate('next')}>{'\u25B6'}</button>
+                                </div>
+                                <div className="filter-row">
+                                    <span className="filter-label">블로거</span>
+                                    <select
+                                        className="blogger-select"
+                                        value={selectedBlogger}
+                                        onChange={e => setSelectedBlogger(e.target.value)}
+                                    >
+                                        <option value="">전체</option>
+                                        {bloggers.map(b => (
+                                            <option key={b} value={b}>{b}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="post-list-section">
+                                {loading ? (
+                                    <div className="loading"><div className="spinner"></div> 로딩 중...</div>
+                                ) : posts.length === 0 ? (
+                                    <div className="loading" style={{ color: '#64748b' }}>수집된 글이 없습니다</div>
+                                ) : (
+                                    <>
+                                        {Object.entries(grouped).map(([blogger, bloggerPosts]) => (
+                                            <div key={blogger} className="blogger-group">
+                                                <div className="blogger-header">
+                                                    <span>{blogger}</span>
+                                                    <span className="blogger-count">{bloggerPosts.length}건</span>
+                                                </div>
+                                                {bloggerPosts.map(p => (
+                                                    <div
+                                                        key={p.id}
+                                                        className={`post-item ${selectedPostId === p.id ? 'active' : ''}`}
+                                                        onClick={() => setSelectedPostId(p.id)}
+                                                    >
+                                                        <span className="post-title-text">{p.title}</span>
+                                                        <div className="post-badges">
+                                                            {isDemo(p.source) && <span className="badge-demo">DEMO</span>}
+                                                            {p.is_edited && <span className="badge-edited">edited</span>}
+                                                            {p.has_summary && !p.is_edited && <span className="badge-ai">AI</span>}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                        <div className="list-stats">
+                                            {posts.length}건 수집 | {posts.filter(p => p.has_summary).length}건 AI 분석됨
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right Panel */}
+                        <div className="right-panel">
+                            {!selectedPostId ? (
+                                <div className="empty-state">
+                                    <div className="empty-icon">
+                                        <span style={{ fontSize: '2rem' }}>{'\uD83D\uDCD6'}</span>
+                                    </div>
+                                    <div>좌측에서 글을 선택하세요</div>
+                                </div>
+                            ) : detailLoading ? (
+                                <div className="loading"><div className="spinner"></div> 상세 정보 로딩 중...</div>
+                            ) : postDetail ? (
+                                <>
+                                    {/* Detail Header */}
+                                    <div className="detail-header">
+                                        <div className="detail-title-row">
+                                            <span className="detail-title">{postDetail.title}</span>
+                                            <a
+                                                className="open-original"
+                                                href={postDetail.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                원문 보기 {'\u2197'}
+                                            </a>
+                                        </div>
+                                        <div className="detail-meta">
+                                            <span className="detail-meta-item">by {postDetail.blogger}</span>
+                                            {postDetail.pub_date && (
+                                                <span className="detail-meta-item">
+                                                    {postDetail.pub_date.slice(0, 10)} {formatTime(postDetail.pub_date)}
+                                                </span>
+                                            )}
+                                            {postDetail.image_size_kb > 0 && (
+                                                <span className="detail-meta-item">
+                                                    IMG {postDetail.image_size_kb > 1024
+                                                        ? (postDetail.image_size_kb / 1024).toFixed(1) + 'MB'
+                                                        : postDetail.image_size_kb + 'KB'
+                                                    }
+                                                </span>
+                                            )}
+                                            {isDemo(postDetail.source) && <span className="badge-demo">DEMO</span>}
+                                        </div>
+                                    </div>
+
+                                    {/* Summary Editing */}
+                                    <div className="summary-section">
+                                        <div className="summary-block">
+                                            <div className="summary-label">
+                                                {'\uD83D\uDCDD'} 내용 요약
+                                            </div>
+                                            <textarea
+                                                className={`summary-textarea ${!editSummary ? 'empty' : ''}`}
+                                                value={editSummary}
+                                                onChange={e => setEditSummary(e.target.value)}
+                                                placeholder="AI 분석 결과가 여기에 표시됩니다. 직접 작성하거나 AI 재분석 버튼을 누르세요."
+                                                rows={4}
+                                            />
+                                        </div>
+                                        <div className="summary-block">
+                                            <div className="summary-label">
+                                                {'\uD83D\uDC41'} 핵심 관점
+                                            </div>
+                                            <textarea
+                                                className={`summary-textarea ${!editViewpoint ? 'empty' : ''}`}
+                                                value={editViewpoint}
+                                                onChange={e => setEditViewpoint(e.target.value)}
+                                                placeholder="투자자의 핵심 관점과 논거"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div className="summary-block">
+                                            <div className="summary-label">
+                                                {'\uD83D\uDCA1'} 시사점
+                                            </div>
+                                            <textarea
+                                                className={`summary-textarea ${!editImplications ? 'empty' : ''}`}
+                                                value={editImplications}
+                                                onChange={e => setEditImplications(e.target.value)}
+                                                placeholder="나에게 주는 시사점"
+                                                rows={3}
+                                            />
+                                        </div>
+
+                                        <div className="action-bar">
+                                            <button
+                                                className="btn btn-save"
+                                                onClick={handleSave}
+                                                disabled={saving}
+                                            >
+                                                {saving ? '저장 중...' : '저장'}
+                                            </button>
+                                            <button
+                                                className="btn btn-analyze"
+                                                onClick={handleAnalyze}
+                                                disabled={analyzing}
+                                            >
+                                                {analyzing ? '분석 중...' : 'AI 재분석'}
+                                            </button>
+                                            {saveStatus && (
+                                                <span className={`save-status ${saveStatus}`}>
+                                                    {saveStatus === 'success' ? '저장됨' : '저장 실패'}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Text Content (collapsible) */}
+                                    {postDetail.text_content && (
+                                        <div className="text-content-section">
+                                            <div className="text-content-toggle" onClick={() => setShowText(!showText)}>
+                                                <span className="image-toggle-label">
+                                                    {'\uD83D\uDCC4'} 추출 텍스트 ({postDetail.text_content.length}자)
+                                                </span>
+                                                <span className={`image-toggle-arrow ${showText ? 'open' : ''}`}>{'\u25BC'}</span>
+                                            </div>
+                                            {showText && (
+                                                <div className="text-content-body" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.7' }}>
+                                                    {postDetail.text_content}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Image (collapsible) */}
+                                    <div className="image-section">
+                                        <div className="image-toggle" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <div onClick={() => setShowImage(!showImage)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
+                                                <span className="image-toggle-label">
+                                                    {'\uD83D\uDDBC'} {postDetail.image_path && postDetail.image_path.endsWith('.pdf') ? '캡처 PDF' : '캡처 이미지'}
+                                                    {postDetail.image_size_kb > 0 &&
+                                                        ` (${postDetail.image_size_kb > 1024
+                                                            ? (postDetail.image_size_kb / 1024).toFixed(1) + 'MB'
+                                                            : postDetail.image_size_kb + 'KB'
+                                                        })`
+                                                    }
+                                                </span>
+                                                <span className={`image-toggle-arrow ${showImage ? 'open' : ''}`}>{'\u25BC'}</span>
+                                            </div>
+                                            {postDetail.image_path && postDetail.image_path.endsWith('.pdf') && (
+                                                <a href={`${API_BASE}/posts/${postDetail.id}/image`}
+                                                    target="_blank" rel="noopener noreferrer"
+                                                    onClick={e => e.stopPropagation()}
+                                                    style={{ color: '#3b82f6', fontSize: '12px', textDecoration: 'none', whiteSpace: 'nowrap', marginLeft: '8px' }}>
+                                                    {'\uD83D\uDD17'} PDF 새 탭에서 열기
+                                                </a>
+                                            )}
+                                        </div>
+                                        {showImage && (
+                                            <div className="image-container">
+                                                {postDetail.image_path && postDetail.image_path.endsWith('.pdf') ? (
+                                                    <iframe
+                                                        className="pdf-viewer"
+                                                        src={`${API_BASE}/posts/${postDetail.id}/image`}
+                                                        title={postDetail.title}
+                                                    />
+                                                ) : postDetail.image_path ? (
+                                                    <img
+                                                        src={`${API_BASE}/posts/${postDetail.id}/image`}
+                                                        alt={postDetail.title}
+                                                        onError={e => { e.target.style.display = 'none'; }}
+                                                    />
+                                                ) : (
+                                                    <div className="image-placeholder">캡처 파일 없음</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : null}
+                        </div>
+                    </div>
+
+                    {/* Toast */}
+                    {toast && (
+                        <Toast
+                            message={toast.message}
+                            type={toast.type}
+                            onClose={() => setToast(null)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // ---- Error Boundary ----
+        class ErrorBoundary extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return React.createElement('div', {
+                        style: { color: '#ef4444', padding: '2rem', fontFamily: 'monospace' }
+                    }, 'Render Error: ' + (this.state.error?.message || 'Unknown'));
+                }
+                return this.props.children;
+            }
+        }
+
+        // ---- Render ----
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ErrorBoundary><BlogReviewApp /></ErrorBoundary>);
+    </script>
+</body>
+
+</html>

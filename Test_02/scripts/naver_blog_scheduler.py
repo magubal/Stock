@@ -26,7 +26,7 @@ def run_daily_collection():
     
     try:
         collector = NaverBlogCollector()
-        collector.collect_all(max_posts_per_blogger=5)  # 매일은 5개만 수집
+        collector.collect_all(max_posts_per_blogger=5, days=7)  # 매일은 5개, 최근 7일만
         logging.info("데이터 수집 완료")
     except Exception as e:
         logging.error(f"데이터 수집 중 오류 발생: {e}")
