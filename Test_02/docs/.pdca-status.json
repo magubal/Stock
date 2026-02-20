@@ -1,7 +1,8 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-19T13:28:56.078Z",
+  "lastUpdated": "2026-02-19T18:57:19.162Z",
   "activeFeatures": [
+    "blog-investor-digest",
     "oracle-earnings-integration",
     "investment-intelligence-engine",
     "stock-research-dashboard",
@@ -27,7 +28,8 @@
     "news_monitor",
     "news_intelligence_service.py",
     "crypto_monitor",
-    "dev"
+    "dev",
+    "blog_monitor"
   ],
   "primaryFeature": "oracle-earnings-integration",
   "features": {
@@ -118,6 +120,12 @@
       "archivedAt": "2026-02-19T16:10:00Z",
       "archivedTo": "docs/archive/2026-02/disclosure-auto-collect/"
     },
+    "pdca-auto-register-v2": {
+      "phase": "do",
+      "startedAt": "2026-02-20T03:00:00Z",
+      "planPath": "docs/01-plan/features/pdca-auto-register-v2.plan.md",
+      "designPath": "docs/02-design/features/pdca-auto-register-v2.design.md"
+    },
     "stock-research-dashboard": {
       "phase": "do",
       "startedAt": "2026-02-09T00:00:00Z",
@@ -133,9 +141,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-11T11:14:01.275Z",
-        "lastUpdated": "2026-02-19T11:23:51.403Z"
+        "lastUpdated": "2026-02-19T17:57:24.602Z"
       },
-      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\main.py"
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\services\\blog_review_service.py"
     },
     "schemas": {
       "phase": "do",
@@ -159,9 +167,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-11T11:15:44.499Z",
-        "lastUpdated": "2026-02-19T13:28:56.078Z"
+        "lastUpdated": "2026-02-19T15:20:30.269Z"
       },
-      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\project_status.py"
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\backend\\app\\api\\blog_review.py"
     },
     "frontend": {
       "phase": "do",
@@ -198,9 +206,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-11T17:55:48.701Z",
-        "lastUpdated": "2026-02-19T11:32:42.553Z"
+        "lastUpdated": "2026-02-19T18:57:19.162Z"
       },
-      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\kill_port.py"
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\pdca_auto_register.py"
     },
     "ask": {
       "phase": "do",
@@ -396,6 +404,19 @@
         "lastUpdated": "2026-02-19T06:27:05.175Z"
       },
       "lastFile": "f:/PSJ/AntigravityWorkPlace/Stock/Test_02/scripts/dev/unregister_daily_collector.ps1"
+    },
+    "blog_monitor": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-19T14:02:54.668Z",
+        "lastUpdated": "2026-02-19T15:53:19.203Z"
+      },
+      "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\blog_monitor\\verify_e2e.py"
     }
   },
   "pipeline": {
@@ -406,7 +427,7 @@
   "session": {
     "startedAt": "2026-02-09T22:00:00.000Z",
     "onboardingCompleted": true,
-    "lastActivity": "2026-02-19T13:28:56.078Z"
+    "lastActivity": "2026-02-19T18:57:19.162Z"
   },
   "history": [
     {
@@ -2824,6 +2845,336 @@
     {
       "timestamp": "2026-02-19T13:28:56.078Z",
       "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T13:59:57.883Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:00:13.453Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:00:58.397Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:01:30.448Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:02:06.881Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:02:54.668Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:03:23.101Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:16:00.826Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:16:21.750Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:16:49.064Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:17:52.496Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:20:03.223Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:20:12.026Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:20:53.228Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:45:25.949Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:46:15.208Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:46:30.762Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:50:42.065Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:55:28.206Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T14:56:32.807Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:19:46.257Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:20:05.120Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:20:22.789Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:20:30.269Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:22:05.403Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:24:15.436Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:24:23.203Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:25:09.165Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:26:22.817Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:39:51.964Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:40:12.204Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T15:53:19.203Z",
+      "feature": "blog_monitor",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:11:04.191Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:22:47.186Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:22:59.429Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:23:13.518Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:23:23.321Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:23:35.860Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:23:42.023Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:23:57.294Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:24:08.613Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:24:45.278Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:49:32.829Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T16:52:47.141Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:49:32.566Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:50:45.884Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:50:57.150Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:55:35.132Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:56:34.523Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T17:57:24.602Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T18:17:09.096Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T18:19:36.367Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T18:20:26.840Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T18:56:07.034Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-19T18:57:19.162Z",
+      "feature": "scripts",
       "phase": "do",
       "action": "updated"
     }

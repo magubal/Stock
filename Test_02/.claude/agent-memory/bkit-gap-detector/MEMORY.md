@@ -158,6 +158,31 @@
    - Cross-consistency: 7/7 (100%), Error handling: 4/4 (100%)
    - Ready for: `/pdca report disclosure-auto-collect`
 
+14. **blog-capture-pdf-migration** (2026-02-20)
+   - Match Rate: 98.9% (PASS)
+   - Design doc: `docs/02-design/features/blog-capture-pdf-migration.design.md`
+   - Analysis: `docs/03-analysis/features/blog-capture-pdf-migration.analysis.md`
+   - 89 items checked: 88 matched, 1 changed (Positive), 0 missing
+   - 7-file change set: final_body_capture.py (rewrite), run_blog.py, naver_blog_collector.py, blog_review_service.py, blog_review.py, blog_review.html, backfill_pdf.py (new)
+   - Core: Playwright page.pdf() A4 + desktop iframe + PRUNE_JS + block-aware text extraction
+   - 10 positive additions: relative URL fix, body fallback in PRUNE_JS, 2 extra selectors, json.dumps for JS injection, --all flag, img onError handler
+   - FR coverage: 12/12 (100%), Error handling: 7/7 (100%), Cross-consistency: 15/15 (100%)
+   - NFR note: PDF 1.7MB test exceeds 500KB target (image-heavy blog, quality prioritized over size)
+   - Backfill script ready but 93-post batch not yet executed
+   - Ready for: `/pdca report blog-capture-pdf-migration`
+
+15. **blog-pipeline-dedup-fix** (2026-02-20)
+   - Match Rate: 99.2% (PASS)
+   - Design doc: `docs/02-design/features/blog-pipeline-dedup-fix.design.md`
+   - Analysis: `docs/03-analysis/features/blog-pipeline-dedup-fix.analysis.md`
+   - 41 items checked: 39 matched, 2 changed (Negligible), 0 missing, 0 added
+   - 2 files: naver_blog_collector.py (is_within_days + collect_blogger_posts days filter + collect_all + main argparse), naver_blog_scheduler.py (days=7)
+   - Minimal-change feature: pub_date N-day filter + CLI --days + scheduler passthrough
+   - 2 Negligible gaps: missing return type annotation on is_within_days(), comment wording in scheduler
+   - FR coverage: 6/6 in-scope (100%), Error handling: 6/6 (100%), Cross-consistency: 10/10 (100%), Log messages: 3/3 (100%)
+   - Success criteria: 6/6 PASS
+   - Ready for: `/pdca report blog-pipeline-dedup-fix`
+
 ### Key Patterns
 
 - Design doc covers dashboard (React/API) but moat estimator is a sub-feature (data pipeline)

@@ -67,7 +67,11 @@
       "Bash(done)",
       "Bash(find:*)",
       "Bash(../backend/venv/Scripts/python.exe:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(sqlite3:*)",
+      "Bash(python3:*)",
+      "Bash(for:*)",
+      "Bash(do echo -n \"$d: \")"
     ]
   }
 }

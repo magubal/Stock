@@ -28,6 +28,18 @@
 | REQ-017 | 대시보드 프로젝트 현황/체크리스트 패널 | 완료 |
 | REQ-018 | Dashboard black screen 복구 | 완료 |
 | REQ-019 | 전역 변경 가드(Global Change Guard) 강제 | 완료 |
+| REQ-020 | Pdca Status Sync (PDCA-010) | 완료 |
+| REQ-021 | News Intelligence Monitor (PDCA-008) | 완료 |
+| REQ-022 | Oracle Earnings Integration & Growth-Adjusted Moat (PDCA-006) | 검증 |
+| REQ-023 | Investment Intelligence Engine (투자 인텔리전스 엔진) (PDCA-007) | 검증 |
+| REQ-024 | Idea Management & AI Collaboration System (PDCA-005) | 검증 |
+| REQ-025 | Disclosure Monitoring (PDCA-004) | 완료 |
+| REQ-026 | Windows 개발 환경에서 포트를 점유하는 좀비 프로세스를 자동 정리하는 유틸리티 (PDCA-012) | 완료 |
+| REQ-027 | Plan 없이 구현된 기능도 개발현황 대시보드에 자동 등록되도록 규칙을 명시하는 건 (PDCA-013) | 완료 |
+| REQ-028 | 개발현황 상세 패널에 기능 설명 한 줄과 Plan/Design 문서 링크를 표시하여 문맥 파악을 용이하게 한다 (PDCA-014) | 완료 |
+| REQ-029 | Disclosure Auto Collect (PDCA-011) | 완료 |
+| REQ-030 | PDCA 신규 피처 등록을 코드 레벨로 자동화하여 에이전트 기억 의존도를 0으로 만드는 건 (PDCA-015) | 기획 |
+| REQ-031 | stock-research-dashboard (PDCA-003) | 진행 |
 
 ---
 
@@ -280,3 +292,43 @@
 ## 메모
 - 본 문서는 UTF-8 기준 문서이며, 요청 추적의 단일 기준 문서입니다.
 - 추가 요청/변경 시 반드시 이 문서와 개발 로그를 함께 갱신합니다.
+
+### REQ-020: Pdca Status Sync (PDCA-010)
+| 항목 | 내용 |
+|---|---|
+| 요청 ID | REQ-020 |
+| 상태 | 완료 |
+| PDCA Feature | pdca-status-sync |
+
+#### 요구사항
+1. Pdca Status Sync
+
+#### 관련 파일
+- (Plan 없음)
+
+### REQ-021: News Intelligence Monitor (PDCA-008)
+| 항목 | 내용 |
+|---|---|
+| 요청 ID | REQ-021 |
+| 상태 | 완료 |
+| PDCA Feature | news-intelligence-monitor |
+
+#### 요구사항
+1. News Intelligence Monitor
+
+#### 관련 파일
+- (Plan 없음)
+
+### REQ-022: Oracle Earnings Integration & Growth-Adjusted Moat (PDCA-006)
+| 항목 | 내용 |
+|---|---|
+| 요청 ID | REQ-022 |
+| 상태 | 검증 |
+| PDCA Feature | oracle-earnings-integration |
+
+#### 요구사항
+1. Oracle Earnings Integration & Growth-Adjusted Moat
+
+#### 관련 파일
+- `docs/01-plan/features/oracle-earnings-integration.plan.md`
+

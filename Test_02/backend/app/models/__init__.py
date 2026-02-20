@@ -221,3 +221,5 @@ from .monitoring import MonitoringIncident, MonitoringDecision, MonitoringEvent
 from .moat_data import MoatStockSnapshot, MoatStockSyncRun, MoatStockHistory
 from .news_article import NewsArticle, MarketNarrative, SectorPerformance, IndustryPerformance, IndustryStock
 from .crypto import CryptoPrice, CryptoMetric, CollectorLog
+from .blog_post import BlogPost, BlogSummary
+from .daily_digest import DailyDigest

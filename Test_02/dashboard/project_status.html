@@ -522,7 +522,12 @@
 
         <section class="layout">
             <article class="card">
-                <h2>개발 리스트 | 상태</h2>
+                <h2 style="display:flex;align-items:center;gap:0.5rem;">개발 리스트 | 상태
+                    <span style="margin-left:auto;display:flex;gap:4px;">
+                        <button type="button" id="sort-asc" title="번호 오름차순" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:2px 8px;font-size:0.75rem;cursor:pointer;">▲</button>
+                        <button type="button" id="sort-desc" title="번호 내림차순" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:2px 8px;font-size:0.75rem;cursor:pointer;">▼</button>
+                    </span>
+                </h2>
                 <div class="dev-list" id="dev-list"></div>
             </article>
 
@@ -574,7 +579,8 @@
 
         const state = {
             selectedId: null,
-            filter: '개발중'
+            filter: '개발중',
+            sortDir: 'desc'
         };
 
         // --- Document modal ---
@@ -699,8 +705,37 @@
             });
         };
 
+        const getIdNum = (item) => {
+            const m = (item.id || '').match(/\d+/);
+            return m ? parseInt(m[0], 10) : 0;
+        };
+
+        const sortItems = (arr) => {
+            const dir = state.sortDir === 'asc' ? 1 : -1;
+            const isAllOrStatus = state.filter === 'all' || !['req-only', 'pdca-only'].includes(state.filter);
+            return [...arr].sort((a, b) => {
+                // 전체/상태 탭: REQ 먼저, PDCA 나중
+                if (isAllOrStatus) {
+                    const srcA = (a.source || 'req') === 'req' ? 0 : 1;
+                    const srcB = (b.source || 'req') === 'req' ? 0 : 1;
+                    if (srcA !== srcB) return srcA - srcB;
+                }
+                return (getIdNum(a) - getIdNum(b)) * dir;
+            });
+        };
+
+        const updateSortButtons = () => {
+            const asc = document.getElementById('sort-asc');
+            const desc = document.getElementById('sort-desc');
+            asc.style.background = state.sortDir === 'asc' ? 'var(--panel-soft)' : 'none';
+            asc.style.color = state.sortDir === 'asc' ? 'var(--accent)' : 'var(--muted)';
+            desc.style.background = state.sortDir === 'desc' ? 'var(--panel-soft)' : 'none';
+            desc.style.color = state.sortDir === 'desc' ? 'var(--accent)' : 'var(--muted)';
+        };
+
         const renderList = () => {
             els.list.innerHTML = '';
+            updateSortButtons();
             let filtered;
             if (state.filter === 'all') {
                 filtered = items;
@@ -713,6 +748,8 @@
             } else {
                 filtered = items.filter((item) => item.status === state.filter);
             }
+
+            filtered = sortItems(filtered);
 
             filtered.forEach((item) => {
                 const button = document.createElement('button');
@@ -917,6 +954,9 @@
             }
             render();
         };
+
+        document.getElementById('sort-asc').addEventListener('click', () => { state.sortDir = 'asc'; render(); });
+        document.getElementById('sort-desc').addEventListener('click', () => { state.sortDir = 'desc'; render(); });
 
         initialize();
     </script>

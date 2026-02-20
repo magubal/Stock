@@ -51,10 +51,13 @@ app.include_router(monitoring.router)
 app.include_router(moat_dashboard.router)
 app.include_router(news_intelligence.router)
 app.include_router(news_analysis.router)
-from .api import collector, crypto_data, project_status
+from .api import collector, crypto_data, project_status, blog_review, daily_digest, disclosures
 app.include_router(collector.router)
 app.include_router(crypto_data.router)
 app.include_router(project_status.router)
+app.include_router(blog_review.router)
+app.include_router(daily_digest.router)
+app.include_router(disclosures.router)
 
 # Root endpoint
 @app.get("/")

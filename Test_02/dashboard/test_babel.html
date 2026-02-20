@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>body{background:#111;color:#fff;font-family:monospace;padding:2rem;} .ok{color:lime;} .fail{color:red;}</style>
+</head>
+<body>
+    <h2>CDN Load Test</h2>
+    <div id="status">Testing CDN connections...</div>
+    <div id="root" style="margin-top:1rem;"></div>
+
+    <script>
+    var results = {};
+    var cdns = [
+        {name:'React', url:'https://unpkg.com/react@18/umd/react.development.js', global:'React'},
+        {name:'ReactDOM', url:'https://unpkg.com/react-dom@18/umd/react-dom.development.js', global:'ReactDOM'},
+        {name:'Babel', url:'https://unpkg.com/@babel/standalone/babel.min.js', global:'Babel'},
+        {name:'D3', url:'https://d3js.org/d3.v7.min.js', global:'d3'},
+        {name:'Lucide', url:'https://unpkg.com/lucide@latest', global:'lucide'},
+    ];
+
+    function showStatus() {
+        var html = '';
+        cdns.forEach(function(cdn) {
+            var loaded = !!window[cdn.global];
+            var cls = loaded ? 'ok' : 'fail';
+            html += '<div class="' + cls + '">' + cdn.name + ': ' + (loaded ? 'OK' : 'FAILED') + ' (' + cdn.url + ')</div>';
+        });
+        document.getElementById('status').innerHTML = html;
+    }
+
+    // Load each CDN dynamically and track results
+    var loaded = 0;
+    cdns.forEach(function(cdn) {
+        var s = document.createElement('script');
+        s.src = cdn.url;
+        s.onload = function() { loaded++; if(loaded>=cdns.length) afterLoad(); };
+        s.onerror = function() { loaded++; if(loaded>=cdns.length) afterLoad(); };
+        document.head.appendChild(s);
+    });
+
+    function afterLoad() {
+        showStatus();
+
+        // Test Babel transpilation
+        if (window.Babel && window.React && window.ReactDOM) {
+            try {
+                var code = Babel.transform(
+                    'function App(){return <div style={{color:"lime",fontSize:"2rem",marginTop:"1rem"}}>Babel+React OK!</div>;}' +
+                    'ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));',
+                    {presets:['env','react']}
+                ).code;
+                eval(code);
+            } catch(e) {
+                document.getElementById('root').innerHTML = '<div class="fail">Babel transform error: ' + e.message + '</div>';
+            }
+        } else {
+            document.getElementById('root').innerHTML = '<div class="fail">Missing required libraries. Cannot render React.</div>';
+        }
+    }
+
+    // Timeout fallback
+    setTimeout(function() {
+        if (loaded < cdns.length) {
+            showStatus();
+            document.getElementById('root').innerHTML = '<div class="fail">Timeout: Some CDNs did not load within 10 seconds.</div>';
+        }
+    }, 10000);
+    </script>
+</body>
+</html>

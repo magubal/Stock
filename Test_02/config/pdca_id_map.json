@@ -1,6 +1,6 @@
 {
   "_comment": "PDCA feature -> fixed ID mapping. Never reuse deleted IDs.",
-  "_nextId": 15,
+  "_nextId": 26,
   "map": {
     "stock-moat-estimator": 1,
     "evidence-based-moat": 2,
@@ -15,6 +15,17 @@
     "disclosure-auto-collect": 11,
     "zombie-process-cleanup": 12,
     "pdca-auto-register": 13,
-    "project-status-detail-enhance": 14
+    "project-status-detail-enhance": 14,
+    "pdca-auto-register-v2": 15,
+    "blog-capture-pdf-migration": 16,
+    "blog-investor-digest": 17,
+    "blog-pipeline-dedup-fix": 18,
+    "crypto-trends-monitor": 19,
+    "daily-data-collector": 20,
+    "dashboard-project-panel-v2": 21,
+    "liquidity-stress-monitor": 22,
+    "market-daily-digest": 23,
+    "manual-collector-trigger": 24,
+    "kill-port-v2-upgrade": 25
   }
 }

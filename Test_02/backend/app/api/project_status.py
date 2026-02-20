@@ -120,15 +120,75 @@ def _build_checklist(feature: dict, phase: str) -> list:
 def _load_active_features() -> list:
     """Load real PDCA features from .pdca-status.json (planPath or archivedTo required)."""
     if not _PDCA_STATUS.exists():
-        return []
-    data = json.loads(_PDCA_STATUS.read_text(encoding="utf-8"))
-    features = data.get("features", {})
+        tracked_features = {}
+    else:
+        data = json.loads(_PDCA_STATUS.read_text(encoding="utf-8"))
+        tracked_features = data.get("features", {})
+
     result = []
-    for name, info in features.items():
+    # 1. Existing tracked features
+    for name, info in tracked_features.items():
         if not info.get("planPath") and not info.get("archivedTo"):
-            continue  # Skip auto-tracked noise (backend, api, scripts, etc.)
+            continue  # Skip auto-tracked noise
         result.append({"name": name, **info})
+        
+    # 2. Dynamically scan for undocumented features from docs/*/features/*.md
+    dynamic_features = _scan_dynamic_features(tracked_features)
+    result.extend(dynamic_features)
+    
     return result
+
+def _scan_dynamic_features(tracked: dict) -> list:
+    """Scan docs/01-plan/features, 02-design, 03-analysis, 04-report for feature md files not in tracked."""
+    docs_dir = _BASE / "docs"
+    discovered = {}
+    
+    # Map of directory pattern to the badge path key it represents
+    doc_types = {
+        "01-plan/features": "planPath",
+        "02-design/features": "designPath",
+        "03-analysis/features": "analysisPath",
+        "04-report/features": "reportPath"
+    }
+
+    for subdir, path_key in doc_types.items():
+        target_dir = docs_dir / subdir
+        if not target_dir.exists():
+            continue
+        for md_file in target_dir.glob("*.md"):
+            # feature-name.plan.md -> feature-name
+            # feature-name.md -> feature-name
+            name = md_file.name
+            for ext in [".plan.md", ".design.md", ".analysis.md", ".report.md", ".md"]:
+                if name.endswith(ext):
+                    name = name[:-len(ext)]
+                    break
+                    
+            if name in tracked:
+                continue
+
+            rel_path = md_file.relative_to(_BASE).as_posix()
+            if name not in discovered:
+                discovered[name] = {
+                    "phase": "plan",
+                    "id": "",
+                    "description": "",
+                    "checklist": []
+                }
+            discovered[name][path_key] = rel_path
+            
+            # If phase is lower than the document found, upgrade it roughly
+            if "design" in subdir and discovered[name]["phase"] in ("plan"):
+                discovered[name]["phase"] = "design"
+            elif "analysis" in subdir and discovered[name]["phase"] in ("plan", "design"):
+                discovered[name]["phase"] = "analysis"
+            elif "report" in subdir:
+                discovered[name]["phase"] = "report"
+
+    res = []
+    for name, info in discovered.items():
+        res.append({"name": name, **info})
+    return res
 
 
 def _load_archived_features() -> list:

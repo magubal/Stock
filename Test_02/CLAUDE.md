@@ -89,13 +89,13 @@ pytest backend/app/test_main.py
 - `scripts/` — Python automation and collection scripts
 - `data/naver_blog_data/YYYY-MM-DD/` — Collected blog data organized by date
 - `.agent/workflows/` — 7-step flywheel workflow definitions (01 through 07)
-- `.agent/skills/` — Agent skill definitions (ui-ux-pro-max, data-collection, analysis, decision, research)
+- `.agent/skills/` — Agent skill definitions (ui-ux-pro-max, data-collection, analysis, decision, research, brain)
 - `docs/investment-philosophy.md` — Core investment philosophy document
 
 ## Custom Commands
 
 - **`/brain <주제>`** — 브레인스토밍 워크플로우 실행
-  - 사용자가 `/brain`, `brain`, `브레인스토밍` 뒤에 주제를 입력하면 `.agent/skills/brainstorm-bkit/SKILL.md` 프로토콜을 실행한다.
+  - 사용자가 `/brain`, `brain`, `브레인스토밍` 뒤에 주제를 입력하면 `.agent/skills/brain/SKILL.md` 프로토콜을 실행한다.
   - 흐름: 문제 정의 → 제약 수집(1~3개 질문) → 대안 생성(2~4개) → 비교표 → 추천안 → Design Brief 출력 → `/pdca plan` handoff
   - 코드 작성 금지. 의사결정만 한다.
 - **`/kill-port [ports]`** — 좀비 프로세스 포트 정리
@@ -132,13 +132,14 @@ VS Code: `Ctrl+Shift+P` → `Tasks: Run Task` → `kill-ports-all`
   - UI auto-detection: dashboards check `source==="DEMO"` and render red DEMO badge
   - Seed scripts: print `[SEED]` prefix in console output
   - Never mix demo and real data without clear distinction in the UI
-- **Plan-less Feature Registration (MANDATORY)**: 모든 구현은 PDCA Plan 유무와 관계없이 반드시 개발현황에 등록한다.
-  - `/brain` 브레인스토밍 → 직접 구현, hotfix, 유틸리티 등 Plan 없이 구현한 기능도 해당
-  - 구현 완료 시 세션 종료 전 반드시:
-    1. 경량 Plan 문서 생성: `docs/01-plan/features/{feature-name}.plan.md` (최소 항목: 배경, 범위, 산출물 테이블)
-    2. `.pdca-status.json`의 `features`에 등록 (`planPath` 포함)
-    3. phase: 완료면 `"archived"`, 진행 중이면 `"do"`
-  - `/brain` 결과물은 Plan 문서에 포함
+- **PDCA Feature Registration (MANDATORY)**:
+  - AI가 규칙을 skip해도 강제 등록 가능: `python scripts/pdca_auto_register.py`
+  - 스크립트가 `.pdca-status.json`에서 planPath 없는 피처를 감지하여:
+    1. 경량 Plan 자동 생성 (`docs/01-plan/features/`)
+    2. `.pdca-status.json`에 planPath 등록
+    3. `config/pdca_id_map.json`에 PDCA-XXX ID 할당
+  - **REQUESTS.md는 대상이 아님** (REQ-XXX는 별도 체계, 다른 AI 인스턴스가 관리)
+  - 사전 확인: `python scripts/pdca_auto_register.py --dry-run`
   - `project_status.py`가 `planPath` 기준으로 필터링하므로 planPath 누락 시 대시보드에서 보이지 않음
 
 ## Environment Variables
