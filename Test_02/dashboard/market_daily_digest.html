@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시장 종합정리 - Stock Research ONE</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #eab308;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(234, 179, 8, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.4rem 0.75rem;
+            color: #94a3b8;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-nav button {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .date-nav button:hover {
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+        }
+
+        .date-nav .date-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #eab308;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .model-select {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.35rem 0.5rem;
+            color: #e2e8f0;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .model-select:focus {
+            outline: none;
+            border-color: #eab308;
+        }
+
+        .ai-btn {
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 6px;
+            padding: 0.35rem 0.75rem;
+            color: #eab308;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .ai-btn:hover {
+            background: rgba(234, 179, 8, 0.25);
+        }
+
+        .ai-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Split Layout */
+        .main-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            height: calc(100vh - 80px);
+        }
+
+        .mindmap-panel {
+            flex: 6;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .mindmap-panel svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 0.25rem;
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 20;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: #eab308;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        .detail-panel {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            overflow-y: auto;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            display: flex;
+            gap: 0.25rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: #e2e8f0;
+        }
+
+        /* Module Detail Card */
+        .detail-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .module-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .module-status {
+            margin-left: auto;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-item {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .kpi-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+        }
+
+        .data-list {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .data-list li {
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        .data-list li:last-child {
+            border-bottom: none;
+        }
+
+        .open-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #eab308;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .open-link:hover {
+            opacity: 0.8;
+        }
+
+        /* Summary Panel */
+        .summary-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #eab308;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .summary-actions button {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .summary-actions button:hover {
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+        }
+
+        .summary-actions .save-btn {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: rgba(234, 179, 8, 0.3);
+            color: #eab308;
+        }
+
+        .summary-actions .save-btn:hover {
+            background: rgba(234, 179, 8, 0.25);
+        }
+
+        .summary-content {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .summary-content h2 {
+            color: #eab308;
+            font-size: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .summary-content h3 {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .summary-content ul {
+            padding-left: 1.2rem;
+        }
+
+        .summary-content li {
+            margin-bottom: 0.3rem;
+        }
+
+        .summary-textarea {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            resize: none;
+            min-height: 200px;
+        }
+
+        .summary-textarea:focus {
+            outline: none;
+            border-color: #eab308;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* History Chips */
+        .footer {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0.5rem 1.5rem 1rem;
+        }
+
+        .history-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .history-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-right: 0.25rem;
+        }
+
+        .history-chip {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-chip:hover {
+            border-color: #eab308;
+            color: #eab308;
+        }
+
+        .history-chip.active {
+            border-color: #eab308;
+            color: #eab308;
+            background: rgba(234, 179, 8, 0.1);
+        }
+
+        /* Placeholder */
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #64748b;
+            font-size: 0.9rem;
+            gap: 0.5rem;
+        }
+
+        /* DEMO badge */
+        .demo-badge {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        /* D3 tooltip */
+        .d3-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            pointer-events: none;
+            z-index: 50;
+            max-width: 250px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .mindmap-panel {
+                min-height: 50vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <div style="color:#64748b;padding:2rem;text-align:center;font-family:sans-serif;">Loading...</div>
+    </div>
+
+    <script>
+        // CDN load check + error handler
+        window.addEventListener('error', function (e) {
+            var root = document.getElementById('root');
+            if (root && root.querySelector('.js-error')) return;
+            var div = document.createElement('div');
+            div.className = 'js-error';
+            div.style.cssText = 'color:#ef4444;padding:2rem;font-family:monospace;background:#1a1a2e;';
+            div.innerHTML = '<h2>JavaScript Error</h2><pre>' +
+                (e.message || String(e)) + '\nFile: ' + (e.filename || '') + '\nLine: ' + (e.lineno || '') + '</pre>';
+            root.prepend(div);
+        });
+        setTimeout(function () {
+            var root = document.getElementById('root');
+            if (root && root.textContent.trim() === 'Loading...') {
+                root.innerHTML = '<div style="color:#ef4444;padding:2rem;font-family:monospace;background:#1a1a2e;">' +
+                    '<h2>Render Failed</h2>' +
+                    '<p>React: ' + !!window.React + ' | ReactDOM: ' + !!window.ReactDOM +
+                    ' | Babel: ' + !!window.Babel + ' | D3: ' + !!window.d3 + '</p>' +
+                    '<p>Press F12 to see console errors.</p></div>';
+            }
+        }, 5000);
+    </script>
+
+    <script id="app-source" type="text/plain">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const API_BASE = 'http://localhost:8000/api/v1/daily-digest';
+
+        // ─── Module Config ─────────────────────────────────
+        const MODULE_CONFIG = {
+            disclosures: {
+                label: '공시', color: '#ef4444', icon: 'file-text',
+                url: 'monitor_disclosures.html',
+                apiUrl: 'http://localhost:8000/api/v1/disclosures',
+                mapToSummary: (d) => ({
+                    count: d?.summary?.total || d?.length || 0,
+                    key: d?.disclosures?.[0]?.title || d?.[0]?.title || '데이터 없음',
+                    items: (d?.disclosures || d || []).slice(0, 5).map(i => i.title || i.corp_name || ''),
+                }),
+                kpis: (s) => [
+                    { label: '공시 건수', value: s?.count || 0 },
+                ],
+            },
+            news: {
+                label: '뉴스', color: '#f97316', icon: 'newspaper',
+                url: 'news_intelligence.html',
+                apiUrl: 'http://localhost:8000/api/v1/news-intel/articles',
+                mapToSummary: (d) => {
+                    const cats = {};
+                    (d?.articles || []).forEach(a => { cats[a.category] = (cats[a.category] || 0) + 1; });
+                    return {
+                        count: d?.total || 0,
+                        categories: cats,
+                        key: d?.articles?.[0]?.title || '데이터 없음',
+                        items: (d?.articles || []).slice(0, 5).map(a => a.title),
+                    };
+                },
+                kpis: (s) => [
+                    { label: '총 기사', value: s?.count || 0 },
+                    { label: '카테고리', value: Object.keys(s?.categories || {}).length },
+                ],
+            },
+            liquidity_stress: {
+                label: '유동성', color: '#22c55e', icon: 'trending-up',
+                url: 'liquidity_stress.html',
+                apiUrl: 'http://localhost:8000/api/v1/liquidity-stress',
+                mapToSummary: (d) => ({
+                    stress_index: d?.totalScore || d?.total_score || 0,
+                    stress_label: d?.level || d?.stress_label || 'N/A',
+                    modules: d?.modules || d?.components || {},
+                }),
+                kpis: (s) => [
+                    { label: '스트레스 지수', value: (s?.stress_index || 0).toFixed(1) },
+                    { label: '수준', value: s?.stress_label || 'N/A' },
+                ],
+            },
+            crypto: {
+                label: '크립토', color: '#a855f7', icon: 'circle-dollar-sign',
+                url: 'crypto_trends.html',
+                apiUrl: null, // external
+                mapToSummary: (d) => ({
+                    btc_price: d?.bitcoin?.usd || 0,
+                    btc_change: d?.bitcoin?.usd_24h_change || 0,
+                    eth_price: d?.ethereum?.usd || 0,
+                    fear_greed: d?.fear_greed || 0,
+                    fear_label: d?.fear_label || '',
+                }),
+                kpis: (s) => [
+                    { label: 'BTC', value: s?.btc_price ? `$${(s.btc_price/1000).toFixed(1)}k` : 'N/A' },
+                    { label: 'ETH', value: s?.eth_price ? `$${s.eth_price.toFixed(0)}` : 'N/A' },
+                    { label: 'Fear&Greed', value: s?.fear_greed || 'N/A' },
+                ],
+            },
+            moat: {
+                label: '해자', color: '#3b82f6', icon: 'shield',
+                url: 'moat_analysis.html',
+                apiUrl: 'http://localhost:8000/api/v1/moat-dashboard',
+                mapToSummary: (d) => ({
+                    count: d?.meta?.total_stocks || d?.total_stocks || d?.analyzed_count || 0,
+                    avg_score: d?.meta?.avg_moat_score || d?.avg_moat_score || d?.average_moat || 0,
+                }),
+                kpis: (s) => [
+                    { label: '분석 종목', value: s?.count || 0 },
+                    { label: '평균 해자', value: `${(s?.avg_score || 0).toFixed(1)}/5` },
+                ],
+            },
+            intelligence: {
+                label: 'Intelligence', color: '#06b6d4', icon: 'brain',
+                url: 'idea_board.html',
+                apiUrl: 'http://localhost:8000/api/v1/cross-module/context',
+                mapToSummary: (d) => ({
+                    modules_count: d?.modules?.length || Object.keys(d?.modules || {}).length || 0,
+                    events_count: d?.events?.length || d?.upcoming_events || 0,
+                    key_insight: d?.key_insight || '',
+                }),
+                kpis: (s) => [
+                    { label: '모듈 수', value: s?.modules_count || 0 },
+                    { label: '이벤트', value: s?.events_count || 0 },
+                ],
+            },
+            blog: {
+                label: '블로그', color: '#ec4899', icon: 'bookmark',
+                url: 'blog_review.html',
+                apiUrl: 'http://localhost:8000/api/v1/blog-review/posts',
+                mapToSummary: (d) => ({
+                    count: d?.total || d?.posts?.length || 0,
+                    items: (d?.posts || []).slice(0, 5).map(p => p.title || p.blog_name || ''),
+                }),
+                kpis: (s) => [
+                    { label: '블로그 수', value: s?.count || 0 },
+                ],
+            },
+        };
+
+        const MODULE_IDS = Object.keys(MODULE_CONFIG);
+
+        // ─── Helper: local date ────────────────────────────
+        function getLocalDate(offset = 0) {
+            const d = new Date();
+            d.setDate(d.getDate() + offset);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function getDayOfWeek(dateStr) {
+            const days = ['일','월','화','수','목','금','토'];
+            return days[new Date(dateStr + 'T00:00:00').getDay()];
+        }
+
+        // ─── Fetch with timeout ─────────────────────────────
+        function fetchWithTimeout(url, timeoutMs = 5000) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+            return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
+        }
+
+        // ─── Fetch helpers ─────────────────────────────────
+        async function fetchModuleData(moduleId, date) {
+            const cfg = MODULE_CONFIG[moduleId];
+            if (!cfg.apiUrl) {
+                // crypto: external APIs
+                if (moduleId === 'crypto') {
+                    try {
+                        const [priceRes, fgRes] = await Promise.all([
+                            fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true', 8000),
+                            fetchWithTimeout('https://api.alternative.me/fng/', 8000),
+                        ]);
+                        const prices = priceRes.ok ? await priceRes.json() : {};
+                        const fg = fgRes.ok ? await fgRes.json() : {};
+                        return {
+                            ...prices,
+                            fear_greed: fg?.data?.[0]?.value || 0,
+                            fear_label: fg?.data?.[0]?.value_classification || '',
+                        };
+                    } catch(e) { return null; }
+                }
+                return null;
+            }
+
+            try {
+                const url = new URL(cfg.apiUrl);
+                if (date) url.searchParams.set('date', date);
+                const res = await fetchWithTimeout(url.toString(), 5000);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch(e) { return null; }
+        }
+
+        // ─── Build mindmap data from summaries ─────────────
+        function buildMindmapData(date, summaries) {
+            const nodes = [
+                { id: 'center', label: `${String(date)}\n시장 종합`, group: 'center', radius: 48, color: '#eab308', fx: null, fy: null },
+            ];
+            const links = [];
+
+            MODULE_IDS.forEach(mid => {
+                const cfg = MODULE_CONFIG[mid];
+                const s = summaries[mid];
+                const status = s ? 'ok' : 'error';
+                const nodeColor = status === 'ok' ? cfg.color : '#475569';
+
+                const label = String(cfg.label || mid);
+
+                nodes.push({
+                    id: mid, label: label, group: 'module', radius: 30,
+                    color: nodeColor, status, moduleId: mid,
+                });
+                links.push({ source: 'center', target: mid });
+
+                // Sub-nodes from KPIs
+                if (s) {
+                    try {
+                        const kpis = cfg.kpis(s);
+                        kpis.forEach((kpi, i) => {
+                            const subId = `${mid}_sub${i}`;
+                            const kpiLabel = String(kpi.label || '');
+                            const kpiValue = String(kpi.value || '');
+                            nodes.push({
+                                id: subId, label: `${kpiLabel}\n${kpiValue}`, group: 'sub',
+                                radius: 17, color: nodeColor + 'cc', moduleId: mid,
+                            });
+                            links.push({ source: mid, target: subId });
+                        });
+                    } catch(e) { window.debugLog(`KPI Error ${mid}: ${e.message}`); }
+                }
+            });
+
+            return { nodes, links };
+        }
+
+        // ─── D3 Force Mind Map Component ───────────────────
+        function D3MindMap({ data, onNodeClick, selectedModule }) {
+            const svgRef = useRef(null);
+            const containerRef = useRef(null);
+            const simRef = useRef(null);
+
+            useEffect(() => {
+                if (!data || !svgRef.current) return;
+
+                const svg = d3.select(svgRef.current);
+                svg.selectAll('*').remove();
+
+                const rect = svgRef.current.parentElement.getBoundingClientRect();
+                const width = rect.width || 800;
+                const height = rect.height || 600;
+
+                svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+                const container = svg.append('g');
+
+                // Zoom
+                const zoom = d3.zoom()
+                    .scaleExtent([0.3, 3])
+                    .on('zoom', (e) => container.attr('transform', e.transform));
+                svg.call(zoom);
+
+                // Store zoom for reset
+                svgRef.current._zoom = zoom;
+                svgRef.current._svg = svg;
+
+                // Deep copy nodes/links
+                const nodes = data.nodes.map(d => ({ ...d }));
+                const links = data.links.map(d => ({ ...d }));
+
+                // Force simulation
+                const sim = d3.forceSimulation(nodes)
+                    .force('link', d3.forceLink(links).id(d => d.id)
+                        .distance(d => {
+                            const src = typeof d.source === 'object' ? d.source : nodes.find(n => n.id === d.source);
+                            return src?.group === 'center' ? 160 : 75;
+                        })
+                        .strength(0.7))
+                    .force('charge', d3.forceManyBody()
+                        .strength(d => d.group === 'center' ? -600 : d.group === 'module' ? -250 : -80))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collision', d3.forceCollide().radius(d => d.radius + 12).strength(0.8))
+                    .alphaDecay(0.025)
+                    .velocityDecay(0.4);
+
+                simRef.current = sim;
+
+                // Links
+                const linkG = container.append('g').attr('class', 'links');
+                const linkEl = linkG.selectAll('line').data(links).join('line')
+                    .attr('stroke', '#334155')
+                    .attr('stroke-width', d => {
+                        const src = typeof d.source === 'object' ? d.source : nodes.find(n => n.id === d.source);
+                        return src?.group === 'center' ? 2 : 1.5;
+                    })
+                    .attr('stroke-opacity', 0.6);
+
+                // Nodes
+                const nodeG = container.append('g').attr('class', 'nodes');
+                const nodeEl = nodeG.selectAll('g').data(nodes).join('g')
+                    .attr('cursor', d => (d.group === 'module' || d.group === 'center') ? 'pointer' : 'default');
+
+                // Circles
+                nodeEl.append('circle')
+                    .attr('r', d => d.radius)
+                    .attr('fill', d => d.color + '25')
+                    .attr('stroke', d => d.color)
+                    .attr('stroke-width', d => d.group === 'center' ? 3 : 2)
+                    .attr('stroke-opacity', d => d.status === 'error' ? 0.3 : 0.8);
+
+                // Glow for center
+                nodeEl.filter(d => d.group === 'center')
+                    .select('circle')
+                    .attr('filter', 'url(#glow)');
+
+                // Glow filter
+                const defs = svg.append('defs');
+                const filter = defs.append('filter').attr('id', 'glow');
+                filter.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'coloredBlur');
+                const merge = filter.append('feMerge');
+                merge.append('feMergeNode').attr('in', 'coloredBlur');
+                merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+                // Labels
+                nodeEl.each(function(d) {
+                    const g = d3.select(this);
+                    // Force string conversion and safe split
+                    const safeLabel = typeof d.label === 'string' ? d.label : String(d.label || '');
+                    const lines = safeLabel.split('\n');
+                    const fontSize = d.group === 'center' ? 13 : d.group === 'module' ? 11 : 9;
+                    lines.forEach((line, i) => {
+                        g.append('text')
+                            .text(line.length > 10 ? line.slice(0, 9) + '…' : line)
+                            .attr('text-anchor', 'middle')
+                            .attr('dy', `${(i - (lines.length-1)/2) * 1.2}em`)
+                            .attr('fill', d.status === 'error' ? '#64748b' : '#e2e8f0')
+                            .attr('font-size', fontSize)
+                            .attr('font-weight', d.group === 'center' ? 700 : 500)
+                            .attr('pointer-events', 'none');
+                    });
+                });
+
+                // Click
+                nodeEl.on('click', (event, d) => {
+                    if (d.group === 'module') onNodeClick(d.moduleId || d.id);
+                    else if (d.group === 'sub') onNodeClick(d.moduleId);
+                    event.stopPropagation();
+                });
+
+                // Double-click → open page
+                nodeEl.on('dblclick', (event, d) => {
+                    const mid = d.moduleId || d.id;
+                    const cfg = MODULE_CONFIG[mid];
+                    if (cfg?.url) window.open(cfg.url, '_blank');
+                    event.stopPropagation();
+                });
+
+                // Drag
+                const drag = d3.drag()
+                    .on('start', (event, d) => {
+                        if (!event.active) sim.alphaTarget(0.3).restart();
+                        d.fx = d.x; d.fy = d.y;
+                    })
+                    .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+                    .on('end', (event, d) => {
+                        if (!event.active) sim.alphaTarget(0);
+                        if (d.group !== 'center') { d.fx = null; d.fy = null; }
+                    });
+                nodeEl.call(drag);
+
+                // Tooltip
+                const tooltip = d3.select(containerRef.current).append('div')
+                    .attr('class', 'd3-tooltip').style('display', 'none');
+
+                nodeEl.on('mouseenter', (event, d) => {
+                    if (d.group === 'sub') return;
+                    const cfg = MODULE_CONFIG[d.moduleId || d.id];
+                    const label = d.group === 'center' ? '전체 시장 종합정리' : `${cfg?.label || d.label} — 클릭: 상세 / 더블클릭: 원본 페이지`;
+                    tooltip.html(label).style('display', 'block');
+                })
+                .on('mousemove', (event) => {
+                    const r = containerRef.current.getBoundingClientRect();
+                    tooltip.style('left', (event.clientX - r.left + 12) + 'px')
+                           .style('top', (event.clientY - r.top - 10) + 'px');
+                })
+                .on('mouseleave', () => tooltip.style('display', 'none'));
+
+                // Tick
+                sim.on('tick', () => {
+                    linkEl.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                          .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    nodeEl.attr('transform', d => `translate(${d.x},${d.y})`);
+                });
+
+                return () => { sim.stop(); tooltip.remove(); };
+            }, [data]);
+
+            // Highlight selected module
+            useEffect(() => {
+                if (!svgRef.current) return;
+                const svg = d3.select(svgRef.current);
+                svg.selectAll('.nodes g circle')
+                    .attr('stroke-width', function() {
+                        const d = d3.select(this.parentNode).datum();
+                        if (!d) return 2;
+                        const isSelected = d.id === selectedModule || d.moduleId === selectedModule;
+                        return isSelected ? 4 : (d.group === 'center' ? 3 : 2);
+                    });
+            }, [selectedModule]);
+
+            return (
+                <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+                    <svg ref={svgRef} />
+                </div>
+            );
+        }
+
+        // ─── Simple Markdown Renderer ──────────────────────
+        function renderMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^- (.+)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                .replace(/<\/ul>\s*<ul>/g, '')
+                .replace(/\n{2,}/g, '<br/><br/>')
+                .replace(/\n/g, '<br/>');
+        }
+
+        // Safe debug log shim
+        window.debugLog = function(msg) {
+            console.log('[App]', msg);
+        };
+
+        // ─── Main App ──────────────────────────────────────
+        function App() {
+            try {
+                // 1. Restore States
+                const [date, setDate] = useState(getLocalDate());
+                const [loading, setLoading] = useState(true);
+                const [loadProgress, setLoadProgress] = useState(0);
+                const [summaries, setSummaries] = useState({});
+                const [mindmapData, setMindmapData] = useState(null);
+                const [selectedModule, setSelectedModule] = useState(null);
+                const [activeTab, setActiveTab] = useState('detail'); 
+                
+                // AI / Summary States
+                const [models, setModels] = useState([]);
+                const [selectedModel, setSelectedModel] = useState('');
+                const [analyzing, setAnalyzing] = useState(false);
+                const [aiSummary, setAiSummary] = useState('');
+                const [userSummary, setUserSummary] = useState('');
+                const [editMode, setEditMode] = useState(false);
+                const [savedDigest, setSavedDigest] = useState(null);
+                const [history, setHistory] = useState([]);
+                const [toast, setToast] = useState(null);
+
+                // Helper
+                const showToast = useCallback((msg, type = 'success') => {
+                    setToast({ msg, type });
+                    setTimeout(() => setToast(null), 3000);
+                }, []);
+                
+                const getDayOfWeek = (d) => {
+                    const days = ['일','월','화','수','목','금','토'];
+                    return days[new Date(d).getDay()];
+                };
+
+                // 2. Load Data Logic
+                const loadData = useCallback(async (targetDate) => {
+                    window.debugLog(`loadData: Starting for ${targetDate}`);
+                    if (!targetDate) {
+                        setLoading(false);
+                        return;
+                    }
+                    setLoading(true);
+                    setLoadProgress(0);
+                    setSelectedModule(null);
+
+                    try {
+                        // Check saved digest
+                        let saved = null;
+                        try {
+                            const res = await fetchWithTimeout(`${API_BASE}/${targetDate}`, 3000);
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data.exists) saved = data;
+                            }
+                        } catch(e) { window.debugLog(`Saved check failed: ${e.message}`); }
+
+                        setSavedDigest(saved);
+                        if (saved) {
+                            setAiSummary(saved.ai_summary || '');
+                            setUserSummary(saved.user_summary || '');
+                        }
+
+                        // Fetch modules
+                        const results = {};
+                        let completed = 0;
+                        const promises = MODULE_IDS.map(async (mid) => {
+                            if (saved?.module_summaries?.[mid]) {
+                                results[mid] = saved.module_summaries[mid];
+                            } else {
+                                try {
+                                    const raw = await fetchModuleData(mid, targetDate);
+                                    if (raw) results[mid] = MODULE_CONFIG[mid].mapToSummary(raw);
+                                } catch(e) {
+                                    window.debugLog(`Error module ${mid}: ${e.message}`);
+                                }
+                            }
+                            completed++;
+                            setLoadProgress(Math.round(completed / MODULE_IDS.length * 100));
+                        });
+
+                        await Promise.allSettled(promises);
+                        setSummaries(results);
+                        
+                        // Mindmap
+                        try {
+                            const mm = buildMindmapData(targetDate, results);
+                            setMindmapData(mm);
+                        } catch(e) { window.debugLog('Mindmap build error: ' + e.message); }
+
+                    } catch (e) {
+                        window.debugLog(`loadData Critical: ${e.message}`);
+                        showToast('Load failed: ' + e.message, 'error');
+                    } finally {
+                        setLoading(false);
+                    }
+                }, []);
+
+                useEffect(() => {
+                    loadData(date);
+                }, [date, loadData]);
+
+                // ── Navigate date
+                const prevDate = () => {
+                    const d = new Date(date + 'T00:00:00');
+                    d.setDate(d.getDate() - 1);
+                    setDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+                };
+                const nextDate = () => {
+                    const d = new Date(date + 'T00:00:00');
+                    d.setDate(d.getDate() + 1);
+                    setDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+                };
+
+                // ── AI Analyze
+                const handleAnalyze = useCallback(async () => {
+                    if (!Object.keys(summaries).length) {
+                        showToast('모듈 데이터가 없습니다', 'error');
+                        return;
+                    }
+                    setAnalyzing(true);
+                    try {
+                        const res = await fetch(`${API_BASE}/ai-analyze`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                date,
+                                module_summaries: summaries,
+                                model: selectedModel || undefined,
+                                source: 'REAL',
+                            }),
+                        });
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({}));
+                            throw new Error(err.detail?.detail || `HTTP ${res.status}`);
+                        }
+                        const result = await res.json();
+                        setAiSummary(result.summary || '');
+                        setActiveTab('summary');
+                        showToast('AI 총평 생성 완료');
+                    } catch (e) {
+                        showToast(`AI 분석 실패: ${e.message}`, 'error');
+                    } finally {
+                        setAnalyzing(false);
+                    }
+                }, [date, summaries, selectedModel, showToast]);
+
+                // ── Save
+                const handleSave = useCallback(async () => {
+                    try {
+                        const payload = {
+                            date,
+                            module_summaries: summaries,
+                            ai_summary: aiSummary,
+                            user_summary: userSummary,
+                            ai_model: selectedModel,
+                            source: 'REAL',
+                        };
+                        const res = await fetch(API_BASE, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                        });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        showToast('저장 완료');
+                        setEditMode(false);
+                        // Refresh history
+                        fetch(`${API_BASE}/history`).then(r => r.json())
+                            .then(d => setHistory(d.dates || []))
+                            .catch(() => {});
+                    } catch (e) {
+                        showToast(`저장 실패: ${e.message}`, 'error');
+                    }
+                }, [date, summaries, aiSummary, userSummary, selectedModel, showToast]);
+
+                // ── Copy
+                const handleCopy = useCallback(() => {
+                    const text = aiSummary || userSummary || '';
+                    navigator.clipboard.writeText(text).then(
+                        () => showToast('클립보드에 복사됨'),
+                        () => showToast('복사 실패', 'error'),
+                    );
+                }, [aiSummary, userSummary, showToast]);
+
+                // ── Zoom controls
+                const handleZoom = (factor) => {
+                    const svgEl = document.querySelector('.mindmap-panel svg');
+                    if (svgEl?._zoom && svgEl?._svg) {
+                        svgEl._svg.transition().duration(300).call(svgEl._zoom.scaleBy, factor);
+                    }
+                };
+                const handleResetZoom = () => {
+                    const svgEl = document.querySelector('.mindmap-panel svg');
+                    if (svgEl?._zoom && svgEl?._svg) {
+                        svgEl._svg.transition().duration(500).call(svgEl._zoom.transform, d3.zoomIdentity);
+                    }
+                };
+
+                // 3. Render Full UI
+                try {
+                // Effect to init icons on render/update
+                useEffect(() => {
+                    if (window.lucide) window.lucide.createIcons();
+                });
+
+                return (
+                    <div className="container">
+                        {/* Header */}
+                        <div className="header">
+                            <div className="header-content">
+                                <div className="header-left">
+                                    <a href="index.html" className="back-btn">← 대시보드</a>
+                                    <div className="logo">
+                                        <div className="logo-icon"><i data-lucide="activity" style={{width:20,height:20,color:'#eab308'}}></i></div>
+                                        시장 종합정리
+                                    </div>
+                                    <div className="date-nav">
+                                        <button onClick={() => {
+                                            const d = new Date(date); d.setDate(d.getDate()-1);
+                                            setDate(d.toISOString().split('T')[0]);
+                                        }}>◀</button>
+                                        <span className="date-display">{date} ({getDayOfWeek(date)})</span>
+                                        <button onClick={() => {
+                                            const d = new Date(date); d.setDate(d.getDate()+1);
+                                            setDate(d.toISOString().split('T')[0]);
+                                        }}>▶</button>
+                                    </div>
+                                    {savedDigest?.source === 'DEMO' && <span className="demo-badge">DEMO</span>}
+                                </div>
+                                <div className="header-right">
+                                    <div className="model-selector">
+                                        <select className="model-select" value={selectedModel}
+                                            onChange={e => setSelectedModel(e.target.value)}>
+                                            {models.length === 0 && <option value="">모델 없음</option>}
+                                            {models.map(m => (
+                                                <option key={m.id} value={m.id}>{m.label} ({m.tier})</option>
+                                            ))}
+                                        </select>
+                                        <button className="ai-btn" onClick={handleAnalyze}
+                                            disabled={analyzing || models.length === 0}>
+                                            {analyzing ? '분석 중...' : 'AI 총평 생성'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Split */}
+                        <div className="main-content">
+                            {/* Left: Mind Map */}
+                            <div className="mindmap-panel">
+                                {loading && (
+                                    <div className="loading-overlay">
+                                        <div style={{color:'#94a3b8',fontSize:'0.9rem'}}>모듈 데이터 로딩 중...</div>
+                                        <div className="loading-bar">
+                                            <div className="loading-bar-fill" style={{width:`${loadProgress}%`}} />
+                                        </div>
+                                        <div style={{color:'#64748b',fontSize:'0.75rem'}}>{loadProgress}%</div>
+                                    </div>
+                                )}
+                                
+                                {!loading && mindmapData && (
+                                    <D3MindMap
+                                        data={mindmapData}
+                                        onNodeClick={(mid) => { setSelectedModule(mid); setActiveTab('detail'); }}
+                                        selectedModule={selectedModule}
+                                    />
+                                )}
+                                
+                                <div className="zoom-controls">
+                                    <button className="zoom-btn" onClick={() => handleZoom(1.3)}>+</button>
+                                    <button className="zoom-btn" onClick={() => handleZoom(0.7)}>−</button>
+                                    <button className="zoom-btn" onClick={handleResetZoom}>Reset</button>
+                                </div>
+                            </div>
+
+                            {/* Right: Detail Panel */}
+                            <div className="detail-panel">
+                                <div className="tab-bar">
+                                    <button className={`tab-btn ${activeTab==='detail'?'active':''}`}
+                                        onClick={() => setActiveTab('detail')}>모듈 상세</button>
+                                    <button className={`tab-btn ${activeTab==='summary'?'active':''}`}
+                                        onClick={() => setActiveTab('summary')}>총평</button>
+                                </div>
+
+                                {activeTab === 'detail' && (
+                                    <div className="detail-card">
+                                        {!selectedModule ? (
+                                            <div className="placeholder">
+                                                <div style={{fontSize:'2rem'}}>👈</div>
+                                                <div>마인드맵에서 모듈을 클릭하세요</div>
+                                                <div style={{fontSize:'0.75rem',color:'#475569'}}>더블클릭: 원본 페이지 열기</div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                            {/* Detail Content */}
+                                            {(() => {
+                                                const selCfg = MODULE_CONFIG[selectedModule];
+                                                const selSummary = summaries[selectedModule];
+                                                return (
+                                                    <>
+                                                        <div className="module-header">
+                                                            <div className="module-icon"
+                                                                style={{background: selCfg.color + '20'}}>
+                                                                <i data-lucide={selCfg.icon} style={{width:20,height:20,color:selCfg.color}}></i>
+                                                            </div>
+                                                            <span className="module-name" style={{color:selCfg.color}}>{selCfg.label}</span>
+                                                            <span className="module-status"
+                                                                style={{
+                                                                    background: selSummary ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+                                                                    color: selSummary ? '#22c55e' : '#ef4444',
+                                                                }}>
+                                                                {selSummary ? 'OK' : 'NO DATA'}
+                                                            </span>
+                                                        </div>
+
+                                                        {selSummary && (
+                                                            <>
+                                                                <div className="kpi-grid">
+                                                                    {selCfg.kpis(selSummary).map((kpi, i) => (
+                                                                        <div className="kpi-item" key={i}>
+                                                                            <div className="kpi-label">{kpi.label}</div>
+                                                                            <div className="kpi-value" style={{color: selCfg.color}}>{kpi.value}</div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+
+                                                                <ul className="data-list">
+                                                                    {selSummary.items?.map((item, i) => (
+                                                                        <li key={i}>{item}</li>
+                                                                    ))}
+                                                                    {selSummary.categories && Object.entries(selSummary.categories).map(([cat, cnt]) => (
+                                                                        <li key={cat}>{cat}: {cnt}건</li>
+                                                                    ))}
+                                                                    {selSummary.modules && typeof selSummary.modules === 'object' &&
+                                                                        Object.entries(selSummary.modules).map(([k, v]) => (
+                                                                            <li key={k}>{k}: {v !== null && v !== undefined ? (typeof v === 'number' ? v.toFixed(1) : v) : 'N/A'}</li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </>
+                                                        )}
+
+                                                        <a href={selCfg.url} target="_blank" className="open-link">
+                                                            원본 페이지 열기 →
+                                                        </a>
+                                                    </>
+                                                );
+                                            })()}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 'summary' && (
+                                    <div className="summary-card">
+                                        <div className="summary-header">
+                                            <span className="summary-title">
+                                                {editMode ? '✏️ 총평 편집' : '💡 시장 총평'}
+                                            </span>
+                                            <div className="summary-actions">
+                                                <button onClick={() => setEditMode(!editMode)}>
+                                                    {editMode ? '보기' : '편집'}
+                                                </button>
+                                                <button onClick={handleCopy}>📋 복사</button>
+                                                <button className="save-btn" onClick={handleSave}>💾 저장</button>
+                                            </div>
+                                        </div>
+
+                                        {editMode ? (
+                                            <>
+                                                <div style={{fontSize:'0.75rem',color:'#64748b',marginBottom:'0.5rem'}}>AI 총평</div>
+                                                <textarea className="summary-textarea" value={aiSummary}
+                                                    onChange={e => setAiSummary(e.target.value)}
+                                                    placeholder="AI 총평 생성 버튼으로 자동 작성하거나 직접 입력하세요..." />
+                                                <div style={{fontSize:'0.75rem',color:'#64748b',marginTop:'0.5rem',marginBottom:'0.25rem'}}>내 메모</div>
+                                                <textarea className="summary-textarea" value={userSummary}
+                                                    onChange={e => setUserSummary(e.target.value)}
+                                                    placeholder="개인 메모, 추가 분석 등을 기록하세요..."
+                                                    style={{minHeight:'100px'}} />
+                                            </>
+                                        ) : (
+                                            <div className="summary-content">
+                                                {aiSummary || userSummary ? (
+                                                    <>
+                                                        {aiSummary && (
+                                                            <div dangerouslySetInnerHTML={{__html: renderMarkdown(aiSummary)}} />
+                                                        )}
+                                                        {userSummary && (
+                                                            <>
+                                                                <h2 style={{marginTop:'1rem'}}>📝 내 메모</h2>
+                                                                <div dangerouslySetInnerHTML={{__html: renderMarkdown(userSummary)}} />
+                                                            </>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div className="placeholder">
+                                                        <div style={{fontSize:'2rem'}}>📝</div>
+                                                        <div>아직 총평이 없습니다</div>
+                                                        <div style={{fontSize:'0.75rem',color:'#475569'}}>
+                                                            "AI 총평 생성" 버튼을 클릭하거나<br/>
+                                                            "편집" 버튼으로 직접 작성하세요
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer: History Chips */}
+                        <div className="footer">
+                            <div className="history-chips">
+                                <span className="history-label">저장 히스토리:</span>
+                                {history.length === 0 && <span style={{fontSize:'0.75rem',color:'#475569'}}>저장된 기록 없음</span>}
+                                {history.map(h => (
+                                    <span key={h.date}
+                                        className={`history-chip ${h.date === date ? 'active' : ''}`}
+                                        onClick={() => setDate(h.date)}>
+                                        {h.date} {h.sentiment ? `(${h.sentiment})` : ''}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Toast */}
+                        {toast && <div className={`toast ${toast.type}`}>{toast.msg}</div>}
+                    </div>
+                );
+
+                } catch(e) {
+                     console.error('Render Error: ' + e.message);
+                     return <div style={{color:'red'}}>Render Error: {e.message}</div>;
+                }
+
+            } catch (e) {
+                console.error('App: Initialization Error: ' + e.message);
+                return <div style={{color:'red'}}>Init Error: {e.message}</div>;
+            }
+        }
+
+
+        
+        // ── Render
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(App, null));
+        } catch(e) {
+            document.getElementById('root').innerHTML =
+                '<div style="color:#ef4444;padding:2rem;">Render Error: ' + e.message + '</div>';
+        }
+    </script>
+
+    <script>
+        // Manual Babel transform + execution
+        (function () {
+            if (!window.Babel) {
+                document.getElementById('root').innerHTML =
+                    '<div style="color:#ef4444;padding:2rem;font-family:monospace;">' +
+                    '<h2>Babel CDN not loaded</h2></div>';
+                return;
+            }
+
+            try {
+                var src = document.getElementById('app-source').textContent;
+                var result = Babel.transform(src, { presets: ['env', 'react'] });
+                (new Function(result.code))();
+            } catch (e) {
+                console.error('Babel/App Error:', e);
+                document.getElementById('root').innerHTML =
+                    '<div style="color:#ef4444;padding:2rem;font-family:monospace;background:#0a0a0a;line-height:1.8;">' +
+                    '<h2 style="margin-bottom:1rem;">Babel/JS Error</h2>' +
+                    '<pre style="white-space:pre-wrap;word-break:break-all;">' +
+                    e.message + (e.loc ? '\nLine: ' + e.loc.line + ', Col: ' + e.loc.column : '') +
+                    '\n\nStack:\n' + (e.stack || '') + '</pre></div>';
+            }
+        })();
+    </script>
+</body>
+
+</html>
