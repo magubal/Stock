@@ -34,8 +34,9 @@ Start-Process -FilePath "python.exe" -ArgumentList "-m http.server 8080" -Window
 ```
 
 ## 5. Tool Usage Integrity (Anti-Workaround)
-**Rule:** When communicating with the user, you must exclusively use the `notify_user` tool or standard conversational responses (when not in a task boundary).
-**Action:** NEVER use `run_command` with `echo`, `print`, or similar commands solely to output messages to the terminal as a workaround for communication restrictions. If you are blocked from using `notify_user`, you should simply provide a standard conversational response. Terminal commands are for system operations, not for chatting with the user.
+**CRITICAL RULE:** A verbal promise to avoid workarounds is weak. To mathematically prevent Quota waste, you are now bound by a **Pre-Execution Cognitive Constraint**.
+**Action:** Before EVERY `run_command` tool call, you MUST evaluate your true intent. If your intent is to inform the user that a task is done (e.g., after a git commit), you MUST abort the tool call. Terminal commands are strictly for system state changes, NEVER for passing messages.
+- **FORBIDDEN:** `echo "Done"`, `echo "Commit finished"`, `print("Continuing...")`
 
 ## 6. Persistent Memory
 **Rule:** This skill should be reviewed at the start of complex coding sessions to ensure operational reliability.
