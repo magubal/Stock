@@ -156,6 +156,64 @@
             min-height: 200px;
         }
 
+        /* 분석 섹션 토글 */
+        .section-toggle {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .section-toggle-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .section-toggle-btn:hover {
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        .section-toggle-arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .section-toggle-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        /* 플라이휠/시장모니터링/프로젝트현황 카드 콘텐츠 높이 제한 + 스크롤 */
+        .scrollable-card .card-content {
+            max-height: 480px;   /* 시장모니터링 8개 항목 기준 높이 */
+            overflow-y: auto;
+        }
+        .scrollable-card .card-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-card .card-content::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 3px;
+        }
+        .scrollable-card .card-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        .scrollable-card .card-content::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        @supports (scrollbar-color: auto) {
+            .scrollable-card .card-content {
+                scrollbar-color: #475569 rgba(30, 41, 59, 0.3);
+                scrollbar-width: thin;
+            }
+        }
+
         .monitoring-link {
             display: flex;
             flex-direction: column;
@@ -875,7 +933,7 @@
             );
         };
 
-        // 플라이휘 실행 현황 컴포넌트
+        // 플라이휠 실행 현황 컴포넌트
         const FlywheelStatus = ({ data }) => {
             return (
                 <div>
@@ -1006,9 +1064,6 @@
                         </div>
                     )}
 
-                    <a href="project_status.html" className="project-view-all" data-testid="project-status-open-default">
-                        전체 개발현황 보기 →
-                    </a>
                 </div>
             );
         };
@@ -1017,6 +1072,7 @@
         const Dashboard = () => {
             const [loading, setLoading] = useState(true);
             const [dashboardData, setDashboardData] = useState({ news: {}, reports: {} });
+            const [analysisOpen, setAnalysisOpen] = useState(true);
 
             useEffect(() => {
                 const loadData = async () => {
@@ -1079,6 +1135,14 @@
                     
                     <div className="dashboard-main">
                         <div className="dashboard-grid">
+                            {/* 분석 섹션 토글 */}
+                            <div className="section-toggle">
+                                <span className="section-toggle-btn" onClick={() => setAnalysisOpen(prev => !prev)}>
+                                    <span className={`section-toggle-arrow ${analysisOpen ? '' : 'collapsed'}`}>▼</span>
+                                </span>
+                            </div>
+
+                            {analysisOpen && <>
                             {/* 투자자 심리 분석 */}
                             <div className="dashboard-card" style={{gridColumn: 'span 2'}}>
                                 <div className="card-header">
@@ -1091,7 +1155,7 @@
                                     <PsychologyMetrics data={dashboardData.news} />
                                 </div>
                             </div>
-                            
+
                             {/* 투자 타이밍 분석 */}
                             <div className="dashboard-card">
                                 <div className="card-header">
@@ -1104,7 +1168,7 @@
                                     <TimingAnalysis data={dashboardData.news} />
                                 </div>
                             </div>
-                            
+
                             {/* 포트폴리오 관리 */}
                             <div className="dashboard-card">
                                 <div className="card-header">
@@ -1117,7 +1181,7 @@
                                     <PortfolioOverview data={dashboardData.reports} />
                                 </div>
                             </div>
-                            
+
                             {/* 기업 평가 워크스페이스 */}
                             <div className="dashboard-card">
                                 <div className="card-header">
@@ -1130,7 +1194,7 @@
                                     <CompanyEvaluation data={dashboardData.reports} />
                                 </div>
                             </div>
-                            
+
                             {/* 맥락 연결 분석기 */}
                             <div className="dashboard-card">
                                 <div className="card-header">
@@ -1143,21 +1207,22 @@
                                     <ContextAnalyzer data={dashboardData.news} />
                                 </div>
                             </div>
-                            
-                            {/* 플라이휘 실행 현황 */}
-                            <div className="dashboard-card">
+                            </>}
+
+                            {/* 플라이휠 실행 현황 */}
+                            <div className="dashboard-card scrollable-card">
                                 <div className="card-header">
                                     <div className="card-icon">
                                         <i data-lucide="refresh-cw"></i>
                                     </div>
-                                    <h3 className="card-title">플라이휘 실행 현황</h3>
+                                    <h3 className="card-title">플라이휠 실행 현황</h3>
                                 </div>
                                 <div className="card-content">
                                     <FlywheelStatus data={{}} />
                                 </div>
                             </div>
 
-                            <div className="dashboard-card">
+                            <div className="dashboard-card scrollable-card">
                                 <div className="card-header">
                                     <div className="card-icon">
                                         <i data-lucide="radio"></i>
@@ -1202,12 +1267,15 @@
                                 </div>
                             </div>
 
-                            <div className="dashboard-card">
-                                <div className="card-header">
+                            <div className="dashboard-card scrollable-card">
+                                <div className="card-header" style={{justifyContent: 'flex-start'}}>
                                     <div className="card-icon">
                                         <i data-lucide="clipboard-list"></i>
                                     </div>
                                     <h3 className="card-title">프로젝트 현황</h3>
+                                    <a href="project_status.html" target="_blank" rel="noopener noreferrer" className="project-view-all" style={{marginLeft: 'auto'}} data-testid="project-status-open-default">
+                                        전체 보기 →
+                                    </a>
                                 </div>
                                 <div className="card-content">
                                     <ProjectStatusPanel />
