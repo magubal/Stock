@@ -9,8 +9,8 @@
             "due": "-",
             "programs": [
                         {
-                                    "name": "naver_blog_collector.py",
-                                    "path": "scripts/naver_blog_collector.py",
+                                    "name": "run_blog.py",
+                                    "path": "scripts/blog_monitor/run_blog.py",
                                     "description": "Related file"
                         },
                         {
@@ -510,44 +510,21 @@
 },
         {
             "id": "REQ-020",
-            "title": "REQ-020 bkit 브레인→PDCA 워크플로우 도입",
+            "title": "REQ-020 Pdca Status Sync (PDCA-010)",
             "status": "완료",
             "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
                         {
-                                    "name": "SKILL.md",
-                                    "path": ".agent/skills/brainstorm-bkit/SKILL.md",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "brain.md",
-                                    "path": ".agent/workflows/brain.md",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "settings.local.json",
-                                    "path": ".claude/settings.local.json",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": ".bkit-memory.json",
-                                    "path": ".bkit-memory.json",
+                                    "name": "(Plan 없음)",
+                                    "path": "(Plan 없음)",
                                     "description": "Related file"
                         }
             ],
             "checklist": [
                         {
-                                    "label": "bkit 도입 수준을 워크플로우 중심(`/brain` → `/pdca`)으로 확정.",
-                                    "done": true
-                        },
-                        {
-                                    "label": "기존 저장소 설정에서 즉시 사용 가능한 경로 확인.",
-                                    "done": true
-                        },
-                        {
-                                    "label": "MCP 연동은 보류(필요 시 차후 확장).",
+                                    "label": "Pdca Status Sync",
                                     "done": true
                         }
             ],
@@ -555,34 +532,21 @@
 },
         {
             "id": "REQ-021",
-            "title": "REQ-021 Intelligence Board Triage v2 체험 개선",
+            "title": "REQ-021 News Intelligence Monitor (PDCA-008)",
             "status": "완료",
             "stage": "완료",
             "owner": "TBD",
             "due": "-",
             "programs": [
                         {
-                                    "name": "idea_board.html",
-                                    "path": "dashboard/idea_board.html",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "idea-board.spec.ts",
-                                    "path": "tests/playwright/tests/idea-board.spec.ts",
+                                    "name": "(Plan 없음)",
+                                    "path": "(Plan 없음)",
                                     "description": "Related file"
                         }
             ],
             "checklist": [
                         {
-                                    "label": "Intelligence Board의 목적(의도/목적) 문구를 화면에 명시.",
-                                    "done": true
-                        },
-                        {
-                                    "label": "실제 사용 체감이 가능한 수준으로 triage UX를 선구현.",
-                                    "done": true
-                        },
-                        {
-                                    "label": "회귀 확인 가능한 최소 테스트 시나리오 추가.",
+                                    "label": "News Intelligence Monitor",
                                     "done": true
                         }
             ],
@@ -590,45 +554,22 @@
 },
         {
             "id": "REQ-022",
-            "title": "REQ-022 Crypto Trends 데이터파싱 버튼 연동",
-            "status": "완료",
-            "stage": "완료",
+            "title": "REQ-022 Oracle Earnings Integration & Growth-Adjusted Moat (PDCA-006)",
+            "status": "검증",
+            "stage": "검증",
             "owner": "TBD",
             "due": "-",
             "programs": [
                         {
-                                    "name": "crypto_trends.html",
-                                    "path": "dashboard/crypto_trends.html",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "crypto_parse.py",
-                                    "path": "backend/app/api/crypto_parse.py",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "main.py",
-                                    "path": "backend/app/main.py",
-                                    "description": "Related file"
-                        },
-                        {
-                                    "name": "crypto-trends-parse.spec.ts",
-                                    "path": "tests/playwright/tests/crypto-trends-parse.spec.ts",
+                                    "name": "oracle-earnings-integration.plan.md",
+                                    "path": "docs/01-plan/features/oracle-earnings-integration.plan.md",
                                     "description": "Related file"
                         }
             ],
             "checklist": [
                         {
-                                    "label": "`crypto_trends.html` 상단 우측에 `데이터파싱` 버튼 추가.",
-                                    "done": true
-                        },
-                        {
-                                    "label": "버튼 클릭 시 파싱 실행(백엔드 API 우선, 미연결 시 프론트 폴백).",
-                                    "done": true
-                        },
-                        {
-                                    "label": "파싱 상태를 사용자에게 표시하고 중복 클릭을 방지.",
-                                    "done": true
+                                    "label": "Oracle Earnings Integration & Growth-Adjusted Moat",
+                                    "done": false
                         }
             ],
             "nextAction": "-"

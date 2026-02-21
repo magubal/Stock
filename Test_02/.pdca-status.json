@@ -17,6 +17,52 @@
       "designPath": "docs/02-design/features/stock-moat-estimator.design.md",
       "matchRate": null,
       "iterationCount": 0
+    },
+    "manual-collector-trigger": {
+      "phase": "archived",
+      "planPath": "docs/01-plan/features/manual-collector-trigger.plan.md",
+      "designPath": "docs/02-design/features/manual-collector-trigger.design.md",
+      "analysisPath": "",
+      "reportPath": "docs/04-report/features/manual-collector-trigger.report.md",
+      "archivedTo": "docs/99-archive/manual-collector-trigger.md",
+      "startedAt": "2026-02-20T09:00:00",
+      "completedAt": "2026-02-20T14:00:00",
+      "matchRate": 100,
+      "owner": "AI Assistant (bkit)",
+      "due": "2026-02-20"
+    },
+    "kill-port-v2-upgrade": {
+      "phase": "archived",
+      "planPath": "docs/01-plan/features/kill-port-v2-upgrade.plan.md",
+      "startedAt": "2026-02-21T10:00:00",
+      "completedAt": "2026-02-21T11:00:00",
+      "matchRate": 100,
+      "owner": "AI Assistant (bkit)",
+      "due": "2026-02-21"
+    },
+    "resilient-blog-collector": {
+      "phase": "archived",
+      "planPath": "docs/01-plan/features/PDCA-026_resilient-blog-collector.plan.md",
+      "designPath": "docs/02-design/features/resilient-blog-collector.design.md",
+      "reportPath": "docs/04-report/features/PDCA-026_resilient-blog-collector.report.md",
+      "startedAt": "2026-02-21T13:00:00",
+      "completedAt": "2026-02-21T15:00:00",
+      "matchRate": 100,
+      "owner": "AI Assistant (bkit)",
+      "due": "2026-02-21"
+    },
+    "blog-attachment-feature": {
+      "phase": "archived",
+      "planPath": "docs/01-plan/features/PDCA-028_blog-attachment-feature.plan.md",
+      "designPath": "docs/02-design/features/blog-attachment-feature.design.md",
+      "analysisPath": "",
+      "reportPath": "docs/04-report/features/PDCA-028_blog-attachment-feature.report.md",
+      "archivedTo": "docs/99-archive/PDCA-028_blog-attachment-feature.md",
+      "startedAt": "2026-02-22T00:00:00",
+      "completedAt": "2026-02-22T02:00:00",
+      "matchRate": 100,
+      "owner": "AI Assistant (bkit)",
+      "due": "2026-02-22"
     }
   },
   "version": "1.5.2",

@@ -9,7 +9,6 @@
 Usage:
     python run_blog.py                 # 수집 + AI 분석
     python run_blog.py --skip-ai       # 수집만 (AI 분석 건너뜀)
-    python run_blog.py --date 2026-02-18  # 특정 날짜 폴더 데이터 DB 등록
 """
 import argparse
 import json
@@ -36,6 +35,30 @@ from app.models.blog_post import BlogPost, BlogSummary
 BLOG_DATA_DIR = ROOT / "data" / "naver_blog_data"
 RSS_LIST_FILE = BLOG_DATA_DIR / "naver_bloger_rss_list.txt"
 KST = timezone(timedelta(hours=9))
+DEFAULT_DAYS = 3  # naver_blog_collector.py와 동일
+
+
+def is_after_cutoff(pub_date_str: str, cutoff_dt: datetime):
+    """pub_date가 cutoff_dt 이후인지 확인.
+
+    Returns:
+        (result, reason)
+        - (True, "within") : N일 이내 (또는 DB 최신글 이후)
+        - (True, "no_date") : pub_date 없음 → 수집 허용
+        - (True, "parse_fail") : 파싱 실패 → 수집 허용
+        - (False, "too_old") : 기준일 초과 → skip
+    """
+    if not pub_date_str or not pub_date_str.strip():
+        return True, "no_date"
+    try:
+        from email.utils import parsedate_to_datetime
+        pub_dt = parsedate_to_datetime(pub_date_str.strip())
+        if pub_dt >= cutoff_dt:
+            return True, "within"
+        else:
+            return False, "too_old"
+    except Exception:
+        return True, "parse_fail"
 
 
 def load_bloggers():
@@ -79,8 +102,13 @@ def load_bloggers():
     return bloggers
 
 
-def collect_and_capture(skip_ai=False):
-    """RSS → 캡처 → DB 저장 → (옵션) AI 분석."""
+def collect_and_capture(skip_ai=False, days=DEFAULT_DAYS):
+    """RSS → 캡처 → DB 저장 → (옵션) AI 분석.
+
+    2-phase 구조:
+      Phase 1: RSS 스캔 + 날짜필터 + dedup → 신규 목록 확정 (빠름)
+      Phase 2: 캡처 + DB 저장 → [PROGRESS] 마커 출력 (느림)
+    """
     bloggers = load_bloggers()
     if not bloggers:
         print("[ERROR] No bloggers configured")
@@ -110,6 +138,58 @@ def collect_and_capture(skip_ai=False):
             })
         return entries
 
+    # ── Phase 1: RSS 스캔 + dedup (캡처 없이 빠르게) ──
+    from sqlalchemy import func
+    pending_items = []  # [(blogger_dict, entry_dict), ...]
+    now_utc = datetime.now(timezone.utc)
+
+    for b in bloggers:
+        print(f"\n  [{b['display_name']}] RSS 스캔 중...")
+        
+        # 블로거별 최신발행일 조회하여 동적 필터링 적용
+        max_pub = session.query(func.max(BlogPost.pub_date)).filter(BlogPost.blogger == b["display_name"]).scalar()
+        base_cutoff = now_utc - timedelta(days=days)
+        if max_pub:
+            if max_pub.tzinfo is None:
+                max_pub = max_pub.replace(tzinfo=timezone.utc)
+            cutoff_dt = max(base_cutoff, max_pub)
+        else:
+            cutoff_dt = base_cutoff
+
+        try:
+            entries = parse_rss_feed(b["rss_url"])
+        except Exception as e:
+            print(f"    [SKIP] RSS error: {e}")
+            continue
+
+        for entry in entries:
+            link = entry.get("link", "")
+            if not link:
+                continue
+
+            # 동적 날짜 필터 적용
+            pub_date_str = entry.get("published", "")
+            within, reason = is_after_cutoff(pub_date_str, cutoff_dt)
+            if not within:
+                continue
+            if reason in ("no_date", "parse_fail"):
+                print(f"    [WARN] pubDate {reason}: {entry.get('title', '')[:40]}")
+
+            existing = session.query(BlogPost).filter(BlogPost.link == link).first()
+            if existing:
+                continue
+            pending_items.append((b, entry))
+
+    total_to_capture = len(pending_items)
+    print(f"\n[PROGRESS] 0/{total_to_capture}")
+    sys.stdout.flush()
+
+    if total_to_capture == 0:
+        print("\n[DONE] New: 0, AI analyzed: 0")
+        session.close()
+        return
+
+    # ── Phase 2: 캡처 + DB 저장 ──
     # Import capture session
     try:
         from final_body_capture import BlogCaptureSession
@@ -125,25 +205,12 @@ def collect_and_capture(skip_ai=False):
         capture_session = BlogCaptureSession()
         capture_session.__enter__()
 
+    last_blogger_name = None
     try:
-        for b in bloggers:
-            print(f"\n  [{b['display_name']}] Fetching RSS...")
+        for b, entry in pending_items:
             try:
-                entries = parse_rss_feed(b["rss_url"])
-            except Exception as e:
-                print(f"    [SKIP] RSS error: {e}")
-                continue
-
-            for entry in entries:
+                last_blogger_name = b["display_name"]
                 link = entry.get("link", "")
-                if not link:
-                    continue
-
-                # 중복 체크
-                existing = session.query(BlogPost).filter(BlogPost.link == link).first()
-                if existing:
-                    continue
-
                 title = entry.get("title", "제목 없음")
                 pub_date = None
                 raw_date = entry.get("published", "")
@@ -182,8 +249,6 @@ def collect_and_capture(skip_ai=False):
                 )
                 session.add(post)
                 session.flush()
-                total_new += 1
-                print(f"    + {title[:50]}")
 
                 # AI analysis
                 if not skip_ai and (text_content or image_path):
@@ -210,8 +275,21 @@ def collect_and_capture(skip_ai=False):
                             print(f"      AI skip: {result['error']}")
                     except Exception as e:
                         print(f"      AI error: {e}")
+                
+                # 개별 단위 성공 시 바로 커밋 (Resilience 확보)
+                session.commit()
+                
+                total_new += 1
+                print(f"[PROGRESS] {total_new}/{total_to_capture}")
+                print(f"    + {title[:50]}")
+                sys.stdout.flush()
 
-            session.commit()
+            except Exception as inner_e:
+                session.rollback()
+                print(f"    [ERROR] Failed to process post '{entry.get('title', '')}': {inner_e}")
+                sys.stdout.flush()
+                continue
+
     finally:
         if capture_session:
             capture_session.__exit__(None, None, None)
@@ -220,85 +298,14 @@ def collect_and_capture(skip_ai=False):
     print(f"\n[DONE] New: {total_new}, AI analyzed: {total_analyzed}")
 
 
-def register_from_files(session, date_str):
-    """기존 파일 데이터를 DB에 등록 (fallback)."""
-    date_dir = BLOG_DATA_DIR / date_str
-    if not date_dir.exists():
-        print(f"[WARN] No data dir: {date_dir}")
-        return
-
-    inserted = 0
-    for json_file in sorted(date_dir.glob("*.json")):
-        try:
-            data = json.loads(json_file.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-
-        link = data.get("link", "")
-        if not link:
-            continue
-
-        existing = session.query(BlogPost).filter(BlogPost.link == link).first()
-        if existing:
-            continue
-
-        stem = json_file.stem
-        image_path = None
-        image_size_kb = 0
-        for ext in (".pdf", ".jpg", ".jpeg", ".png"):
-            candidate = date_dir / f"{stem}{ext}"
-            if candidate.exists():
-                image_path = str(candidate.relative_to(ROOT)).replace("\\", "/")
-                image_size_kb = int(candidate.stat().st_size / 1024)
-                break
-
-        pub_date = None
-        raw_date = data.get("pub_date", "")
-        if raw_date:
-            try:
-                from email.utils import parsedate_to_datetime
-                pub_date = parsedate_to_datetime(raw_date)
-            except Exception:
-                pass
-
-        collected_at = None
-        raw_collected = data.get("collected_date", "")
-        if raw_collected:
-            try:
-                collected_at = datetime.fromisoformat(raw_collected)
-            except Exception:
-                pass
-
-        post = BlogPost(
-            blogger=data.get("blogger", "unknown"),
-            title=data.get("title", stem),
-            link=link,
-            pub_date=pub_date,
-            text_content=None,
-            image_path=image_path,
-            image_size_kb=image_size_kb,
-            collected_at=collected_at,
-            source="COLLECTOR",
-        )
-        session.add(post)
-        inserted += 1
-
-    session.commit()
-    print(f"[FILE] Registered {inserted} posts from {date_dir.name}")
-
-
 def main():
     parser = argparse.ArgumentParser(description="Blog Monitor Batch")
     parser.add_argument("--skip-ai", action="store_true", help="Skip AI analysis")
-    parser.add_argument("--date", type=str, help="Register file data for specific date (YYYY-MM-DD)")
+    parser.add_argument("--days", type=int, default=DEFAULT_DAYS,
+                        help=f"최근 N일 이내 발행 글만 수집 (0=필터없음, 기본={DEFAULT_DAYS})")
     args = parser.parse_args()
 
-    if args.date:
-        session = Session()
-        register_from_files(session, args.date)
-        session.close()
-    else:
-        collect_and_capture(skip_ai=args.skip_ai)
+    collect_and_capture(skip_ai=args.skip_ai, days=args.days)
 
 
 if __name__ == "__main__":

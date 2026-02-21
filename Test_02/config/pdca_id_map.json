@@ -1,6 +1,6 @@
 {
   "_comment": "PDCA feature -> fixed ID mapping. Never reuse deleted IDs.",
-  "_nextId": 26,
+  "_nextId": 29,
   "map": {
     "stock-moat-estimator": 1,
     "evidence-based-moat": 2,
@@ -26,6 +26,9 @@
     "liquidity-stress-monitor": 22,
     "market-daily-digest": 23,
     "manual-collector-trigger": 24,
-    "kill-port-v2-upgrade": 25
+    "kill-port-v2-upgrade": 25,
+    "resilient-blog-collector": 26,
+    "PDCA-026_resilient-blog-collector": 27,
+    "blog-attachment-feature": 28
   }
 }

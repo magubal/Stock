@@ -122,8 +122,8 @@ def feature_name_to_title(name):
 
 def create_lightweight_plan(feature_name, pdca_id):
     """경량 Plan 파일 생성. 이미 있으면 skip."""
-    plan_path = PLAN_DIR / f"{feature_name}.plan.md"
-    relative_path = f"docs/01-plan/features/{feature_name}.plan.md"
+    plan_path = PLAN_DIR / f"PDCA-{pdca_id:03d}_{feature_name}.plan.md"
+    relative_path = f"docs/01-plan/features/PDCA-{pdca_id:03d}_{feature_name}.plan.md"
 
     if plan_path.exists():
         print(f"    Plan 이미 존재: {relative_path}")

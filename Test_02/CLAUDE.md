@@ -16,6 +16,14 @@ Before starting any work, read these files in order:
 
 Previous technical decisions must not be rolled back without explicit user approval.
 
+## Preservation Rule (기존 요건 보존 — 필수)
+
+코드 수정/추가/변경 시 **반드시** 아래를 지킬 것:
+1. **참조 프로그램 확인**: 동일/유사 기능의 기존 프로그램이 있으면 핵심 로직(필터, 검증, 기본값)을 먼저 파악
+2. **기존 요건 보존**: 기존 필터/검증/기본값은 명시적 요청 없이 제거·변경 금지
+3. **영향 범위 최소화**: 요청받은 변경 외의 코드는 건드리지 않음
+4. **변경 내역 보고**: 변경 파일·내용을 명확하게 정리하여 보고
+
 ## Commands
 
 ### Backend
@@ -135,12 +143,15 @@ VS Code: `Ctrl+Shift+P` → `Tasks: Run Task` → `kill-ports-all`
 - **PDCA Feature Registration (MANDATORY)**:
   - AI가 규칙을 skip해도 강제 등록 가능: `python scripts/pdca_auto_register.py`
   - 스크립트가 `.pdca-status.json`에서 planPath 없는 피처를 감지하여:
-    1. 경량 Plan 자동 생성 (`docs/01-plan/features/`)
+    1. 경량 Plan 자동 생성 (`docs/01-plan/features/PDCA-XXX_feature-name.plan.md`)
     2. `.pdca-status.json`에 planPath 등록
     3. `config/pdca_id_map.json`에 PDCA-XXX ID 할당
   - **REQUESTS.md는 대상이 아님** (REQ-XXX는 별도 체계, 다른 AI 인스턴스가 관리)
   - 사전 확인: `python scripts/pdca_auto_register.py --dry-run`
   - `project_status.py`가 `planPath` 기준으로 필터링하므로 planPath 누락 시 대시보드에서 보이지 않음
+- **PDCA Document Naming Convention (MANDATORY)**:
+  - 모든 PDCA 기획/설계/검증 문서를 새로 생성할 때는 **반드시** 파일명에 `PDCA-XXX_` 접두사를 붙여야 합니다. (예: `PDCA-026_resilient-blog-collector.plan.md`)
+  - XXX 숫자 할당은 `config/pdca_id_map.json`을 확인하여 다음 숫자를 사용하고 업데이트합니다.
 
 ## Environment Variables
 

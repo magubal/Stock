@@ -80,5 +80,6 @@ description: >
 
 ## 7) bkit로 handoff
 - 다음 명령: /pdca plan <feature>
+- 생성될 문서의 파일명은 반드시 `docs/01-plan/features/PDCA-XXX_<feature>.plan.md` 규칙을 따르도록 명시 (XXX는 3자리 숫자 ID)
 - plan 문서에 넣을 핵심 포인트(요약 bullet 5~10개)
 - (선택) /pdca design <feature>로 이어갈 설계 포인트 bullet 5~10개

@@ -1,0 +1,148 @@
+[BATCH] Starting stock collection for 144 industries (date=2026-02-19)
+[BATCH] Delay: 4.0~8.0s between industries
+  [  1/144] Advertising Agencies... 20 stocks saved
+  [  2/144] Aerospace & Defense... 20 stocks saved
+  [  3/144] Agricultural Inputs... 14 stocks saved
+  [  4/144] Airlines... 18 stocks saved
+  [  5/144] Airports & Air Services... 8 stocks saved
+  [  6/144] Aluminum... 4 stocks saved
+  [  7/144] Apparel Manufacturing... 20 stocks saved
+  [  8/144] Apparel Retail... 20 stocks saved
+  [  9/144] Asset Management... 20 stocks saved
+  [ 10/144] Auto & Truck Dealerships... 20 stocks saved
+  [ 11/144] Auto Manufacturers... 20 stocks saved
+  [ 12/144] Auto Parts... 20 stocks saved
+  [ 13/144] Banks - Diversified... 19 stocks saved
+  [ 14/144] Banks - Regional... 20 stocks saved
+  [ 15/144] Beverages - Brewers... 7 stocks saved
+  [ 16/144] Beverages - Non-Alcoholic... 18 stocks saved
+  [ 17/144] Beverages - Wineries & Distilleries... 11 stocks saved
+  [ 18/144] Biotechnology... 20 stocks saved
+  [ 19/144] Broadcasting... 14 stocks saved
+  [ 20/144] Building Materials... 17 stocks saved
+  [ 21/144] Building Products & Equipment... 20 stocks saved
+  [ 22/144] Business Equipment & Supplies... 5 stocks saved
+  [ 23/144] Capital Markets... 20 stocks saved
+  [ 24/144] Chemicals... 18 stocks saved
+  [ 25/144] Coking Coal... 5 stocks saved
+  [ 26/144] Communication Equipment... 20 stocks saved
+  [ 27/144] Computer Hardware... 20 stocks saved
+  [ 28/144] Confectioners... 5 stocks saved
+  [ 29/144] Conglomerates... 20 stocks saved
+  [ 30/144] Consulting Services... 20 stocks saved
+  [ 31/144] Consumer Electronics... 18 stocks saved
+  [ 32/144] Copper... 6 stocks saved
+  [ 33/144] Credit Services... 20 stocks saved
+  [ 34/144] Department Stores... 4 stocks saved
+  [ 35/144] Diagnostics & Research... 20 stocks saved
+  [ 36/144] Discount Stores... 9 stocks saved
+  [ 37/144] Drug Manufacturers - General... 20 stocks saved
+  [ 38/144] Drug Manufacturers - Specialty & Generic... 20 stocks saved
+  [ 39/144] Education & Training Services... 20 stocks saved
+  [ 40/144] Electrical Equipment & Parts... 20 stocks saved
+  [ 41/144] Electronic Components... 20 stocks saved
+  [ 42/144] Electronic Gaming & Multimedia... 20 stocks saved
+  [ 43/144] Electronics & Computer Distribution... 8 stocks saved
+  [ 44/144] Engineering & Construction... 20 stocks saved
+  [ 45/144] Entertainment... 20 stocks saved
+  [ 46/144] Farm & Heavy Construction Machinery... 20 stocks saved
+  [ 47/144] Farm Products... 20 stocks saved
+  [ 48/144] Financial Conglomerates... 6 stocks saved
+  [ 49/144] Financial Data & Stock Exchanges... 15 stocks saved
+  [ 50/144] Food Distribution... 13 stocks saved
+  [ 51/144] Footwear & Accessories... 15 stocks saved
+  [ 52/144] Furnishings, Fixtures & Appliances... 20 stocks saved
+  [ 53/144] Gambling... 13 stocks saved
+  [ 54/144] Gold... 20 stocks saved
+  [ 55/144] Grocery Stores... 12 stocks saved
+  [ 56/144] Health Information Services... 20 stocks saved
+  [ 57/144] Healthcare Plans... 11 stocks saved
+  [ 58/144] Home Improvement Retail... 6 stocks saved
+  [ 59/144] Household & Personal Products... 20 stocks saved
+  [ 60/144] Industrial Distribution... 20 stocks saved
+  [ 61/144] Information Technology Services... 20 stocks saved
+  [ 62/144] Insurance - Diversified... 12 stocks saved
+  [ 63/144] Insurance - Life... 19 stocks saved
+  [ 64/144] Insurance - Property & Casualty... 20 stocks saved
+  [ 65/144] Insurance - Reinsurance... 7 stocks saved
+  [ 66/144] Insurance - Specialty... 17 stocks saved
+  [ 67/144] Insurance Brokers... 20 stocks saved
+  [ 68/144] Integrated Freight & Logistics... 20 stocks saved
+  [ 69/144] Internet Content & Information... 20 stocks saved
+  [ 70/144] Internet Retail... 20 stocks saved
+  [ 71/144] Leisure... 20 stocks saved
+  [ 72/144] Lodging... 12 stocks saved
+  [ 73/144] Lumber & Wood Production... 6 stocks saved
+  [ 74/144] Luxury Goods... 11 stocks saved
+  [ 75/144] Marine Shipping... 20 stocks saved
+  [ 76/144] Medical Care Facilities... 20 stocks saved
+  [ 77/144] Medical Devices... 20 stocks saved
+  [ 78/144] Medical Distribution... 11 stocks saved
+  [ 79/144] Medical Instruments & Supplies... 20 stocks saved
+  [ 80/144] Metal Fabrication... 17 stocks saved
+  [ 81/144] Mortgage Finance... 13 stocks saved
+  [ 82/144] Oil & Gas Drilling... 9 stocks saved
+  [ 83/144] Oil & Gas E&P... 20 stocks saved
+  [ 84/144] Oil & Gas Equipment & Services... 20 stocks saved
+  [ 85/144] Oil & Gas Integrated... 19 stocks saved
+  [ 86/144] Oil & Gas Midstream... 20 stocks saved
+  [ 87/144] Oil & Gas Refining & Marketing... 19 stocks saved
+  [ 88/144] Other Industrial Metals & Mining... 20 stocks saved
+  [ 89/144] Other Precious Metals & Mining... 16 stocks saved
+  [ 90/144] Packaged Foods... 20 stocks saved
+  [ 91/144] Packaging & Containers... 20 stocks saved
+  [ 92/144] Paper & Paper Products... 5 stocks saved
+  [ 93/144] Personal Services... 16 stocks saved
+  [ 94/144] Pharmaceutical Retailers... 7 stocks saved
+  [ 95/144] Pollution & Treatment Controls... 17 stocks saved
+  [ 96/144] Publishing... 8 stocks saved
+  [ 97/144] Railroads... 12 stocks saved
+  [ 98/144] Real Estate - Development... 14 stocks saved
+  [ 99/144] Real Estate - Diversified... 3 stocks saved
+  [100/144] Real Estate Services... 20 stocks saved
+  [101/144] Recreational Vehicles... 16 stocks saved
+  [102/144] REIT - Diversified... 17 stocks saved
+  [103/144] REIT - Healthcare Facilities... 17 stocks saved
+  [104/144] REIT - Hotel & Motel... 16 stocks saved
+  [105/144] REIT - Industrial... 17 stocks saved
+  [106/144] REIT - Mortgage... 20 stocks saved
+  [107/144] REIT - Office... 20 stocks saved
+  [108/144] REIT - Residential... 20 stocks saved
+  [109/144] REIT - Retail... 20 stocks saved
+  [110/144] REIT - Specialty... 18 stocks saved
+  [111/144] Rental & Leasing Services... 20 stocks saved
+  [112/144] Residential Construction... 20 stocks saved
+  [113/144] Resorts & Casinos... 18 stocks saved
+  [114/144] Restaurants... 20 stocks saved
+  [115/144] Scientific & Technical Instruments... 20 stocks saved
+  [116/144] Security & Protection Services... 20 stocks saved
+  [117/144] Semiconductor Equipment & Materials... 20 stocks saved
+  [118/144] Semiconductors... 20 stocks saved
+  [119/144] Shell Companies... 20 stocks saved
+  [120/144] Silver... 5 stocks saved
+  [121/144] Software - Application... 20 stocks saved
+  [122/144] Software - Infrastructure... 20 stocks saved
+  [123/144] Solar... 20 stocks saved
+  [124/144] Specialty Business Services... 20 stocks saved
+  [125/144] Specialty Chemicals... 20 stocks saved
+  [126/144] Specialty Industrial Machinery... 20 stocks saved
+  [127/144] Specialty Retail... 20 stocks saved
+  [128/144] Staffing & Employment Services... 17 stocks saved
+  [129/144] Steel... 20 stocks saved
+  [130/144] Telecom Services... 20 stocks saved
+  [131/144] Textile Manufacturing... 4 stocks saved
+  [132/144] Thermal Coal... 6 stocks saved
+  [133/144] Tobacco... 10 stocks saved
+  [134/144] Tools & Accessories... 10 stocks saved
+  [135/144] Travel Services... 19 stocks saved
+  [136/144] Trucking... 16 stocks saved
+  [137/144] Uranium... 12 stocks saved
+  [138/144] Utilities - Diversified... 7 stocks saved
+  [139/144] Utilities - Independent Power Producers... 9 stocks saved
+  [140/144] Utilities - Regulated Electric... 20 stocks saved
+  [141/144] Utilities - Regulated Gas... 16 stocks saved
+  [142/144] Utilities - Regulated Water... 13 stocks saved
+  [143/144] Utilities - Renewable... 20 stocks saved
+  [144/144] Waste Management... 20 stocks saved
+
+[BATCH] Done: 144 industries, 2332 stocks in 1471s

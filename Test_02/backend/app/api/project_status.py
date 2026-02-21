@@ -163,6 +163,11 @@ def _scan_dynamic_features(tracked: dict) -> list:
                 if name.endswith(ext):
                     name = name[:-len(ext)]
                     break
+            
+            # Remove PDCA prefix if present
+            m = re.match(r'^PDCA-\d+_(.*)$', name)
+            if m:
+                name = m.group(1)
                     
             if name in tracked:
                 continue

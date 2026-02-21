@@ -600,6 +600,85 @@
             text-align: center;
         }
 
+        /* Attachments */
+        .attachment-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .attachment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .attachment-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #22c55e;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-upload {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-upload:hover {
+            background: rgba(59, 130, 246, 0.25);
+        }
+
+        .attachment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .attachment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #1e293b;
+            font-size: 0.8rem;
+        }
+
+        .attachment-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.2s;
+            flex-grow: 1;
+        }
+
+        .attachment-link:hover {
+            color: #3b82f6;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0.2rem;
+            transition: color 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: #ef4444;
+        }
+
         /* Loading */
         .loading {
             display: flex;
@@ -682,10 +761,36 @@
         .collect-status-text {
             font-size: 0.75rem;
             color: #94a3b8;
-            max-width: 250px;
+            max-width: 300px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .collect-status-text.done {
+            color: #22c55e;
+        }
+
+        .collect-status-text.running {
+            color: #f59e0b;
+        }
+
+        .collect-progress-bar {
+            width: 80px;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+
+        .collect-progress-fill {
+            height: 100%;
+            background: #f59e0b;
+            border-radius: 2px;
+            transition: width 0.3s;
         }
 
         .btn-collect {
@@ -785,6 +890,11 @@
             // Collapsible sections
             const [showImage, setShowImage] = useState(false);
             const [showText, setShowText] = useState(false);
+
+            // Attachments
+            const [attachments, setAttachments] = useState([]);
+            const [uploading, setUploading] = useState(false);
+            const fileInputRef = useRef(null);
 
             // Collection status state
             const [collectState, setCollectState] = useState({ status: 'idle', message: '대기 중' });
@@ -900,6 +1010,12 @@
                     .catch(() => {
                         setDetailLoading(false);
                     });
+
+                // Fetch attachments
+                fetch(`${API_BASE}/posts/${selectedPostId}/attachments`)
+                    .then(r => r.json())
+                    .then(data => setAttachments(data.attachments || []))
+                    .catch(() => setAttachments([]));
             }, [selectedPostId]);
 
             // ---- Date navigation ----
@@ -978,6 +1094,50 @@
                 setAnalyzing(false);
             }
 
+            // ---- Attachments ----
+            function handleFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file || !selectedPostId) return;
+
+                setUploading(true);
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch(`${API_BASE}/posts/${selectedPostId}/attachments`, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(r => {
+                        if (!r.ok) throw new Error('업로드 실패');
+                        return r.json();
+                    })
+                    .then(() => {
+                        setToast({ message: '파일이 첨부되었습니다.', type: 'success' });
+                        return fetch(`${API_BASE}/posts/${selectedPostId}/attachments`);
+                    })
+                    .then(r => r.json())
+                    .then(data => setAttachments(data.attachments || []))
+                    .catch(err => setToast({ message: err.message, type: 'error' }))
+                    .finally(() => {
+                        setUploading(false);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                    });
+            }
+
+            function handleDeleteAttachment(filename) {
+                if (!confirm(`'${filename}' 파일을 삭제하시겠습니까?`)) return;
+
+                fetch(`${API_BASE}/posts/${selectedPostId}/attachments/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => {
+                        if (!r.ok) throw new Error('삭제 실패');
+                        setToast({ message: '삭제되었습니다.', type: 'success' });
+                        setAttachments(prev => prev.filter(a => a.name !== filename));
+                    })
+                    .catch(err => setToast({ message: err.message, type: 'error' }));
+            }
+
             // ---- Group posts by blogger ----
             function groupPostsByBlogger(postList) {
                 const groups = {};
@@ -1005,8 +1165,13 @@
                             </div>
                             <div className="collect-action-container">
                                 {collectState.message && (
-                                    <span className="collect-status-text" title={collectState.message}>
+                                    <span className={`collect-status-text${collectState.today_count > 0 ? ' done' : ''}${collectState.status === 'running' ? ' running' : ''}`} title={collectState.message}>
                                         {collectState.message}
+                                        {collectState.status === 'running' && collectState.total > 0 && (
+                                            <span className="collect-progress-bar">
+                                                <span className="collect-progress-fill" style={{ width: `${Math.round((collectState.current || 0) / collectState.total * 100)}%` }}></span>
+                                            </span>
+                                        )}
                                     </span>
                                 )}
                                 <button
@@ -1206,6 +1371,53 @@
                                                 </span>
                                             )}
                                         </div>
+                                    </div>
+
+                                    {/* Attachment Section */}
+                                    <div className="attachment-section">
+                                        <div className="attachment-header">
+                                            <div className="attachment-title">
+                                                {'\uD83D\uDCCE'} 첨부 파일 관리
+                                            </div>
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                style={{ display: 'none' }}
+                                                onChange={handleFileUpload}
+                                            />
+                                            <button
+                                                className="btn btn-upload"
+                                                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                                                disabled={uploading}
+                                            >
+                                                {uploading ? '업로드 중...' : '파일 추가'}
+                                            </button>
+                                        </div>
+                                        {attachments.length === 0 ? (
+                                            <div style={{ fontSize: '0.8rem', color: '#64748b', paddingBottom: '0.5rem' }}>첨부된 파일이 없습니다. PC에 있는 관련 자료를 자유롭게 업로드하세요.</div>
+                                        ) : (
+                                            <div className="attachment-list">
+                                                {attachments.map(att => (
+                                                    <div className="attachment-item" key={att.name}>
+                                                        <a
+                                                            href={`http://localhost:8000${att.url}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="attachment-link"
+                                                        >
+                                                            {att.name}
+                                                        </a>
+                                                        <button
+                                                            className="btn-delete"
+                                                            title="삭제"
+                                                            onClick={() => handleDeleteAttachment(att.name)}
+                                                        >
+                                                            {'\u2715'}
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Text Content (collapsible) */}

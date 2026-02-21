@@ -55,7 +55,7 @@
 3. 스케줄러 기반 자동 실행.
 
 #### 관련 파일
-- `scripts/naver_blog_collector.py`
+- `scripts/blog_monitor/run_blog.py`
 - `scripts/final_body_capture.py`
 - `data/naver_blog_data/naver_bloger_rss_list.txt`
 

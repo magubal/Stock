@@ -29,7 +29,8 @@
     "news_intelligence_service.py",
     "crypto_monitor",
     "dev",
-    "blog_monitor"
+    "blog_monitor",
+    "resilient-blog-collector"
   ],
   "primaryFeature": "oracle-earnings-integration",
   "features": {
@@ -417,6 +418,29 @@
         "lastUpdated": "2026-02-19T15:53:19.203Z"
       },
       "lastFile": "f:\\PSJ\\AntigravityWorkPlace\\Stock\\Test_02\\scripts\\blog_monitor\\verify_e2e.py"
+    },
+    "resilient-blog-collector": {
+      "phase": "archived",
+      "planPath": "docs/01-plan/features/PDCA-026_resilient-blog-collector.plan.md",
+      "startedAt": "2026-02-21T11:54:05Z",
+      "doCompletedAt": "2026-02-21T12:39:25Z",
+      "checkCompletedAt": "2026-02-21T12:39:25Z",
+      "archivedAt": "2026-02-21T12:39:25Z",
+      "matchRate": 100,
+      "iterationCount": 0
+    },
+    "kill-port-v2-upgrade": {
+      "phase": "archived",
+      "startedAt": "2026-02-19T11:00:00Z",
+      "planPath": "docs/01-plan/features/kill-port-v2-upgrade.plan.md",
+      "designPath": "docs/02-design/features/kill-port-v2-upgrade.design.md",
+      "analysisPath": "docs/03-analysis/features/kill-port-v2-upgrade.analysis.md",
+      "reportPath": "docs/04-report/features/kill-port-v2-upgrade.report.md",
+      "doCompletedAt": "2026-02-21T12:47:30Z",
+      "checkCompletedAt": "2026-02-21T12:47:30Z",
+      "archivedAt": "2026-02-21T12:47:30Z",
+      "matchRate": 100,
+      "iterationCount": 0
     }
   },
   "pipeline": {

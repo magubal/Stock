@@ -178,7 +178,7 @@ class NaverBlogCollector:
             print(f"블로그 내용 추출 실패 {blog_url}: {e}")
             return {'title': '', 'description': '', 'content': '', 'images': []}
     
-    def collect_blogger_posts(self, blogger_info: Dict, max_posts: int = 10, days: int = 7) -> List[Dict]:
+    def collect_blogger_posts(self, blogger_info: Dict, max_posts: int = 10, days: int = 3) -> List[Dict]:
         """개별 블로거의 최신 게시물 수집
 
         Args:
@@ -284,7 +284,7 @@ class NaverBlogCollector:
         else:
             print(f"  → 실패: {capture_result['message']}")
     
-    def collect_all(self, max_posts_per_blogger: int = 10, days: int = 7):
+    def collect_all(self, max_posts_per_blogger: int = 10, days: int = 3):
         """모든 블로거의 데이터 수집 (브라우저 재사용)
 
         Args:
@@ -367,7 +367,7 @@ class NaverBlogCollector:
         with open(summary_file, 'w', encoding='utf-8') as f:
             json.dump(summary, f, ensure_ascii=False, indent=2)
     
-    def get_recent_posts(self, days: int = 7) -> Dict:
+    def get_recent_posts(self, days: int = 3) -> Dict:
         """최근 일자별 게시물 요약 가져오기"""
         summary_file = self.index_dir / "daily_summary.json"
         
@@ -393,8 +393,8 @@ def main():
     """메인 실행 함수"""
     import argparse
     parser = argparse.ArgumentParser(description="네이버 블로그 수집기")
-    parser.add_argument("--days", type=int, default=7,
-                        help="최근 N일 이내 발행 글만 수집 (0=필터없음, 기본=7)")
+    parser.add_argument("--days", type=int, default=3,
+                        help="최근 N일 이내 발행 글만 수집 (0=필터없음, 기본=3)")
     parser.add_argument("--max-posts", type=int, default=10,
                         help="블로거당 RSS 최대 아이템 수 (기본=10)")
     args = parser.parse_args()

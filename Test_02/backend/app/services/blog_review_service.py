@@ -204,6 +204,20 @@ def get_available_dates(db: Session, limit: int = 30):
     return [str(r[0]) for r in rows if r[0]]
 
 
+def get_today_count(db: Session, date_str: str) -> int:
+    """오늘 수집된 블로그 글 수."""
+    try:
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        return 0
+    start = dt.replace(hour=0, minute=0, second=0)
+    end = dt.replace(hour=23, minute=59, second=59)
+    return db.query(sa_func.count(BlogPost.id)).filter(
+        BlogPost.collected_at >= start,
+        BlogPost.collected_at <= end,
+    ).scalar() or 0
+
+
 def resolve_image_path(image_path: str) -> Path:
     """이미지 경로를 안전하게 resolve."""
     if not image_path:

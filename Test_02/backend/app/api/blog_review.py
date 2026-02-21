@@ -8,9 +8,13 @@ GET  /bloggers       - 블로거 목록
 GET  /dates          - 수집된 날짜 목록
 """
 
+import os
+import shutil
+import re
 import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, UploadFile, File
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -34,15 +38,17 @@ class SummaryUpdate(BaseModel):
 import time
 
 def run_collection_process():
-    """Background task to run the python script and manage the lock."""
+    """Background task: RSS수집 → 캡처 → DB저장 (run_blog.py 사용)."""
     # Ensure data dir exists
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Create absolute paths
     base_dir = Path(__file__).resolve().parent.parent.parent.parent
-    scripts_dir = base_dir / "scripts"
-    script_path = scripts_dir / "naver_blog_collector.py"
-    
+    script_path = base_dir / "scripts" / "blog_monitor" / "run_blog.py"
+    # venv Python 사용 (시스템 Python에는 sqlalchemy 없음)
+    venv_python = base_dir / "backend" / "venv" / "Scripts" / "python.exe"
+    python_cmd = str(venv_python) if venv_python.exists() else sys.executable
+
     # Write PID into lock file
     with open(LOCK_FILE, "w") as f:
         f.write("running")
@@ -50,7 +56,7 @@ def run_collection_process():
     try:
         with open(base_dir / LOG_FILE, "w", encoding="utf-8") as out_file:
             process = subprocess.Popen(
-                ["python", str(script_path)],
+                [python_cmd, str(script_path), "--skip-ai"],
                 stdout=out_file,
                 stderr=subprocess.STDOUT,
                 cwd=str(base_dir)
@@ -78,32 +84,51 @@ async def trigger_collection(background_tasks: BackgroundTasks):
 
 
 @router.get("/collect/status")
-async def get_collection_status():
-    """현재 블로그 수집 프로세스의 파싱 상태 반환"""
+async def get_collection_status(db: Session = Depends(get_db)):
+    """현재 블로그 수집 프로세스의 파싱 상태 반환 + idle 시 오늘 수집 건수"""
     base_dir = Path(__file__).resolve().parent.parent.parent.parent
     log_file_path = base_dir / LOG_FILE
-    
+
     if not LOCK_FILE.exists():
-        return {"status": "idle", "message": "대기 중"}
-        
+        # 오늘 수집 건수 조회
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime("%Y-%m-%d")
+        today_count = svc.get_today_count(db, today)
+        if today_count > 0:
+            message = f"오늘 {today_count}건 수집완료"
+        else:
+            message = "수집 대기"
+        return {"status": "idle", "message": message, "today_count": today_count}
+
     status_msg = "수집 진행 중..."
+    current = 0
+    total = 0
     if log_file_path.exists():
         try:
             with open(log_file_path, "r", encoding="utf-8") as f:
-                # Read last 10 lines
                 lines = f.readlines()
-                if lines:
-                    last_lines = lines[-10:]
-                    # Find a meaningful last line
-                    for line in reversed(last_lines):
-                        line = line.strip()
-                        if line:
-                            status_msg = line
-                            break
+                # [PROGRESS] 마커에서 진행률 파싱 (마지막 것 사용)
+                for line in reversed(lines[-30:]):
+                    stripped = line.strip()
+                    m = re.match(r"\[PROGRESS]\s+(\d+)/(\d+)", stripped)
+                    if m:
+                        current = int(m.group(1))
+                        total = int(m.group(2))
+                        if total == 0:
+                            status_msg = "RSS 스캔 중..."
+                        elif current >= total:
+                            status_msg = f"수집 완료 처리 중... ({current}/{total})"
+                        else:
+                            status_msg = f"수집 중 ({current}/{total})"
+                        break
         except Exception:
             pass
-            
-    return {"status": "running", "message": status_msg}
+
+    result = {"status": "running", "message": status_msg}
+    if total > 0:
+        result["current"] = current
+        result["total"] = total
+    return result
 
 
 @router.get("/posts")
@@ -194,3 +219,95 @@ async def get_dates(
 ):
     """수집된 날짜 목록."""
     return svc.get_available_dates(db, limit)
+
+
+def _get_attachment_dir(post_id: int, detail: dict) -> Path:
+    """첨부 파일 저장 대상 OS 폴더 추출 헬퍼"""
+    date_str = None
+    
+    # 1. image_path에서 YYYY-MM-DD 추출 시도 (예: "data/naver_blog_data/2026-02-21/블로거_글/...")
+    if detail.get("image_path"):
+        m = re.search(r"(\d{4}-\d{2}-\d{2})", detail["image_path"])
+        if m:
+            date_str = m.group(1)
+            
+    # 2. image_path에 없으면 collected_at에서 추출
+    if not date_str and detail.get("collected_at"):
+        date_str = detail["collected_at"][:10]
+        
+    # 3. 최후의 보루: 오늘 날짜
+    if not date_str:
+        date_str = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+        
+    base_dir = Path(__file__).resolve().parent.parent.parent.parent
+    return base_dir / "data" / "naver_blog_data" / date_str / f"{post_id}_첨부"
+
+@router.get("/posts/{post_id}/attachments")
+async def get_attachments(post_id: int, db: Session = Depends(get_db)):
+    """첨부 파일 목록 동적 스캔 반환"""
+    detail = svc.get_post_detail(db, post_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Post not found")
+        
+    target_dir = _get_attachment_dir(post_id, detail)
+    files = []
+    if target_dir.exists() and target_dir.is_dir():
+        for filename in os.listdir(target_dir):
+            if os.path.isfile(target_dir / filename):
+                files.append({
+                    "name": filename,
+                    "url": f"/api/v1/blog-review/posts/{post_id}/attachments/{filename}"
+                })
+                
+    return {"attachments": files}
+
+
+@router.post("/posts/{post_id}/attachments")
+async def upload_attachment(post_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """새로운 첨부 파일 업로드"""
+    detail = svc.get_post_detail(db, post_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Post not found")
+        
+    target_dir = _get_attachment_dir(post_id, detail)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    
+    file_path = target_dir / file.filename
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    return {"message": "success", "filename": file.filename}
+
+
+@router.get("/posts/{post_id}/attachments/{filename}")
+async def download_attachment(post_id: int, filename: str, db: Session = Depends(get_db)):
+    """첨부 파일 다운로드/서빙"""
+    detail = svc.get_post_detail(db, post_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Post not found")
+        
+    target_dir = _get_attachment_dir(post_id, detail)
+    file_path = target_dir / filename
+    
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+        
+    # Content-Disposition 헤더 세팅을 위해 FileResponse 대신 직접 파일 리턴 (미디어타입 추론)
+    return FileResponse(str(file_path), filename=filename)
+
+
+@router.delete("/posts/{post_id}/attachments/{filename}")
+async def delete_attachment(post_id: int, filename: str, db: Session = Depends(get_db)):
+    """첨부 파일 삭제"""
+    detail = svc.get_post_detail(db, post_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Post not found")
+        
+    target_dir = _get_attachment_dir(post_id, detail)
+    file_path = target_dir / filename
+    
+    if file_path.exists() and file_path.is_file():
+        os.remove(file_path)
+        return {"message": "deleted"}
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
